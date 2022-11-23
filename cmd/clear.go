@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/metafates/go-template/color"
-	"github.com/metafates/go-template/constant"
-	"github.com/metafates/go-template/filesystem"
-	"github.com/metafates/go-template/icon"
-	"github.com/metafates/go-template/style"
-	"github.com/metafates/go-template/util"
-	"github.com/metafates/go-template/where"
+	"github.com/vivi-app/vivi/color"
+	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/icon"
+	"github.com/vivi-app/vivi/style"
+	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/where"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 )

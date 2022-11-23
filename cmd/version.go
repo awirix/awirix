@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	"github.com/metafates/go-template/color"
-	"github.com/metafates/go-template/style"
+	"github.com/vivi-app/vivi/color"
+	"github.com/vivi-app/vivi/style"
 	"github.com/samber/lo"
 	"html/template"
 	"runtime"
 
-	"github.com/metafates/go-template/constant"
+	"github.com/vivi-app/vivi/constant"
 	"github.com/spf13/cobra"
 )
 

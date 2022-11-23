@@ -1,7 +1,7 @@
 package where
 
 import (
-	"github.com/metafates/go-template/constant"
+	"github.com/vivi-app/vivi/constant"
 	"strings"
 )
 

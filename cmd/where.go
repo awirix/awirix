@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"github.com/metafates/go-template/color"
-	"github.com/metafates/go-template/constant"
-	"github.com/metafates/go-template/style"
-	"github.com/metafates/go-template/where"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"github.com/vivi-app/vivi/color"
+	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/style"
+	"github.com/vivi-app/vivi/where"
 	"os"
 )
 
@@ -19,6 +19,7 @@ type whereTarget struct {
 
 // Specify what paths to show
 var wherePaths = []whereTarget{
+	{"Downloads", where.Downloads, "d", "downloads"},
 	{"Config", where.Config, "c", "config"},
 	{"Logs", where.Logs, "l", "logs"},
 }

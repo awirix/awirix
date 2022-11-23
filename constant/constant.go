@@ -2,7 +2,7 @@ package constant
 
 const (
 	// App is the name of the application
-	App = "app"
+	App = "vivi"
 
 	// Version is the version of the application
 	Version = "0.0.1"
@@ -11,4 +11,3 @@ const (
 	// Available options are: json, yaml, toml
 	ConfigFormat = "toml"
 )
-

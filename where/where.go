@@ -1,8 +1,9 @@
 package where
 
 import (
-	"github.com/metafates/go-template/constant"
 	"github.com/samber/lo"
+	"github.com/spf13/viper"
+	"github.com/vivi-app/vivi/constant"
 	"os"
 	"path/filepath"
 )
@@ -44,4 +45,16 @@ func Cache() string {
 func Temp() string {
 	tempDir := filepath.Join(os.TempDir(), constant.PrefixTemp)
 	return mkdir(tempDir)
+}
+
+func Downloads() string {
+	path := viper.GetString(constant.DownloaderPath)
+	path = os.ExpandEnv(path)
+	absPath, err := filepath.Abs(path)
+
+	if err == nil {
+		path = absPath
+	}
+
+	return mkdir(path)
 }

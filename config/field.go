@@ -2,15 +2,15 @@ package config
 
 import (
 	"fmt"
-	"github.com/metafates/go-template/constant"
-	"github.com/metafates/go-template/style"
+	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/style"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
 	"reflect"
 	"strings"
 	"text/template"
 
-	"github.com/metafates/go-template/color"
+	"github.com/vivi-app/vivi/color"
 )
 
 type Field struct {

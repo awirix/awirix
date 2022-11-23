@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/metafates/go-template/constant"
 	"github.com/spf13/viper"
+	"github.com/vivi-app/vivi/constant"
 )
 
 // fields is the config fields with their default values and descriptions
@@ -21,6 +21,14 @@ Available options are: (from less to most verbose)
 panic, fatal, error, warn, info, debug, trace`,
 	},
 	// END LOGS
+
+	// DOWNLOADER
+	{
+		constant.DownloaderPath,
+		".",
+		"Path to the downloader executable",
+	},
+	// END DOWNLOADER
 }
 
 func setDefaults() {

@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/metafates/go-template/cmd"
-	"github.com/metafates/go-template/config"
-	"github.com/metafates/go-template/log"
+	"github.com/vivi-app/vivi/cmd"
+	"github.com/vivi-app/vivi/config"
+	"github.com/vivi-app/vivi/log"
 	"github.com/samber/lo"
 )
 

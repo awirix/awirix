@@ -3,9 +3,9 @@ package log
 import (
 	"errors"
 	"fmt"
-	"github.com/metafates/go-template/constant"
-	"github.com/metafates/go-template/filesystem"
-	"github.com/metafates/go-template/where"
+	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/where"
 	"github.com/samber/lo"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
