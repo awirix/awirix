@@ -3,7 +3,9 @@ module github.com/vivi-app/vivi
 go 1.19
 
 require (
+	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/charmbracelet/lipgloss v0.6.0
+	github.com/google/go-github/v48 v48.1.0
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/ka-weihe/fast-levenshtein v0.0.0-20201227151214-4c99ee36a1ba
 	github.com/pelletier/go-toml/v2 v2.0.6
@@ -17,12 +19,9 @@ require (
 )
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.3.6 // indirect
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
-	github.com/emvi/iso-639-1 v1.0.1 // indirect
 	github.com/fatih/color v1.13.0 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
-	github.com/google/go-github/v48 v48.1.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
