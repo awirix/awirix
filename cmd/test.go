@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/pelletier/go-toml/v2"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/vivi-app/vivi/constant"
@@ -17,9 +16,6 @@ func init() {
 	rootCmd.AddCommand(testCmd)
 
 	testCmd.Flags().BoolP("passport", "p", false, "test passport")
-	testCmd.Flags().BoolP("run", "r", false, "run scraper")
-
-	testCmd.MarkFlagsMutuallyExclusive("passport", "run")
 }
 
 var testCmd = &cobra.Command{
@@ -41,11 +37,6 @@ var testCmd = &cobra.Command{
 
 		return nil
 	},
-	PreRun: func(cmd *cobra.Command, args []string) {
-		if !cmd.Flags().Changed("passport") && !cmd.Flags().Changed("run") {
-			handleErr(fmt.Errorf("either --passport or --run flag must be set"))
-		}
-	},
 	Run: func(cmd *cobra.Command, args []string) {
 		path := args[0]
 
@@ -53,21 +44,10 @@ var testCmd = &cobra.Command{
 		handleErr(err)
 
 		if lo.Must(cmd.Flags().GetBool("passport")) {
-			if isDir {
-				path = filepath.Join(path, constant.Passport)
-			}
-
-			data, err := filesystem.Api().ReadFile(path)
+			p, err := passport.FromPath(path)
 			handleErr(err)
-
-			var passport passport.Passport
-			err = toml.Unmarshal(data, &passport)
-			handleErr(err)
-
-			handleErr(passport.Validate())
-
-			fmt.Println(passport.String())
-		} else if lo.Must(cmd.Flags().GetBool("run")) {
+			fmt.Println(p.String())
+		} else {
 			if isDir {
 				path = filepath.Join(path, constant.Scraper)
 			}

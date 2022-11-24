@@ -1,16 +1,27 @@
 package vivi
 
-import lua "github.com/yuin/gopher-lua"
+import (
+	"github.com/vivi-app/vivi/constant"
+	lua "github.com/yuin/gopher-lua"
+)
 
 func Preload(L *lua.LState) {
-	L.PreloadModule(`vivi`, Loader)
+	L.PreloadModule(constant.App, Loader)
 }
 
 func Loader(L *lua.LState) int {
 	t := L.NewTable()
-	L.SetFuncs(t, api)
+
+	t.RawSet(lua.LString("api"), NewTableWithFuncs(L, api))
+
 	L.Push(t)
 	return 1
+}
+
+func NewTableWithFuncs(L *lua.LState, funcMap map[string]lua.LGFunction) *lua.LTable {
+	t := L.NewTable()
+	L.SetFuncs(t, funcMap)
+	return t
 }
 
 var api = map[string]lua.LGFunction{

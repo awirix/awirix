@@ -19,7 +19,8 @@ func Bg(color lipgloss.Color) func(string) string {
 }
 
 var (
-	Faint  = New().Faint(true).Render
-	Bold   = New().Bold(true).Render
-	Italic = New().Italic(true).Render
+	Faint     = New().Faint(true).Render
+	Bold      = New().Bold(true).Render
+	Italic    = New().Italic(true).Render
+	Underline = New().Underline(true).Render
 )

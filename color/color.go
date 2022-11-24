@@ -3,6 +3,10 @@ package color
 import "github.com/charmbracelet/lipgloss"
 
 const (
+	Pink = lipgloss.Color("#ff79c6")
+)
+
+const (
 	Red    = lipgloss.Color("1")
 	Green  = lipgloss.Color("2")
 	Yellow = lipgloss.Color("3")

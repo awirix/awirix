@@ -431,7 +431,7 @@ func (v *Version) UnmarshalJSON(b []byte) error {
 }
 
 // MarshalJSON implements JSON.Marshaler interface.
-func (v Version) MarshalJSON() ([]byte, error) {
+func (v *Version) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.String())
 }
 
@@ -450,7 +450,7 @@ func (v *Version) UnmarshalText(b []byte) error {
 	return nil
 }
 
-func (v Version) MarshalText() ([]byte, error) {
+func (v *Version) MarshalText() ([]byte, error) {
 	return []byte(v.String()), nil
 }
 
