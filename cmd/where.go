@@ -20,6 +20,7 @@ type whereTarget struct {
 // Specify what paths to show
 var wherePaths = []whereTarget{
 	{"Downloads", where.Downloads, "d", "downloads"},
+	{"Extensions", where.Extensions, "e", "extensions"},
 	{"Config", where.Config, "c", "config"},
 	{"Logs", where.Logs, "l", "logs"},
 }

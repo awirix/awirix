@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	cc "github.com/ivanpirog/coloredcobra"
+	"github.com/spf13/cobra"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
@@ -10,7 +11,6 @@ import (
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/where"
-	"github.com/spf13/cobra"
 	"os"
 	"strings"
 )
@@ -18,7 +18,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     strings.ToLower(constant.App),
-	Short:   "App description",
+	Short:   "Multimedia Metascraper",
 	Version: constant.Version,
 }
 

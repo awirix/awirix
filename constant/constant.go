@@ -8,6 +8,10 @@ const (
 	Version = "0.0.1"
 
 	// ConfigFormat is the format of the config file
-	// Available options are: json, yaml, toml
 	ConfigFormat = "toml"
+)
+
+const (
+	Passport = "passport.toml"
+	Scraper  = "scraper.lua"
 )

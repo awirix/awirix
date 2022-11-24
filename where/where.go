@@ -58,3 +58,7 @@ func Downloads() string {
 
 	return mkdir(path)
 }
+
+func Extensions() string {
+	return mkdir(filepath.Join(Config(), "extensions"))
+}
