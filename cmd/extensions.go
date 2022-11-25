@@ -8,6 +8,7 @@ import (
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/extension"
+	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/style"
@@ -42,7 +43,7 @@ var extensionsNewCmd = &cobra.Command{
 			"%s Created %s extension for %s domain\n",
 			style.Fg(color.Green)(icon.Check),
 			style.Fg(color.Purple)(ext.String()),
-			style.New().Foreground(color.Yellow).Bold(true).Render(string(ext.GetPassport().Domain)),
+			style.New().Foreground(color.Yellow).Bold(true).Render(string(ext.Passport().Domain)),
 		)
 
 		if printPath := lo.Must(cmd.Flags().GetBool("print-path")); printPath {
@@ -64,7 +65,7 @@ var extensionsListCmd = &cobra.Command{
 		var byDomain = make(map[passport.Domain][]*extension.Extension)
 
 		for _, ext := range extensions {
-			byDomain[ext.GetPassport().Domain] = append(byDomain[ext.GetPassport().Domain], ext)
+			byDomain[ext.Passport().Domain] = append(byDomain[ext.Passport().Domain], ext)
 		}
 
 		printForDomain := func(d passport.Domain) {
@@ -80,8 +81,8 @@ var extensionsListCmd = &cobra.Command{
 				fmt.Printf(
 					"%s %s %s\n",
 					style.Fg(color.Purple)(e.String()),
-					style.Bold(e.GetPassport().Version.String()),
-					style.Faint(e.GetPassport().About),
+					style.Bold(e.Passport().Version.String()),
+					style.Faint(e.Passport().About),
 				)
 			}
 		}
@@ -108,8 +109,9 @@ func init() {
 }
 
 var extensionsRemoveCmd = &cobra.Command{
-	Use:   "remove",
-	Short: "Remove an extension",
+	Use:     "remove",
+	Short:   "Remove an extension",
+	Aliases: []string{"rm"},
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions := extension.ListInstalled()
 
@@ -166,5 +168,52 @@ var extensionsRemoveCmd = &cobra.Command{
 			style.Fg(color.Green)(icon.Check),
 			util.Quantify(len(selected), "extension", "extensions"),
 		)
+	},
+}
+
+func init() {
+	extensionsCmd.AddCommand(extensionsRunCmd)
+}
+
+var extensionsRunCmd = &cobra.Command{
+	Use:   "run",
+	Short: "Run an extension for the testing purposes",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		path := args[0]
+
+		isDir, err := filesystem.Api().IsDir(path)
+		handleErr(err)
+
+		if !isDir {
+			handleErr(fmt.Errorf("path %s is not a directory", path))
+			return
+		}
+
+		ext, err := extension.FromPath(path)
+		handleErr(err)
+
+		// Script will be executed when it's loaded
+		// I don't like this behavior, but it cannot be avoided, so let's use it as it is
+		err = ext.LoadScraper()
+		handleErr(err)
+	},
+}
+
+func init() {
+	extensionsCmd.AddCommand(extensionsInfoCmd)
+}
+
+var extensionsInfoCmd = &cobra.Command{
+	Use:   "info",
+	Short: "Show extension info",
+	Args:  cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		path := args[0]
+
+		ext, err := extension.FromPath(path)
+		handleErr(err)
+
+		fmt.Println(ext.Passport().Info())
 	},
 }

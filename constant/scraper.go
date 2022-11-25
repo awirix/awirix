@@ -1,8 +1,8 @@
 package constant
 
 const (
-	ModuleScraper = "scraper"
-	ModuleTest    = "test"
+	ModuleScraper = "Scraper"
+	ModuleTest    = "Test"
 )
 
 const (

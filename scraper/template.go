@@ -9,10 +9,12 @@ import (
 	"text/template"
 )
 
-var templateVideo = lo.Must(template.New("video").Parse(`local {{ .Module }} = { {{ .Field.HasSearch }} = true }
+var templateVideo = lo.Must(template.New("video").Parse(`-- vim:ts=3 ss=3 sw=3 expandtab
 
---- @alias {{ .Noun.Singular }} { ['str']: string, [any]: any }
---- @alias episode { ['str']: string, [any]: any }
+{{ .Module }} = { {{ .Field.HasSearch }} = true }
+
+--- @alias {{ .Noun.Singular }} { ['string']: string, [any]: any }
+--- @alias episode { ['string']: string, [any]: any }
 
 --- Searches for the {{ .Noun.Plural }}
 --- @param query string The query to search for.
@@ -48,8 +50,7 @@ function {{ .Module }}.{{ .Fn.Download }}(episode)
 end
 
 return {{ .Module }}
-
--- vim:ts=3 ss=3 sw=3 expandtab`))
+`))
 
 func GenerateTemplate(domain passport.Domain) (string, error) {
 	type Noun struct {
@@ -107,3 +108,20 @@ func GenerateTemplate(domain passport.Domain) (string, error) {
 
 	return b.String(), nil
 }
+
+var TemplateTest = fmt.Sprintf(`-- vim:ts=3 ss=3 sw=3 expandtab
+
+%[1]s = {}
+
+require('%[2]s')
+
+function %[1]s.%[3]s()
+   assert(2 + 2 == 4, "2 + 2 should be 4")
+end
+
+return %[1]s
+`,
+	constant.ModuleTest,
+	constant.ModuleScraper,
+	constant.FunctionTest,
+)

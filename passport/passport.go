@@ -48,7 +48,7 @@ var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
 {{ if not .Requirements}}No requirements{{ else }}{{ .Requirements.Info }}{{ end }}
 {{ if not .Github }}No repository{{ else }}{{ url .Github.URL }}{{ end }}`))
 
-func (p *Passport) String() string {
+func (p *Passport) Info() string {
 	var b strings.Builder
 
 	lo.Must0(passportTemplate.Execute(&b, p))
@@ -99,6 +99,7 @@ func FromPath(path string) (*Passport, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer file.Close()
 
 	passport, err := Parse(file)
 	if err != nil {

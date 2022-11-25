@@ -7,10 +7,8 @@ import (
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/language"
-	"github.com/vivi-app/vivi/option"
 	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/scraper/test"
 	"github.com/vivi-app/vivi/semver"
 	"github.com/vivi-app/vivi/util"
 	"github.com/vivi-app/vivi/where"
@@ -21,7 +19,7 @@ import (
 
 type Extension struct {
 	passport *passport.Passport
-	scraper  option.Option[*scraper.Scraper]
+	scraper  *scraper.Scraper
 }
 
 func ListInstalled() []*Extension {
@@ -43,34 +41,47 @@ func ListInstalled() []*Extension {
 	return extensions
 }
 
-func (e *Extension) attachScraper() error {
+func (e *Extension) LoadScraper() error {
 	theScraper, err := scraper.FromPath(e.Path())
 	if err != nil {
 		return err
 	}
 
-	e.scraper = option.Some(theScraper)
+	e.scraper = theScraper
 	return nil
 }
 
 func FromPath(path string) (*Extension, error) {
+	exists, err := filesystem.Api().Exists(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if !exists {
+		return nil, fmt.Errorf("path does not exist: %s", path)
+	}
+
+	isDir, err := filesystem.Api().IsDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if !isDir {
+		return nil, fmt.Errorf("path is not a directory: %s", path)
+	}
+
 	thePassport, err := passport.FromPath(path)
 	if err != nil {
 		return nil, err
 	}
 
-	theScraper, err := scraper.FromPath(path)
-	if err != nil {
-		return nil, err
-	}
-
-	return New(thePassport, theScraper), nil
+	return New(thePassport, nil), nil
 }
 
 func New(passport *passport.Passport, scraper *scraper.Scraper) *Extension {
 	return &Extension{
 		passport: passport,
-		scraper:  option.Some(scraper),
+		scraper:  scraper,
 	}
 }
 
@@ -191,7 +202,7 @@ func NewInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	err = filesystem.Api().WriteFile(filepath.Join(path, constant.Test), []byte(test.Template), os.ModePerm)
+	err = filesystem.Api().WriteFile(filepath.Join(path, constant.Test), []byte(scraper.TemplateTest), os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
@@ -200,27 +211,15 @@ func NewInteractive() (*Extension, error) {
 }
 
 func (e *Extension) String() string {
-	return e.GetPassport().Name
+	return e.Passport().Name
 }
 
-func (e *Extension) GetPassport() *passport.Passport {
+func (e *Extension) Passport() *passport.Passport {
 	return e.passport
 }
 
-func (e *Extension) GetScraper() (*scraper.Scraper, error) {
-	if sc, ok := e.scraper.Get(); ok {
-		return sc, nil
-	}
-
-	if err := e.attachScraper(); err != nil {
-		return nil, err
-	}
-
-	return e.scraper.MustGet(), nil
-}
-
-func (e *Extension) MustGetScraper() *scraper.Scraper {
-	return e.scraper.MustGet()
+func (e *Extension) Scraper() *scraper.Scraper {
+	return e.scraper
 }
 
 func (e *Extension) IsInstalled() bool {
@@ -240,12 +239,12 @@ func (e *Extension) IsInstalled() bool {
 }
 
 func (e *Extension) Path() string {
-	dir := util.SanitizeFilename(e.GetPassport().ID)
+	dir := util.SanitizeFilename(e.Passport().ID)
 	return filepath.Join(where.Extensions(), dir)
 }
 
 func (e *Extension) Install() error {
-	svn, err := e.GetPassport().Github.Repository.SVNURL()
+	svn, err := e.Passport().Github.Repository.SVNURL()
 	if err != nil {
 		return err
 	}
