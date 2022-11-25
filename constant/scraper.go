@@ -1,8 +1,8 @@
 package constant
 
 const (
-	ScraperModuleName = "scraper"
-	TestModuleName    = "test"
+	ModuleScraper = "scraper"
+	ModuleTest    = "test"
 )
 
 const (
@@ -12,4 +12,8 @@ const (
 	FunctionWatch    = "watch"
 	FunctionDownload = "download"
 	FunctionTest     = "test"
+)
+
+const (
+	FieldHasSearch = "has_search"
 )

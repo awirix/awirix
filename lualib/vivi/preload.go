@@ -13,6 +13,7 @@ func Loader(L *lua.LState) int {
 	t := L.NewTable()
 
 	t.RawSet(lua.LString("api"), NewTableWithFuncs(L, api))
+	t.RawSet(lua.LString("meta"), NewTableWithFuncs(L, meta))
 
 	L.Push(t)
 	return 1
@@ -26,4 +27,10 @@ func NewTableWithFuncs(L *lua.LState, funcMap map[string]lua.LGFunction) *lua.LT
 
 var api = map[string]lua.LGFunction{
 	"watch": Watch,
+}
+
+var meta = map[string]lua.LGFunction{
+	"version": Version,
+	"os":      OS,
+	"arch":    Arch,
 }

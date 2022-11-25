@@ -3,23 +3,15 @@ package cmd
 import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/pelletier/go-toml/v2"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/extension"
 	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/language"
 	"github.com/vivi-app/vivi/passport"
-	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/scraper/test"
-	"github.com/vivi-app/vivi/semver"
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/util"
-	"github.com/vivi-app/vivi/where"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -43,117 +35,18 @@ var extensionsNewCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Create a new extension",
 	Run: func(cmd *cobra.Command, args []string) {
-		var questions = []*survey.Question{
-			{
-				Name: "domain",
-				Prompt: &survey.Select{
-					Message: "Domain",
-					Options: []string{string(passport.DomainAnime), string(passport.DomainMovies), string(passport.DomainShows)},
-					VimMode: true,
-				},
-				Validate: survey.Required,
-			},
-			{
-				Name: "name",
-				Prompt: &survey.Input{
-					Message: "Name of the extension",
-				},
-				Validate: survey.Required,
-			},
-			{
-				Name: "about",
-				Prompt: &survey.Input{
-					Message: "About the extension",
-				},
-				Validate: survey.MaxLength(100),
-			},
-			{
-				Name: "nsfw",
-				Prompt: &survey.Confirm{
-					Message: "Is this extension NSFW?",
-				},
-			},
-			{
-				Name: "tags",
-				Prompt: &survey.Input{
-					Message: "Tags (comma separated)",
-				},
-			},
-			{
-				Name: "language",
-				Prompt: &survey.Select{
-					Renderer: survey.Renderer{},
-					Message:  "Language of the extension",
-					Options:  language.Names,
-					Default:  "English",
-					PageSize: 8,
-				},
-			},
-		}
-
-		answers := struct {
-			Domain   string
-			Name     string
-			About    string
-			Nsfw     bool
-			Tags     string
-			Language string
-		}{}
-
-		err := survey.Ask(questions, &answers)
+		ext, err := extension.NewInteractive()
 		handleErr(err)
-
-		lang, _ := language.FromName(answers.Language)
-
-		var domain = passport.Domain(answers.Domain)
-
-		p := passport.Passport{
-			Name:     answers.Name,
-			ID:       passport.ToID(answers.Name),
-			About:    answers.About,
-			Version:  semver.MustParse("0.1.0"),
-			Domain:   domain,
-			Language: lang,
-			NSFW:     answers.Nsfw,
-			Config: map[string]*passport.ConfigSection{
-				"test": {
-					Display: "this is a test",
-					About:   "about the test",
-					Default: false,
-				},
-			},
-		}
-
-		if answers.Tags != "" {
-			for _, tag := range strings.Split(answers.Tags, ",") {
-				p.Tags = append(p.Tags, strings.TrimSpace(tag))
-			}
-		}
-
-		path := filepath.Join(where.Extensions(), util.SanitizeFilename(p.ID))
-		handleErr(filesystem.Api().MkdirAll(path, os.ModePerm))
-
-		data, err := toml.Marshal(p)
-		handleErr(err)
-
-		handleErr(filesystem.Api().WriteFile(filepath.Join(path, constant.Passport), data, os.ModePerm))
-
-		scraperTemplate, err := scraper.GenerateTemplate(domain)
-		handleErr(err)
-
-		// TODO: dry
-		handleErr(filesystem.Api().WriteFile(filepath.Join(path, constant.Scraper), []byte(scraperTemplate), os.ModePerm))
-		handleErr(filesystem.Api().WriteFile(filepath.Join(path, constant.Test), []byte(test.Template), os.ModePerm))
 
 		fmt.Printf(
 			"%s Created %s extension for %s domain\n",
 			style.Fg(color.Green)(icon.Check),
-			style.Fg(color.Purple)(answers.Name),
-			style.New().Foreground(color.Yellow).Bold(true).Render(answers.Domain),
+			style.Fg(color.Purple)(ext.String()),
+			style.New().Foreground(color.Yellow).Bold(true).Render(string(ext.GetPassport().Domain)),
 		)
 
 		if printPath := lo.Must(cmd.Flags().GetBool("print-path")); printPath {
-			fmt.Println(path)
+			fmt.Println(ext.Path())
 		}
 	},
 }
@@ -164,29 +57,14 @@ func init() {
 
 var extensionsListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "List installed extensions",
+	Short: "ListInstalled installed extensions",
 	Run: func(cmd *cobra.Command, args []string) {
-		// get all dirs
-		descriptors, err := filesystem.Api().ReadDir(where.Extensions())
-		handleErr(err)
+		extensions := extension.ListInstalled()
 
-		var (
-			passports = make(map[passport.Domain][]*passport.Passport)
-			count     int
-		)
+		var byDomain = make(map[passport.Domain][]*extension.Extension)
 
-		for _, d := range descriptors {
-			if d.IsDir() {
-				if p, err := passport.FromPath(filepath.Join(where.Extensions(), d.Name())); err == nil {
-					passports[p.Domain] = append(passports[p.Domain], p)
-					count++
-				}
-			}
-		}
-
-		if len(passports) == 0 {
-			fmt.Println("No extensions installed")
-			return
+		for _, ext := range extensions {
+			byDomain[ext.GetPassport().Domain] = append(byDomain[ext.GetPassport().Domain], ext)
 		}
 
 		printForDomain := func(d passport.Domain) {
@@ -198,18 +76,18 @@ var extensionsListCmd = &cobra.Command{
 					Render(util.Capitalize(string(d))),
 			)
 
-			for _, p := range passports[d] {
+			for _, e := range byDomain[d] {
 				fmt.Printf(
 					"%s %s %s\n",
-					style.Fg(color.Purple)(p.Name),
-					style.Bold(p.Version.String()),
-					style.Faint(p.About),
+					style.Fg(color.Purple)(e.String()),
+					style.Bold(e.GetPassport().Version.String()),
+					style.Faint(e.GetPassport().About),
 				)
 			}
 		}
 
 		for _, domain := range passport.Domains {
-			if _, ok := passports[domain]; ok {
+			if _, ok := byDomain[domain]; ok {
 				printForDomain(domain)
 				fmt.Println()
 			}
@@ -218,7 +96,7 @@ var extensionsListCmd = &cobra.Command{
 		fmt.Printf(
 			"%s %s installed\n",
 			style.Fg(color.Pink)(icon.Heart),
-			util.Quantify(count, "extension", "extensions"),
+			util.Quantify(len(extensions), "extension", "extensions"),
 		)
 	},
 }
@@ -233,50 +111,54 @@ var extensionsRemoveCmd = &cobra.Command{
 	Use:   "remove",
 	Short: "Remove an extension",
 	Run: func(cmd *cobra.Command, args []string) {
+		extensions := extension.ListInstalled()
+
 		if name := lo.Must(cmd.Flags().GetString("name")); name != "" {
-			path := filepath.Join(where.Extensions(), util.SanitizeFilename(name))
-			if err := filesystem.Api().Remove(filepath.Join(where.Extensions(), path)); err != nil {
-				handleErr(err)
+			toRemove, ok := lo.Find(extensions, func(e *extension.Extension) bool {
+				return e.String() == name
+			})
+
+			if !ok {
+				handleErr(fmt.Errorf(
+					"extension %s not found",
+					style.Fg(color.Purple)(name),
+				))
 			}
+
+			handleErr(toRemove.Uninstall())
 
 			return
 		}
 
-		// get all dirs
-		descriptors, err := filesystem.Api().ReadDir(where.Extensions())
-		handleErr(err)
+		var nameExtensionMap = make(map[string]*extension.Extension)
 
-		var (
-			extensions = make(map[string]string)
-		)
-
-		for _, d := range descriptors {
-			if !d.IsDir() {
-				continue
-			}
-
-			path := filepath.Join(where.Extensions(), d.Name())
-			p, err := passport.FromPath(path)
-			if err != nil {
-				continue
-			}
-
-			extensions[p.Name] = path
+		for _, ext := range extensions {
+			nameExtensionMap[ext.String()] = ext
 		}
 
 		var selected []string
-
-		err = survey.AskOne(&survey.MultiSelect{
+		err := survey.AskOne(&survey.MultiSelect{
 			Message: "Select extensions to remove",
-			Options: lo.Keys(extensions),
+			Options: lo.Keys(nameExtensionMap),
 		}, &selected)
-
 		handleErr(err)
 
+		var confirm bool
+		err = survey.AskOne(&survey.Confirm{
+			Message: fmt.Sprintf("Remove %s?", strings.Join(lo.Map(selected, func(s string, _ int) string {
+				return style.Fg(color.Purple)(s)
+			}), ", ")),
+			Default: false,
+		}, &confirm)
+		handleErr(err)
+
+		if !confirm {
+			fmt.Printf("%s OK, aborted\n", style.Fg(color.Green)(icon.Check))
+			return
+		}
+
 		for _, s := range selected {
-			if err := filesystem.Api().RemoveAll(extensions[s]); err != nil {
-				handleErr(err)
-			}
+			handleErr(nameExtensionMap[s].Uninstall())
 		}
 
 		fmt.Printf(

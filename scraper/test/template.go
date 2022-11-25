@@ -13,7 +13,7 @@ function %[1]s.%[2]s()
 end
 
 return %[1]s`,
-	constant.TestModuleName,
+	constant.ModuleTest,
 	constant.FunctionTest,
-	constant.ScraperModuleName,
+	constant.ModuleScraper,
 )

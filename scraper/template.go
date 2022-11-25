@@ -9,45 +9,47 @@ import (
 	"text/template"
 )
 
-var TemplateVideo = lo.Must(template.New("video").Parse(`local {{ .Const.Module }} = {}
+var templateVideo = lo.Must(template.New("video").Parse(`local {{ .Module }} = { {{ .Field.HasSearch }} = true }
 
 --- @alias {{ .Noun.Singular }} { ['str']: string, [any]: any }
 --- @alias episode { ['str']: string, [any]: any }
 
 --- Searches for the {{ .Noun.Plural }}
 --- @param query string The query to search for.
---- @return {{ .Noun.Singular }}[] shows.
-function {{ .Const.Module }}.{{ .Const.Search }}(query)
-	return {}
+--- @return {{ .Noun.Singular }}[] # The {{ .Noun.Plural }} that match the query.
+function {{ .Module }}.{{ .Fn.Search }}(query)
+   return {}
 end
 
 --- Returns a list of episodes for {{ .Noun.Singular }}.
---- @param {{ .Noun.Singular }} {{ .Noun.Singular }} The {{ .Noun.Singular }} to get episodes for.
---- @return episode[] episodes.
-function {{ .Const.Module }}.{{ .Const.Episodes }}({{ .Noun.Singular }})
-	return {}
+--- @param {{ .Noun.Singular }} {{ .Noun.Singular }}? The {{ .Noun.Singular }} to get episodes for.
+--- @return episode[] # The list of episodes.
+function {{ .Module }}.{{ .Fn.Episodes }}({{ .Noun.Singular }})
+   return {}
 end
 
 --- Prepares an episode for watching/downloading.
 --- @param episode episode The episode to prepare.
---- @return episode episode The prepared episode. 
-function {{ .Const.Module }}.{{ .Const.Prepare }}(episode)
-	return episode
+--- @return episode # The prepared episode.
+function {{ .Module }}.{{ .Fn.Prepare }}(episode)
+   return episode
 end
 
 --- Watches an episode.
 --- @param episode episode The episode to watch.
-function {{ .Const.Module }}.{{ .Const.Watch }}(episode)
-	require('{{ .Const.App }}').api.watch(episode.url)
+function {{ .Module }}.{{ .Fn.Watch }}(episode)
+   require('{{ .App }}').api.watch(episode.url)
 end
 
 --- Downloads an episode.
 --- @param episode episode The episode to download.
-function {{ .Const.Module }}.{{ .Const.Download }}(episode)
-	require('{{ .Const.App }}').api.download(episode.show, episode.url)
+function {{ .Module }}.{{ .Fn.Download }}(episode)
+   require('{{ .App }}').api.download(episode.show, episode.url)
 end
 
-return {{ .Const.Module }}`))
+return {{ .Module }}
+
+-- vim:ts=3 ss=3 sw=3 expandtab`))
 
 func GenerateTemplate(domain passport.Domain) (string, error) {
 	type Noun struct {
@@ -61,39 +63,42 @@ func GenerateTemplate(domain passport.Domain) (string, error) {
 
 	switch domain {
 	case passport.DomainAnime:
-		tmpl = TemplateVideo
+		tmpl = templateVideo
 		noun = &Noun{"anime", "animes"}
 	case passport.DomainMovies:
-		tmpl = TemplateVideo
+		tmpl = templateVideo
 		noun = &Noun{"movie", "movies"}
 	case passport.DomainShows:
-		tmpl = TemplateVideo
+		tmpl = templateVideo
 		noun = &Noun{"show", "shows"}
 	default:
 		return "", fmt.Errorf("unknown domain: %s", domain)
 	}
 
 	s := struct {
-		Const struct {
-			Module,
+		Fn struct {
 			Search,
 			Episodes,
 			Prepare,
 			Watch,
-			Download,
-			App string
+			Download string
 		}
-		Noun *Noun
+		Field struct {
+			HasSearch string
+		}
+		Module, App string
+		Noun        *Noun
 	}{}
 
-	s.Const.Module = constant.ScraperModuleName
-	s.Const.Search = constant.FunctionSearch
-	s.Const.Episodes = constant.FunctionEpisodes
-	s.Const.Prepare = constant.FunctionPrepare
-	s.Const.Watch = constant.FunctionWatch
-	s.Const.Download = constant.FunctionDownload
-	s.Const.App = constant.App
+	s.Module = constant.ModuleScraper
+	s.App = constant.App
 	s.Noun = noun
+	s.Fn.Search = constant.FunctionSearch
+	s.Fn.Episodes = constant.FunctionEpisodes
+	s.Fn.Prepare = constant.FunctionPrepare
+	s.Fn.Watch = constant.FunctionWatch
+	s.Fn.Download = constant.FunctionDownload
+	s.Field.HasSearch = constant.FieldHasSearch
 
 	var b strings.Builder
 	if err := tmpl.Execute(&b, s); err != nil {

@@ -21,6 +21,14 @@ func (r *Repository) URL() string {
 	return fmt.Sprintf("https://github.com/%s/%s", r.Owner, r.Name)
 }
 
+func (r *Repository) SVNURL() (string, error) {
+	if err := r.Setup(); err != nil {
+		return "", err
+	}
+
+	return r.repo.MustGet().GetSVNURL(), nil
+}
+
 func (r *Repository) GetFile(path string) (*File, error) {
 	files, err := r.Files()
 	if err != nil {

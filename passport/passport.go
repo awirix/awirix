@@ -10,7 +10,9 @@ import (
 	"github.com/vivi-app/vivi/language"
 	"github.com/vivi-app/vivi/semver"
 	"github.com/vivi-app/vivi/style"
+	"github.com/vivi-app/vivi/util"
 	"io"
+	"path"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -104,4 +106,26 @@ func FromPath(path string) (*Passport, error) {
 	}
 
 	return passport, nil
+}
+
+func (p *Passport) LatestVersion() (*semver.Version, error) {
+	file, err := p.Github.Repository.GetFile(p.remotePassportPath())
+	if err != nil {
+		return nil, err
+	}
+
+	passport, err := Parse(file)
+	if err != nil {
+		return nil, err
+	}
+
+	return passport.Version, nil
+}
+
+func (p *Passport) remotePath() string {
+	return path.Join(constant.ExtensionsDir, util.SanitizeFilename(p.ID))
+}
+
+func (p *Passport) remotePassportPath() string {
+	return path.Join(p.remotePath(), constant.Passport)
 }
