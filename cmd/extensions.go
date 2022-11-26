@@ -8,7 +8,6 @@ import (
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/extension"
-	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/style"
@@ -24,6 +23,7 @@ var extensionsCmd = &cobra.Command{
 	Use:     "extensions",
 	Aliases: []string{"ext"},
 	Short:   constant.App + " extensions",
+	Args:    cobra.NoArgs,
 }
 
 func init() {
@@ -35,6 +35,7 @@ func init() {
 var extensionsNewCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Create a new extension",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		ext, err := extension.NewInteractive()
 		handleErr(err)
@@ -59,6 +60,7 @@ func init() {
 var extensionsListCmd = &cobra.Command{
 	Use:   "list",
 	Short: "ListInstalled installed extensions",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions := extension.ListInstalled()
 
@@ -105,25 +107,26 @@ var extensionsListCmd = &cobra.Command{
 func init() {
 	extensionsCmd.AddCommand(extensionsRemoveCmd)
 
-	extensionsRemoveCmd.Flags().StringP("name", "n", "", "Name of the extension to remove")
+	extensionsRemoveCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
 }
 
 var extensionsRemoveCmd = &cobra.Command{
 	Use:     "remove",
 	Short:   "Remove an extension",
 	Aliases: []string{"rm"},
+	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions := extension.ListInstalled()
 
-		if name := lo.Must(cmd.Flags().GetString("name")); name != "" {
+		if id := lo.Must(cmd.Flags().GetString("id")); id != "" {
 			toRemove, ok := lo.Find(extensions, func(e *extension.Extension) bool {
-				return e.String() == name
+				return e.String() == id
 			})
 
 			if !ok {
 				handleErr(fmt.Errorf(
 					"extension %s not found",
-					style.Fg(color.Purple)(name),
+					style.Fg(color.Purple)(id),
 				))
 			}
 
@@ -174,51 +177,26 @@ var extensionsRemoveCmd = &cobra.Command{
 func init() {
 	extensionsCmd.AddCommand(extensionsRunCmd)
 
-	extensionsRunCmd.Flags().StringP("path", "p", "", "Path to the extension to run")
-	extensionsRunCmd.Flags().StringP("name", "n", "", "Name of the extension to run")
+	extensionsRunCmd.Flags().StringP("path", "p", "", "path to the extension to run")
+	extensionsRunCmd.Flags().StringP("id", "i", "", "id of the extension to run")
 
-	extensionsRunCmd.MarkFlagsMutuallyExclusive("path", "name")
+	extensionsRunCmd.MarkFlagsMutuallyExclusive("path", "id")
 	extensionsRunCmd.MarkFlagDirname("path")
 
-	extensionsRunCmd.RegisterFlagCompletionFunc("name", completionExtensionsNames)
+	extensionsRunCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
 }
 
 var extensionsRunCmd = &cobra.Command{
 	Use:     "run",
 	Short:   "Run an extension for the testing purposes",
-	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "name"),
+	Args:    cobra.NoArgs,
+	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "id"),
 	Run: func(cmd *cobra.Command, args []string) {
-		var (
-			ext *extension.Extension
-			err error
-		)
-
-		if cmd.Flags().Changed("path") {
-			path := lo.Must(cmd.Flags().GetString("path"))
-			isDir, err := filesystem.Api().IsDir(path)
-			handleErr(err)
-
-			if !isDir {
-				handleErr(fmt.Errorf("path %s is not a directory", path))
-				return
-			}
-
-			ext, err = extension.FromPath(path)
-			handleErr(err)
-		} else {
-			var ok bool
-			name := lo.Must(cmd.Flags().GetString("name"))
-			ext, ok = extension.FromLocalName(name)
-
-			if !ok {
-				handleErr(fmt.Errorf("extension %s not found", style.Fg(color.Purple)(name)))
-			}
-		}
+		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
 
 		// Script will be executed when it's loaded
 		// I don't like this behavior, but it cannot be avoided, so let's use it as it is
-		err = ext.LoadScraper()
-		handleErr(err)
+		handleErr(ext.LoadScraper())
 	},
 }
 
@@ -226,45 +204,44 @@ func init() {
 	extensionsCmd.AddCommand(extensionsInfoCmd)
 
 	extensionsInfoCmd.Flags().StringP("path", "p", "", "Path to the extension to run")
-	extensionsInfoCmd.Flags().StringP("name", "n", "", "Name of the extension to run")
+	extensionsInfoCmd.Flags().StringP("id", "i", "", "id of the extension to run")
 
-	extensionsInfoCmd.MarkFlagsMutuallyExclusive("path", "name")
+	extensionsInfoCmd.MarkFlagsMutuallyExclusive("path", "id")
 	extensionsInfoCmd.MarkFlagDirname("path")
 
-	extensionsInfoCmd.RegisterFlagCompletionFunc("name", completionExtensionsNames)
+	extensionsInfoCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
 }
 
 var extensionsInfoCmd = &cobra.Command{
 	Use:     "info",
 	Short:   "Show extension info",
-	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "name"),
+	Args:    cobra.NoArgs,
+	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "id"),
 	Run: func(cmd *cobra.Command, args []string) {
-		var ext *extension.Extension
-
-		switch {
-		case cmd.Flags().Changed("path"):
-			path := lo.Must(cmd.Flags().GetString("path"))
-			isDir, err := filesystem.Api().IsDir(path)
-			handleErr(err)
-
-			if !isDir {
-				handleErr(fmt.Errorf("path %s is not a directory", path))
-				return
-			}
-
-			ext, err = extension.FromPath(path)
-			handleErr(err)
-		case cmd.Flags().Changed("name"):
-			var ok bool
-
-			name := lo.Must(cmd.Flags().GetString("name"))
-			ext, ok = extension.FromLocalName(name)
-
-			if !ok {
-				handleErr(fmt.Errorf("extension %s not found", style.Fg(color.Purple)(name)))
-			}
-		}
-
+		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
 		fmt.Println(ext.Passport().Info())
+	},
+}
+
+func init() {
+	extensionsCmd.AddCommand(extensionsTestCmd)
+
+	extensionsTestCmd.Flags().StringP("path", "p", "", "Path to the extension to run")
+	extensionsTestCmd.Flags().StringP("id", "i", "", "id of the extension to run")
+
+	extensionsTestCmd.MarkFlagsMutuallyExclusive("path", "id")
+	extensionsTestCmd.MarkFlagDirname("path")
+
+	extensionsTestCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
+}
+
+var extensionsTestCmd = &cobra.Command{
+	Use:     "test",
+	Short:   "Test an extension",
+	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "id"),
+	Run: func(cmd *cobra.Command, args []string) {
+		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
+		handleErr(ext.LoadTester())
+		handleErr(ext.Tester().Test())
 	},
 }

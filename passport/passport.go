@@ -46,7 +46,7 @@ var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
 {{ if not .About }}No description{{ else }}{{ faint .About }}{{ end }}
 
 {{ if not .Requirements}}No requirements{{ else }}{{ .Requirements.Info }}{{ end }}
-{{ if not .Github }}No repository{{ else }}{{ url .Github.URL }}{{ end }}`))
+{{ if not .Github }}No repository{{ else }}{{ url .Github.Repository.URL }}{{ end }}`))
 
 func (p *Passport) Info() string {
 	var b strings.Builder

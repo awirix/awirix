@@ -1,4 +1,4 @@
-package scraper
+package tester
 
 import (
 	"fmt"
@@ -10,20 +10,15 @@ import (
 	"path/filepath"
 )
 
-type Scraper struct {
-	state *lua.LState
-
-	functionSearch *lua.LFunction
+type Tester struct {
+	state        *lua.LState
+	functionTest *lua.LFunction
 }
 
-func (s *Scraper) HasSearch() bool {
-	return s.functionSearch != nil
-}
-
-func New(path string, r io.Reader) (*Scraper, error) {
+func New(path string, r io.Reader) (*Tester, error) {
 	L := vm.New(path)
 
-	lfunc, err := L.Load(r, constant.ModuleScraper)
+	lfunc, err := L.Load(r, constant.ModuleTest)
 	if err != nil {
 		return nil, err
 	}
@@ -37,32 +32,34 @@ func New(path string, r io.Reader) (*Scraper, error) {
 	})
 
 	module := L.Get(-1)
-	theScraper := &Scraper{}
+	theTester := &Tester{}
 
 	// get script return value
 	table, ok := module.(*lua.LTable)
 	if !ok {
 		fmt.Printf(module.Type().String(), module.String())
-		return nil, fmt.Errorf("scraper module must return a table")
+		return nil, fmt.Errorf("tester module must return a table")
 	}
 
-	functionSearch := table.RawGet(lua.LString(constant.FunctionSearch))
-	if functionSearch.Type() == lua.LTFunction {
-		theScraper.functionSearch = functionSearch.(*lua.LFunction)
+	functionTest := table.RawGet(lua.LString(constant.FunctionTest))
+	if functionTest.Type() == lua.LTFunction {
+		theTester.functionTest = functionTest.(*lua.LFunction)
+	} else {
+		return nil, fmt.Errorf("tester module must have a %s function", constant.FunctionTest)
 	}
 
-	theScraper.state = L
-	return theScraper, nil
+	theTester.state = L
+	return theTester, nil
 }
 
-func NewFromPath(path string) (*Scraper, error) {
+func NewFromPath(path string) (*Tester, error) {
 	isDir, err := filesystem.Api().IsDir(path)
 	if err != nil {
 		return nil, err
 	}
 
 	if isDir {
-		path = filepath.Join(path, constant.Scraper)
+		path = filepath.Join(path, constant.Tester)
 	}
 
 	file, err := filesystem.Api().Open(path)

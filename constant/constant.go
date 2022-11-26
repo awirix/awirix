@@ -14,5 +14,5 @@ const (
 const (
 	Passport = "passport.toml"
 	Scraper  = "scraper.lua"
-	Test     = "test.lua"
+	Tester   = "test.lua"
 )

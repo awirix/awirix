@@ -14,7 +14,7 @@ func ListInstalled() []*Extension {
 	}
 
 	for _, file := range installed {
-		extension, err := FromPath(filepath.Join(where.Extensions(), file.Name()))
+		extension, err := NewFromPath(filepath.Join(where.Extensions(), file.Name()))
 		if err != nil {
 			continue
 		}

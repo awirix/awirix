@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/pelletier/go-toml/v2"
+	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/language"
 	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/semver"
+	"github.com/vivi-app/vivi/template"
+	"github.com/vivi-app/vivi/tester"
 	"github.com/vivi-app/vivi/util"
 	"github.com/vivi-app/vivi/where"
 	"os"
@@ -17,10 +20,10 @@ import (
 	"strings"
 )
 
-func FromLocalName(name string) (*Extension, bool) {
+func NewFromID(id string) (*Extension, bool) {
 	extensions := ListInstalled()
 	for _, extension := range extensions {
-		if extension.Passport().Name == name {
+		if extension.Passport().ID == id {
 			return extension, true
 		}
 	}
@@ -28,7 +31,7 @@ func FromLocalName(name string) (*Extension, bool) {
 	return nil, false
 }
 
-func FromPath(path string) (*Extension, error) {
+func NewFromPath(path string) (*Extension, error) {
 	exists, err := filesystem.Api().Exists(path)
 	if err != nil {
 		return nil, err
@@ -52,13 +55,14 @@ func FromPath(path string) (*Extension, error) {
 		return nil, err
 	}
 
-	return New(thePassport, nil), nil
+	return New(thePassport, nil, nil), nil
 }
 
-func New(passport *passport.Passport, scraper *scraper.Scraper) *Extension {
+func New(passport *passport.Passport, scraper *scraper.Scraper, tester *tester.Tester) *Extension {
 	return &Extension{
 		passport: passport,
 		scraper:  scraper,
+		tester:   tester,
 	}
 }
 
@@ -168,21 +172,15 @@ func NewInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	scraperTemplate, err := scraper.GenerateTemplate(domain)
-	if err != nil {
-		return nil, err
+	for _, t := range []lo.Tuple2[string, func() []byte]{
+		{constant.Scraper, func() []byte { return template.NewScraper(domain) }},
+		{constant.Tester, template.NewTest},
+	} {
+		err = filesystem.Api().WriteFile(filepath.Join(path, t.A), t.B(), os.ModePerm)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	// TODO: dry
-	err = filesystem.Api().WriteFile(filepath.Join(path, constant.Scraper), []byte(scraperTemplate), os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-
-	err = filesystem.Api().WriteFile(filepath.Join(path, constant.Test), []byte(scraper.TemplateTest), os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-
-	return FromPath(path)
+	return NewFromPath(path)
 }

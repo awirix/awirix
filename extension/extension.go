@@ -5,6 +5,7 @@ import (
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/scraper"
+	"github.com/vivi-app/vivi/tester"
 	"github.com/vivi-app/vivi/util"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
@@ -13,15 +14,26 @@ import (
 type Extension struct {
 	passport *passport.Passport
 	scraper  *scraper.Scraper
+	tester   *tester.Tester
 }
 
 func (e *Extension) LoadScraper() error {
-	theScraper, err := scraper.FromPath(e.Path())
+	theScraper, err := scraper.NewFromPath(e.Path())
 	if err != nil {
 		return err
 	}
 
 	e.scraper = theScraper
+	return nil
+}
+
+func (e *Extension) LoadTester() error {
+	theTester, err := tester.NewFromPath(e.Path())
+	if err != nil {
+		return err
+	}
+
+	e.tester = theTester
 	return nil
 }
 
@@ -35,6 +47,10 @@ func (e *Extension) Passport() *passport.Passport {
 
 func (e *Extension) Scraper() *scraper.Scraper {
 	return e.scraper
+}
+
+func (e *Extension) Tester() *tester.Tester {
+	return e.tester
 }
 
 func (e *Extension) IsInstalled() bool {
