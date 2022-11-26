@@ -12,49 +12,50 @@ import (
 )
 
 type Scraper struct {
-	HasSearch bool
-	state     *lua.LState
+	state *lua.LState
 
 	functionSearch *lua.LFunction
 }
 
-func Parse(r io.Reader) (*Scraper, error) {
-	proto, err := Compile(r)
-	if err != nil {
-		return nil, err
-	}
+func (s *Scraper) HasSearch() bool {
+	return s.functionSearch != nil
+}
 
+func Parse(r io.Reader) (*Scraper, error) {
+	//proto, err := Compile(r)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
 	L := lua.NewState()
 	lualib.Preload(L)
 
-	lfunc := L.NewFunctionFromProto(proto)
-	L.Push(lfunc)
-	err = L.PCall(0, 1, nil)
+	lfunc, err := L.Load(r, constant.ModuleScraper)
 	if err != nil {
 		return nil, err
 	}
 
+	L.Push(lfunc)
+
+	err = L.CallByParam(lua.P{
+		Fn:      lfunc,
+		NRet:    1,
+		Protect: true,
+	})
+
+	module := L.Get(-1)
 	theScraper := &Scraper{}
 
 	// get script return value
-	module := L.GetGlobal(constant.ModuleScraper)
 	table, ok := module.(*lua.LTable)
 	if !ok {
 		fmt.Printf(module.Type().String(), module.String())
-		return nil, fmt.Errorf("invalid scraper")
-	}
-
-	hasSearch := table.RawGet(lua.LString(constant.FieldHasSearch))
-	if hasSearch.Type() == lua.LTBool {
-		theScraper.HasSearch = bool(hasSearch.(lua.LBool))
+		return nil, fmt.Errorf("scraper module must return a table")
 	}
 
 	functionSearch := table.RawGet(lua.LString(constant.FunctionSearch))
 	if functionSearch.Type() == lua.LTFunction {
-		theScraper.HasSearch = true
 		theScraper.functionSearch = functionSearch.(*lua.LFunction)
-	} else {
-		theScraper.HasSearch = false
 	}
 
 	theScraper.state = L

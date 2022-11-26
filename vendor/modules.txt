@@ -125,6 +125,9 @@ github.com/spf13/viper/internal/encoding/yaml
 # github.com/subosito/gotenv v1.4.1
 ## explicit; go 1.18
 github.com/subosito/gotenv
+# github.com/vivi-app/libopen v1.0.0
+## explicit
+github.com/vivi-app/libopen/open
 # github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64
 ## explicit; go 1.17
 github.com/yuin/gopher-lua

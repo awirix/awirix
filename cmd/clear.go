@@ -1,7 +1,8 @@
 package cmd
 
 import (
-	"fmt"
+	"github.com/samber/lo"
+	"github.com/spf13/cobra"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
@@ -9,8 +10,6 @@ import (
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/util"
 	"github.com/vivi-app/vivi/where"
-	"github.com/samber/lo"
-	"github.com/spf13/cobra"
 )
 
 type clearTarget struct {
@@ -44,7 +43,7 @@ var clearCmd = &cobra.Command{
 		for _, n := range clearTargets {
 			if lo.Must(cmd.Flags().GetBool(n.name)) {
 				handleErr(n.clear())
-				fmt.Printf("%s %s cleared\n", successStyle(icon.Check), util.Capitalize(n.name))
+				cmd.Printf("%s %s cleared\n", successStyle(icon.Check), util.Capitalize(n.name))
 				didSomething = true
 			}
 		}

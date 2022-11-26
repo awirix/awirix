@@ -8,3 +8,7 @@ const (
 const (
 	DownloaderPath = "downloader.path"
 )
+
+const (
+	VideoDefaultPlayer = "video.default_player"
+)

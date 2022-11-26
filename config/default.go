@@ -29,6 +29,15 @@ panic, fatal, error, warn, info, debug, trace`,
 		"Path to the downloader executable",
 	},
 	// END DOWNLOADER
+
+	// VIDEO
+	{
+		constant.VideoDefaultPlayer,
+		"auto",
+		`Default video player.
+'auto' is a special value that will try to use the best* player available.`,
+	},
+	// END VIDEO
 }
 
 func setDefaults() {

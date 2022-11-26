@@ -11,7 +11,7 @@ import (
 
 var templateVideo = lo.Must(template.New("video").Parse(`-- vim:ts=3 ss=3 sw=3 expandtab
 
-{{ .Module }} = { {{ .Field.HasSearch }} = true }
+local {{ .Module }} = {}
 
 --- @alias {{ .Noun.Singular }} { ['string']: string, [any]: any }
 --- @alias episode { ['string']: string, [any]: any }
@@ -84,9 +84,6 @@ func GenerateTemplate(domain passport.Domain) (string, error) {
 			Watch,
 			Download string
 		}
-		Field struct {
-			HasSearch string
-		}
 		Module, App string
 		Noun        *Noun
 	}{}
@@ -99,7 +96,6 @@ func GenerateTemplate(domain passport.Domain) (string, error) {
 	s.Fn.Prepare = constant.FunctionPrepare
 	s.Fn.Watch = constant.FunctionWatch
 	s.Fn.Download = constant.FunctionDownload
-	s.Field.HasSearch = constant.FieldHasSearch
 
 	var b strings.Builder
 	if err := tmpl.Execute(&b, s); err != nil {
@@ -111,7 +107,7 @@ func GenerateTemplate(domain passport.Domain) (string, error) {
 
 var TemplateTest = fmt.Sprintf(`-- vim:ts=3 ss=3 sw=3 expandtab
 
-%[1]s = {}
+local %[1]s = {}
 
 require('%[2]s')
 

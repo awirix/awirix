@@ -14,6 +14,7 @@ require (
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.13.0
+	github.com/vivi-app/libopen v1.0.0
 	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64
 	golang.org/x/exp v0.0.0-20221004215720-b9f4876ce741
 )
