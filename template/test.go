@@ -2,22 +2,17 @@ package template
 
 import (
 	"bytes"
+	_ "embed"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/constant"
 	"text/template"
 )
 
+//go:embed test.lua.tmpl
+var templateTest string
+
 func NewTest() []byte {
-	tmpl := lo.Must(template.New("test").
-		Parse(`-- vim:ts=3 ss=3 sw=3 expandtab
-
-local M = {}
-
-function M.{{ .Fn.Test }}()
-	assert(2 + 2 == 4, 'Math is broken')
-end
-
-return M`))
+	tmpl := lo.Must(template.New("test").Parse(templateTest))
 
 	m := newMeta(constant.ModuleTest, nil)
 
