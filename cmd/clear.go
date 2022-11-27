@@ -37,6 +37,7 @@ func init() {
 var clearCmd = &cobra.Command{
 	Use:   "clear",
 	Short: "Clears sidelined files produced by the " + constant.App,
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		successStyle := style.Fg(color.Green)
 		var didSomething bool

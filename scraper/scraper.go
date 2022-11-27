@@ -35,15 +35,16 @@ func New(path string, r io.Reader) (*Scraper, error) {
 		NRet:    1,
 		Protect: true,
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	module := L.Get(-1)
+	module := L.Get(L.GetTop())
 	theScraper := &Scraper{}
 
-	// get script return value
 	table, ok := module.(*lua.LTable)
 	if !ok {
-		fmt.Printf(module.Type().String(), module.String())
-		return nil, fmt.Errorf("scraper module must return a table")
+		return nil, fmt.Errorf("scraper module must return a table, got %s", module.Type().String())
 	}
 
 	functionSearch := table.RawGet(lua.LString(constant.FunctionSearch))

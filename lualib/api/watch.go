@@ -1,4 +1,4 @@
-package vivi
+package api
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"runtime"
 )
 
-func Watch(L *lua.LState) int {
+func watch(L *lua.LState) int {
 	url := L.CheckString(1)
 
 	if player := viper.GetString(constant.VideoDefaultPlayer); player != "auto" {

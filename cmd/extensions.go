@@ -59,7 +59,7 @@ func init() {
 
 var extensionsListCmd = &cobra.Command{
 	Use:   "list",
-	Short: "ListInstalled installed extensions",
+	Short: "List installed extensions",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions := extension.ListInstalled()
@@ -175,73 +175,41 @@ var extensionsRemoveCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsRunCmd)
+	extensionsCmd.AddCommand(extensionsSelectCmd)
 
-	extensionsRunCmd.Flags().StringP("path", "p", "", "path to the extension to run")
-	extensionsRunCmd.Flags().StringP("id", "i", "", "id of the extension to run")
+	extensionsSelectCmd.Flags().StringP("path", "p", "", "path to the extension")
+	extensionsSelectCmd.Flags().StringP("id", "i", "", "id of the extension")
+	extensionsSelectCmd.MarkFlagsMutuallyExclusive("path", "id")
+	extensionsSelectCmd.MarkFlagDirname("path")
+	extensionsSelectCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
 
-	extensionsRunCmd.MarkFlagsMutuallyExclusive("path", "id")
-	extensionsRunCmd.MarkFlagDirname("path")
+	extensionsSelectCmd.Flags().Bool("run", false, "run the selected extension")
+	extensionsSelectCmd.Flags().Bool("test", false, "test the selected extension")
+	extensionsSelectCmd.Flags().Bool("info", false, "show info about the extension")
+	extensionsSelectCmd.Flags().BoolP("json", "j", false, "output in json format")
 
-	extensionsRunCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
+	extensionsSelectCmd.MarkFlagsMutuallyExclusive("run", "test", "info")
 }
 
-var extensionsRunCmd = &cobra.Command{
-	Use:     "run",
-	Short:   "Run an extension for the testing purposes",
-	Args:    cobra.NoArgs,
-	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "id"),
+var extensionsSelectCmd = &cobra.Command{
+	Use:   "select",
+	Short: "Select an extension to perform an action on",
+	Args:  cobra.NoArgs,
+	PreRunE: preRunERequiredMutuallyExclusiveFlags(
+		[]string{"path", "id"},
+		[]string{"run", "test", "info"},
+	),
 	Run: func(cmd *cobra.Command, args []string) {
 		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
 
-		// Script will be executed when it's loaded
-		// I don't like this behavior, but it cannot be avoided, so let's use it as it is
-		handleErr(ext.LoadScraper())
-	},
-}
-
-func init() {
-	extensionsCmd.AddCommand(extensionsInfoCmd)
-
-	extensionsInfoCmd.Flags().StringP("path", "p", "", "Path to the extension to run")
-	extensionsInfoCmd.Flags().StringP("id", "i", "", "id of the extension to run")
-
-	extensionsInfoCmd.MarkFlagsMutuallyExclusive("path", "id")
-	extensionsInfoCmd.MarkFlagDirname("path")
-
-	extensionsInfoCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
-}
-
-var extensionsInfoCmd = &cobra.Command{
-	Use:     "info",
-	Short:   "Show extension info",
-	Args:    cobra.NoArgs,
-	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "id"),
-	Run: func(cmd *cobra.Command, args []string) {
-		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
-		fmt.Println(ext.Passport().Info())
-	},
-}
-
-func init() {
-	extensionsCmd.AddCommand(extensionsTestCmd)
-
-	extensionsTestCmd.Flags().StringP("path", "p", "", "Path to the extension to run")
-	extensionsTestCmd.Flags().StringP("id", "i", "", "id of the extension to run")
-
-	extensionsTestCmd.MarkFlagsMutuallyExclusive("path", "id")
-	extensionsTestCmd.MarkFlagDirname("path")
-
-	extensionsTestCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
-}
-
-var extensionsTestCmd = &cobra.Command{
-	Use:     "test",
-	Short:   "Test an extension",
-	PreRunE: preRunERequiredMutuallyExclusiveFlags("path", "id"),
-	Run: func(cmd *cobra.Command, args []string) {
-		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
-		handleErr(ext.LoadTester())
-		handleErr(ext.Tester().Test())
+		switch {
+		case lo.Must(cmd.Flags().GetBool("run")):
+			handleErr(ext.LoadScraper())
+		case lo.Must(cmd.Flags().GetBool("test")):
+			handleErr(ext.LoadTester())
+			handleErr(ext.Tester().Test())
+		case lo.Must(cmd.Flags().GetBool("info")):
+			fmt.Println(ext.Passport().Info())
+		}
 	},
 }

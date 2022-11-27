@@ -48,7 +48,7 @@ func Temp() string {
 }
 
 func Downloads() string {
-	path := viper.GetString(constant.DownloaderPath)
+	path := viper.GetString(constant.PathAnimeDownloads)
 	path = os.ExpandEnv(path)
 	absPath, err := filepath.Abs(path)
 

@@ -2,11 +2,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/style"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
+	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/style"
 	"reflect"
+	"strconv"
 	"strings"
 	"text/template"
 
@@ -20,19 +21,34 @@ type Field struct {
 }
 
 var prettyTemplate = lo.Must(template.New("pretty").Funcs(template.FuncMap{
-	"faint":    style.Faint,
-	"bold":     style.Bold,
-	"purple":   style.Fg(color.Purple),
-	"yellow":   style.Fg(color.Yellow),
-	"cyan":     style.Fg(color.Cyan),
-	"value":    func(k string) string { return fmt.Sprint(viper.Get(k)) },
+	"faint":  style.Faint,
+	"bold":   style.Bold,
+	"purple": style.Fg(color.Purple),
+	"blue":   style.Fg(color.Blue),
+	"cyan":   style.Fg(color.Cyan),
+	"value":  func(k string) any { return viper.Get(k) },
+	"hl": func(v any) string {
+		switch value := v.(type) {
+		case bool:
+			b := strconv.FormatBool(value)
+			if value {
+				return style.Fg(color.Green)(b)
+			}
+
+			return style.Fg(color.Red)(b)
+		case string:
+			return style.Fg(color.Yellow)(value)
+		default:
+			return fmt.Sprint(value)
+		}
+	},
 	"typename": func(v any) string { return reflect.TypeOf(v).String() },
 }).Parse(`{{ faint .Description }}
-{{ yellow "Key:" }}     {{ purple .Key }}
-{{ yellow "Env:" }}     {{ .Env }}
-{{ yellow "Value:" }}   {{ value .Key }}
-{{ yellow "Default:" }} {{ .DefaultValue }}
-{{ yellow "Type:" }}    {{ typename .DefaultValue }}`))
+{{ blue "Key:" }}     {{ purple .Key }}
+{{ blue "Env:" }}     {{ .Env }}
+{{ blue "Value:" }}   {{ hl (value .Key) }}
+{{ blue "Default:" }} {{ hl (.DefaultValue) }}
+{{ blue "Type:" }}    {{ typename .DefaultValue }}`))
 
 func (f *Field) Pretty() string {
 	var b strings.Builder

@@ -22,22 +22,42 @@ panic, fatal, error, warn, info, debug, trace`,
 	},
 	// END LOGS
 
-	// DOWNLOADER
+	// PATH
 	{
-		constant.DownloaderPath,
+		constant.PathAnimeDownloads,
 		".",
-		"Path to the downloader executable",
+		"Path to anime downloads",
 	},
-	// END DOWNLOADER
+	{
+		constant.PathMoviesDownloads,
+		".",
+		"Path to movies downloads",
+	},
+	{
+		constant.PathShowsDownloads,
+		".",
+		"Path to shows downloads",
+	},
+	// END PATH
 
 	// VIDEO
 	{
 		constant.VideoDefaultPlayer,
 		"auto",
 		`Default video player.
-'auto' is a special value that will try to use the best* player available.`,
+'auto' is a special value that will try to use the most suitable player.`,
 	},
 	// END VIDEO
+
+	// EXTENSIONS
+	{
+		constant.ExtensionsSafeMode,
+		true,
+		`Enable safe mode for extensions.
+If enabled, system commands will be disabled
+and the extension will be unable to access the filesystem.`,
+	},
+	// EXTENSIONS
 }
 
 func setDefaults() {

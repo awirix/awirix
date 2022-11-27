@@ -46,6 +46,7 @@ func init() {
 var whereCmd = &cobra.Command{
 	Use:   "where",
 	Short: "Show the paths for a files related to the " + constant.App,
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		headerStyle := style.NewColored(color.HiPurple, "").Bold(true).Render
 		argStyle := style.Fg(color.Yellow)

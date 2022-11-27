@@ -1,14 +1,28 @@
 package lualib
 
 import (
-	"github.com/vivi-app/vivi/lualib/vivi"
+	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/lualib/api"
+	"github.com/vivi-app/vivi/lualib/app"
+	"github.com/vivi-app/vivi/lualib/sdk"
 	lua "github.com/yuin/gopher-lua"
 )
 
 func Preload(L *lua.LState) {
-	for _, preload := range []func(*lua.LState){
-		vivi.Preload,
+	L.PreloadModule(constant.App, Loader)
+}
+
+func Loader(L *lua.LState) int {
+	libs := L.NewTable()
+
+	for name, create := range map[string]func(*lua.LState) *lua.LTable{
+		"app": app.New,
+		"api": api.New,
+		"sdk": sdk.New,
 	} {
-		preload(L)
+		L.SetField(libs, name, create(L))
 	}
+
+	L.Push(libs)
+	return 1
 }

@@ -17,15 +17,26 @@ func completionExtensionsIDs(_ *cobra.Command, _ []string, _ string) ([]string, 
 	}), cobra.ShellCompDirectiveNoFileComp
 }
 
-func preRunERequiredMutuallyExclusiveFlags(flags ...string) func(*cobra.Command, []string) error {
+func preRunERequiredMutuallyExclusiveFlags(flagsGroups ...[]string) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
-		for _, flag := range flags {
-			if cmd.Flag(flag).Changed {
-				return nil
+		checkGroup := func(group []string) error {
+			for _, flag := range group {
+				if cmd.Flag(flag).Changed {
+					return nil
+				}
+			}
+
+			return fmt.Errorf("one of the flags %v is required", group)
+		}
+
+		for _, group := range flagsGroups {
+			err := checkGroup(group)
+			if err != nil {
+				return err
 			}
 		}
 
-		return fmt.Errorf("one of the flags %v is required", flags)
+		return nil
 	}
 }
 

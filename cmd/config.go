@@ -11,15 +11,15 @@ import (
 	"strconv"
 
 	levenshtein "github.com/ka-weihe/fast-levenshtein"
+	"github.com/samber/lo"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/config"
 	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/where"
-	"github.com/samber/lo"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // errUnknownKey will generate error for key that was not found and will provide a hint
@@ -47,6 +47,7 @@ func init() {
 var configCmd = &cobra.Command{
 	Use:   "config",
 	Short: "Various config commands",
+	Args:  cobra.NoArgs,
 }
 
 func init() {
@@ -58,6 +59,7 @@ func init() {
 var configInfoCmd = &cobra.Command{
 	Use:   "info",
 	Short: "Show the info for each config field with description",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			key    = lo.Must(cmd.Flags().GetString("key"))
@@ -99,6 +101,7 @@ func init() {
 var configSetCmd = &cobra.Command{
 	Use:   "set",
 	Short: "Set a config value",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			key   = lo.Must(cmd.Flags().GetString("key"))
@@ -156,6 +159,7 @@ func init() {
 var configGetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "Get a config value",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			key = lo.Must(cmd.Flags().GetString("key"))
@@ -209,6 +213,7 @@ func init() {
 var configWriteCmd = &cobra.Command{
 	Use:   "write",
 	Short: "Write current config to the file",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			force          = lo.Must(cmd.Flags().GetBool("force"))

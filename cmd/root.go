@@ -19,7 +19,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:     strings.ToLower(constant.App),
 	Short:   "Multimedia Metascraper",
+	Long:    constant.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
 	Version: constant.Version,
+	Args:    cobra.NoArgs,
 }
 
 func Execute() {
