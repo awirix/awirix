@@ -1,24 +1,72 @@
 package extension
 
 import (
+	"context"
 	"fmt"
+	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/lualib"
 	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
 	"github.com/vivi-app/vivi/util"
 	"github.com/vivi-app/vivi/where"
+	lua "github.com/yuin/gopher-lua"
 	"path/filepath"
+	"strings"
 )
 
 type Extension struct {
 	passport *passport.Passport
 	scraper  *scraper.Scraper
 	tester   *tester.Tester
+	state    *lua.LState
+}
+
+func (e *Extension) Init() {
+	if e.state != nil {
+		return
+	}
+
+	L := lua.NewState()
+	L.SetContext(context.WithValue(context.Background(), "passport", e.Passport()))
+
+	// Load the standard libraries except for the debug, io and os
+	for _, openLib := range []lua.LGFunction{
+		lua.OpenBase,
+		lua.OpenTable,
+		lua.OpenString,
+		lua.OpenMath,
+		lua.OpenCoroutine,
+		lua.OpenChannel,
+		lua.OpenPackage,
+	} {
+		openLib(L)
+	}
+
+	pkg := L.GetGlobal("package").(*lua.LTable)
+	paths := strings.Split(pkg.RawGetString("path").String(), ";")
+
+	viviPaths := []string{
+		filepath.Join(e.Path(), "?.lua"),
+	}
+
+	paths = append(viviPaths, paths...)
+
+	pkg.RawSetString("path", lua.LString(strings.Join(paths, ";")))
+
+	lualib.Preload(L)
+	e.state = L
 }
 
 func (e *Extension) LoadScraper() error {
-	theScraper, err := scraper.NewFromPath(e.Path())
+	file, err := filesystem.Api().Open(filepath.Join(e.Path(), constant.Scraper))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	theScraper, err := scraper.New(e.state, file)
 	if err != nil {
 		return err
 	}
@@ -28,7 +76,13 @@ func (e *Extension) LoadScraper() error {
 }
 
 func (e *Extension) LoadTester() error {
-	theTester, err := tester.NewFromPath(e.Path())
+	file, err := filesystem.Api().Open(filepath.Join(e.Path(), constant.Tester))
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	theTester, err := tester.New(e.state, file)
 	if err != nil {
 		return err
 	}

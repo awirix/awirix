@@ -201,6 +201,7 @@ var extensionsSelectCmd = &cobra.Command{
 	),
 	Run: func(cmd *cobra.Command, args []string) {
 		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
+		ext.Init()
 
 		switch {
 		case lo.Must(cmd.Flags().GetBool("run")):

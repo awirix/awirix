@@ -3,11 +3,8 @@ package scraper
 import (
 	"fmt"
 	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/vm"
 	lua "github.com/yuin/gopher-lua"
 	"io"
-	"path/filepath"
 )
 
 type Scraper struct {
@@ -20,9 +17,7 @@ func (s *Scraper) HasSearch() bool {
 	return s.functionSearch != nil
 }
 
-func New(path string, r io.Reader) (*Scraper, error) {
-	L := vm.New(path)
-
+func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 	lfunc, err := L.Load(r, constant.ModuleScraper)
 	if err != nil {
 		return nil, err
@@ -54,23 +49,4 @@ func New(path string, r io.Reader) (*Scraper, error) {
 
 	theScraper.state = L
 	return theScraper, nil
-}
-
-func NewFromPath(path string) (*Scraper, error) {
-	isDir, err := filesystem.Api().IsDir(path)
-	if err != nil {
-		return nil, err
-	}
-
-	if isDir {
-		path = filepath.Join(path, constant.Scraper)
-	}
-
-	file, err := filesystem.Api().Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	return New(filepath.Dir(path), file)
 }

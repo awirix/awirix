@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	"github.com/vivi-app/vivi/lualib/sdk/cmd"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto"
 	"github.com/vivi-app/vivi/lualib/sdk/html"
 	"github.com/vivi-app/vivi/lualib/sdk/http"
@@ -19,5 +20,6 @@ func New(L *lua.LState) *lua.LTable {
 		"http":   http.New(L),
 		"regexp": regexp.New(L),
 		"js":     js.New(L),
+		"cmd":    cmd.New(L),
 	}, nil)
 }

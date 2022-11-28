@@ -11,6 +11,7 @@ type ConfigSection struct {
 	About   string `toml:"about,omitempty"`
 	Default any    `toml:"default"`
 	Values  []any  `toml:"values,omitempty"`
+	value   any
 }
 
 func (c *ConfigSection) UnmarshalText(text []byte) error {
@@ -19,6 +20,7 @@ func (c *ConfigSection) UnmarshalText(text []byte) error {
 		About   string `toml:"about"`
 		Default any    `toml:"default"`
 		Values  []any  `toml:"values"`
+		value   any
 	}
 
 	var r raw
@@ -52,4 +54,16 @@ func (c *ConfigSection) UnmarshalText(text []byte) error {
 	*c = ConfigSection(r)
 
 	return nil
+}
+
+func (c *ConfigSection) SetValue(value any) {
+	c.value = value
+}
+
+func (c *ConfigSection) Value() any {
+	if c.value != nil {
+		return c.value
+	}
+
+	return c.Default
 }

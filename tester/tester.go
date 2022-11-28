@@ -3,11 +3,8 @@ package tester
 import (
 	"fmt"
 	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/vm"
 	lua "github.com/yuin/gopher-lua"
 	"io"
-	"path/filepath"
 )
 
 type Tester struct {
@@ -15,9 +12,7 @@ type Tester struct {
 	functionTest *lua.LFunction
 }
 
-func New(path string, r io.Reader) (*Tester, error) {
-	L := vm.New(path)
-
+func New(L *lua.LState, r io.Reader) (*Tester, error) {
 	lfunc, err := L.Load(r, constant.ModuleTest)
 	if err != nil {
 		return nil, err
@@ -50,23 +45,4 @@ func New(path string, r io.Reader) (*Tester, error) {
 
 	theTester.state = L
 	return theTester, nil
-}
-
-func NewFromPath(path string) (*Tester, error) {
-	isDir, err := filesystem.Api().IsDir(path)
-	if err != nil {
-		return nil, err
-	}
-
-	if isDir {
-		path = filepath.Join(path, constant.Tester)
-	}
-
-	file, err := filesystem.Api().Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	return New(filepath.Dir(path), file)
 }
