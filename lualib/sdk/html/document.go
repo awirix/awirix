@@ -8,18 +8,29 @@ import (
 
 const documentTypeName = "document"
 
-func registerDocumentType(L *lua.LState) {
-	mt := L.NewTypeMetatable(documentTypeName)
-	L.SetGlobal(documentTypeName, mt)
+var documentMethods = map[string]lua.LGFunction{
+	"find": documentFind,
 }
 
-func checkDocument(L *lua.LState) *goquery.Document {
-	ud := L.CheckUserData(1)
+func registerDocumentType(L *lua.LState) {
+	mt := L.NewTypeMetatable(documentTypeName)
+	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), documentMethods))
+}
+
+func checkDocument(L *lua.LState, n int) *goquery.Document {
+	ud := L.CheckUserData(n)
 	if v, ok := ud.Value.(*goquery.Document); ok {
 		return v
 	}
 	L.ArgError(1, "document expected")
 	return nil
+}
+
+func pushDocument(L *lua.LState, document *goquery.Document) {
+	ud := L.NewUserData()
+	ud.Value = document
+	L.SetMetatable(ud, L.GetTypeMetatable(documentTypeName))
+	L.Push(ud)
 }
 
 func parse(L *lua.LState) int {
@@ -32,10 +43,15 @@ func parse(L *lua.LState) int {
 		return 2
 	}
 
-	ud := L.NewUserData()
-	ud.Value = document
-	L.SetMetatable(ud, L.GetTypeMetatable(documentTypeName))
-	L.Push(ud)
+	pushDocument(L, document)
+	return 1
+}
 
+func documentFind(L *lua.LState) int {
+	document := checkDocument(L, 1)
+	selector := L.CheckString(2)
+
+	selection := document.Find(selector)
+	pushSelection(L, selection)
 	return 1
 }

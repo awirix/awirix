@@ -94,6 +94,15 @@ github.com/pelletier/go-toml/v2/unstable
 # github.com/rivo/uniseg v0.4.2
 ## explicit; go 1.18
 github.com/rivo/uniseg
+# github.com/robertkrimen/otto v0.0.0-20221128155055-c74509626007
+## explicit; go 1.18
+github.com/robertkrimen/otto
+github.com/robertkrimen/otto/ast
+github.com/robertkrimen/otto/dbg
+github.com/robertkrimen/otto/file
+github.com/robertkrimen/otto/parser
+github.com/robertkrimen/otto/registry
+github.com/robertkrimen/otto/token
 # github.com/samber/lo v1.30.0
 ## explicit; go 1.18
 github.com/samber/lo
@@ -175,6 +184,10 @@ golang.org/x/text/width
 # gopkg.in/ini.v1 v1.67.0
 ## explicit
 gopkg.in/ini.v1
+# gopkg.in/sourcemap.v1 v1.0.5
+## explicit
+gopkg.in/sourcemap.v1
+gopkg.in/sourcemap.v1/base64vlq
 # gopkg.in/yaml.v2 v2.4.0
 ## explicit; go 1.15
 gopkg.in/yaml.v2
