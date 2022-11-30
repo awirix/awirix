@@ -11,7 +11,7 @@ import (
 type Repository struct {
 	Owner  string `toml:"owner"`
 	Name   string `toml:"name"`
-	Branch string `toml:"branch"`
+	Branch string `toml:"branch,omitempty"`
 
 	repo  option.Option[*github.Repository]
 	files option.Option[[]*File]
@@ -95,5 +95,10 @@ func (r *Repository) Setup() error {
 	}
 
 	r.repo = option.Some(repo)
+
+	if r.Branch == "" {
+		r.Branch = repo.GetDefaultBranch()
+	}
+
 	return nil
 }

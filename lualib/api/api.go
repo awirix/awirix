@@ -7,7 +7,8 @@ import (
 
 func New(L *lua.LState) *lua.LTable {
 	return util.NewTable(L, nil, map[string]lua.LGFunction{
-		"watch":    watch,
-		"download": download,
+		"play_video": playVideo,
+		"open":       openDefault,
+		"download":   download,
 	})
 }

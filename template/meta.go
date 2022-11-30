@@ -2,37 +2,31 @@ package template
 
 import "github.com/vivi-app/vivi/constant"
 
-type noun struct {
-	Singular, Plural string
-}
-
 type funcs struct {
 	Search,
-	Episodes,
+	Explore,
 	Prepare,
-	Watch,
+	Play,
 	Download,
 	Test string
 }
 
 type meta struct {
-	Noun   *noun
 	Module string
 	App    string
 	Fn     *funcs
 }
 
-func newMeta(module string, n *noun) *meta {
+func newMeta(module string) *meta {
 	m := &meta{}
 
-	m.Noun = n
 	m.Module = module
 	m.App = constant.App
 	m.Fn = &funcs{
 		Search:   constant.FunctionSearch,
-		Episodes: constant.FunctionEpisodes,
+		Explore:  constant.FunctionExplore,
 		Prepare:  constant.FunctionPrepare,
-		Watch:    constant.FunctionWatch,
+		Play:     constant.FunctionPlay,
 		Download: constant.FunctionDownload,
 		Test:     constant.FunctionTest,
 	}

@@ -1,44 +1,47 @@
--- vim:ts=3 ss=3 sw=3 expandtab
+{{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}}-- vim:ts=3 ss=3 sw=3 expandtab
 
---- @alias stringer { string: string, [any]: any } Any table that have a string field named "string" used for string representation.
+--- Any table that have a string field named "string" used for string representation.
+--- @alias stringer { string: string, [any]: any }
 
 local M = {}
 
---- Searches for the {{ .Noun.Plural }}.
+--- Searches for the media
 --- This function may be omitted if this extension does not provide searching functionality.
---- E.g. when the site is dedicated to a single {{ .Noun.Singular }}.
+--- Might be the case if the site is dedicated to the single show/movie/book/...
 --- @param query string The query to search for.
---- @return stringer[] # The {{ .Noun.Plural }} that match the query.
+--- @return stringer[] # The media that match the query.
 function M.{{ .Fn.Search }}(query)
    return {}
 end
 
---- Returns a list of episodes for {{ .Noun.Singular }}.
---- @param {{ .Noun.Singular }} stringer? The {{ .Noun.Singular }} to get episodes for.
+--- Returns a list of nested medias for the search result entry.
+--- E.g. it should return list of episodes for the show, chapters for the book and so on.
+--- @param media stringer? The entry to explore.
 --- Nil will be passed if the `search` function is missing.
+--- Might be the case if the site is dedicated to the single show/movie/book/...
 --- @return stringer[] # The list of episodes.
-function M.{{ .Fn.Episodes }}({{ .Noun.Singular }})
+function M.{{ .Fn.Explore }}(media)
    return {}
 end
 
---- Prepares an episode for watching/downloading.
+--- Prepares a media for watching/downloading.
 --- When you need to do some heavy operations before passing it further.
---- @param episode stringer The episode to prepare.
---- @return stringer # The prepared episode.
-function M.{{ .Fn.Prepare }}(episode)
-   return episode
+--- @param media stringer The media to prepare.
+--- @return stringer # The prepared media
+function M.{{ .Fn.Prepare }}(media)
+   return media
 end
 
---- Watches an episode.
---- @param episode stringer The episode to watch.
-function M.{{ .Fn.Watch }}(episode)
-   require('{{ .App }}').api.watch(episode.url)
+--- Opens a media
+--- @param media stringer The media to play (watch, read, open).
+function M.{{ .Fn.Play }}(media)
+   require('{{ .App }}').api.open(media.url)
 end
 
---- Downloads an episode.
---- @param episode stringer The episode to download.
-function M.{{ .Fn.Download }}(episode)
-   require('{{ .App }}').api.download(episode.string, episode.url)
+--- Downloads a media.
+--- @param media stringer The media to download.
+function M.{{ .Fn.Download }}(media)
+   require('{{ .App }}').api.download(media.string, media.url)
 end
 
 return M

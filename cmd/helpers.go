@@ -5,14 +5,18 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/extension"
+	"github.com/vivi-app/vivi/extensions/extension"
+	"github.com/vivi-app/vivi/extensions/manager"
 	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/style"
 )
 
 func completionExtensionsIDs(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-	return lo.Map(extension.ListInstalled(), func(e *extension.Extension, _ int) string {
+	exts, err := manager.InstalledExtensions()
+	if err != nil {
+		exts = []*extension.Extension{}
+	}
+
+	return lo.Map(exts, func(e *extension.Extension, _ int) string {
 		return e.Passport().ID
 	}), cobra.ShellCompDirectiveNoFileComp
 }
@@ -44,7 +48,7 @@ func loadExtension(pathFlag, idFlag *pflag.Flag) *extension.Extension {
 	var ext *extension.Extension
 
 	switch {
-	case pathFlag.Changed:
+	case pathFlag != nil && pathFlag.Changed:
 		path := pathFlag.Value.String()
 		isDir, err := filesystem.Api().IsDir(path)
 		handleErr(err)
@@ -53,16 +57,15 @@ func loadExtension(pathFlag, idFlag *pflag.Flag) *extension.Extension {
 			handleErr(fmt.Errorf("path %s is not a directory", path))
 		}
 
-		ext, err = extension.NewFromPath(path)
+		ext = extension.New(path)
+		err = ext.LoadPassport()
 		handleErr(err)
-	case idFlag.Changed:
-		var ok bool
+	case idFlag != nil && idFlag.Changed:
+		var err error
 		id := idFlag.Value.String()
-		ext, ok = extension.NewFromID(id)
+		ext, err = manager.GetExtensionByID(id)
 
-		if !ok {
-			handleErr(fmt.Errorf("extension %s not found", style.Fg(color.Purple)(id)))
-		}
+		handleErr(err)
 	}
 
 	return ext

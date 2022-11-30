@@ -7,9 +7,9 @@ const (
 
 const (
 	FunctionSearch   = "search"
-	FunctionEpisodes = "episodes"
+	FunctionExplore  = "explore"
 	FunctionPrepare  = "prepare"
-	FunctionWatch    = "watch"
+	FunctionPlay     = "play"
 	FunctionDownload = "download"
 	FunctionTest     = "test"
 )

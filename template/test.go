@@ -14,7 +14,7 @@ var templateTest string
 func NewTest() []byte {
 	tmpl := lo.Must(template.New("test").Parse(templateTest))
 
-	m := newMeta(constant.ModuleTest, nil)
+	m := newMeta(constant.ModuleTest)
 
 	var b bytes.Buffer
 

@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -19,4 +20,9 @@ func Quantify(n int, singular, plural string) string {
 	}
 
 	return fmt.Sprintf("%d %s", n, plural)
+}
+
+func IsURL(s string) bool {
+	pattern := regexp.MustCompile(`^https?://`)
+	return pattern.MatchString(s)
 }

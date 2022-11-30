@@ -6,13 +6,12 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/extension"
+	"github.com/vivi-app/vivi/extensions/extension"
+	"github.com/vivi-app/vivi/extensions/manager"
 	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/passport"
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/util"
-	"strings"
+	"regexp"
 )
 
 func init() {
@@ -21,8 +20,8 @@ func init() {
 
 var extensionsCmd = &cobra.Command{
 	Use:     "extensions",
-	Aliases: []string{"ext"},
-	Short:   constant.App + " extensions",
+	Aliases: []string{"exts", "ext"},
+	Short:   "Manage extensions",
 	Args:    cobra.NoArgs,
 }
 
@@ -37,14 +36,15 @@ var extensionsNewCmd = &cobra.Command{
 	Short: "Create a new extension",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		ext, err := extension.NewInteractive()
+		ext, err := extension.GenerateInteractive()
 		handleErr(err)
 
+		handleErr(ext.LoadPassport())
+
 		fmt.Printf(
-			"%s Created %s extension for %s domain\n",
+			"%s Created %s extension\n",
 			style.Fg(color.Green)(icon.Check),
 			style.Fg(color.Purple)(ext.String()),
-			style.New().Foreground(color.Yellow).Bold(true).Render(string(ext.Passport().Domain)),
 		)
 
 		if printPath := lo.Must(cmd.Flags().GetBool("print-path")); printPath {
@@ -58,40 +58,46 @@ func init() {
 }
 
 var extensionsListCmd = &cobra.Command{
-	Use:   "list",
-	Short: "List installed extensions",
-	Args:  cobra.NoArgs,
+	Use:     "list",
+	Short:   "List installed extensions",
+	Aliases: []string{"ls"},
+	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		extensions := extension.ListInstalled()
+		extensions, err := manager.InstalledExtensions()
+		handleErr(err)
 
-		var byDomain = make(map[passport.Domain][]*extension.Extension)
+		var (
+			byAuthor = make(map[string][]*extension.Extension)
+			authors  = make(map[string]any, 0)
+		)
 
 		for _, ext := range extensions {
-			byDomain[ext.Passport().Domain] = append(byDomain[ext.Passport().Domain], ext)
+			byAuthor[ext.Author()] = append(byAuthor[ext.Author()], ext)
+			authors[ext.Author()] = nil
 		}
 
-		printForDomain := func(d passport.Domain) {
+		printForDomain := func(author string) {
 			fmt.Println(
 				style.
 					New().
 					Foreground(color.Yellow).
 					Bold(true).
-					Render(util.Capitalize(string(d))),
+					Render(author),
 			)
 
-			for _, e := range byDomain[d] {
+			for _, e := range byAuthor[author] {
 				fmt.Printf(
 					"%s %s %s\n",
-					style.Fg(color.Purple)(e.String()),
+					style.Fg(color.Purple)(e.Passport().Name),
 					style.Bold(e.Passport().Version.String()),
 					style.Faint(e.Passport().About),
 				)
 			}
 		}
 
-		for _, domain := range passport.Domains {
-			if _, ok := byDomain[domain]; ok {
-				printForDomain(domain)
+		for author, _ := range authors {
+			if _, ok := byAuthor[author]; ok {
+				printForDomain(author)
 				fmt.Println()
 			}
 		}
@@ -105,18 +111,19 @@ var extensionsListCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsRemoveCmd)
+	extensionsCmd.AddCommand(extensionsUninstallCmd)
 
-	extensionsRemoveCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
+	extensionsUninstallCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
 }
 
-var extensionsRemoveCmd = &cobra.Command{
-	Use:     "remove",
-	Short:   "Remove an extension",
-	Aliases: []string{"rm"},
+var extensionsUninstallCmd = &cobra.Command{
+	Use:     "del",
+	Short:   "Uninstall an extension",
+	Aliases: []string{"rm", "remove", "uninstall"},
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		extensions := extension.ListInstalled()
+		extensions, err := manager.InstalledExtensions()
+		handleErr(err)
 
 		if id := lo.Must(cmd.Flags().GetString("id")); id != "" {
 			toRemove, ok := lo.Find(extensions, func(e *extension.Extension) bool {
@@ -130,7 +137,7 @@ var extensionsRemoveCmd = &cobra.Command{
 				))
 			}
 
-			handleErr(toRemove.Uninstall())
+			handleErr(manager.UninstallExtension(toRemove))
 
 			return
 		}
@@ -142,7 +149,7 @@ var extensionsRemoveCmd = &cobra.Command{
 		}
 
 		var selected []string
-		err := survey.AskOne(&survey.MultiSelect{
+		err = survey.AskOne(&survey.MultiSelect{
 			Message: "Select extensions to remove",
 			Options: lo.Keys(nameExtensionMap),
 		}, &selected)
@@ -150,9 +157,7 @@ var extensionsRemoveCmd = &cobra.Command{
 
 		var confirm bool
 		err = survey.AskOne(&survey.Confirm{
-			Message: fmt.Sprintf("Remove %s?", strings.Join(lo.Map(selected, func(s string, _ int) string {
-				return style.Fg(color.Purple)(s)
-			}), ", ")),
+			Message: fmt.Sprintf("Remove %s?", util.Quantify(len(selected), "extension", "extensions")),
 			Default: false,
 		}, &confirm)
 		handleErr(err)
@@ -163,7 +168,8 @@ var extensionsRemoveCmd = &cobra.Command{
 		}
 
 		for _, s := range selected {
-			handleErr(nameExtensionMap[s].Uninstall())
+			err = manager.UninstallExtension(nameExtensionMap[s])
+			handleErr(err)
 		}
 
 		fmt.Printf(
@@ -192,9 +198,10 @@ func init() {
 }
 
 var extensionsSelectCmd = &cobra.Command{
-	Use:   "select",
-	Short: "Select an extension to perform an action on",
-	Args:  cobra.NoArgs,
+	Use:     "select",
+	Short:   "Select an extension to perform an action on",
+	Aliases: []string{"sel"},
+	Args:    cobra.NoArgs,
 	PreRunE: preRunERequiredMutuallyExclusiveFlags(
 		[]string{"path", "id"},
 		[]string{"run", "test", "info"},
@@ -212,5 +219,41 @@ var extensionsSelectCmd = &cobra.Command{
 		case lo.Must(cmd.Flags().GetBool("info")):
 			fmt.Println(ext.Passport().Info())
 		}
+	},
+}
+
+func init() {
+	extensionsCmd.AddCommand(extensionsAddCmd)
+
+	extensionsAddCmd.Flags().BoolP("yes", "y", false, "skip install confirmation")
+	extensionsAddCmd.Flags().BoolP("force", "f", false, "skip passport validation")
+
+	extensionsAddCmd.MarkFlagsMutuallyExclusive("yes", "force")
+}
+
+var extensionsAddCmd = &cobra.Command{
+	Use:     "add",
+	Short:   "Install an extension",
+	Aliases: []string{"install"},
+	Args:    cobra.ExactArgs(1),
+	Run: func(cmd *cobra.Command, args []string) {
+		arg := args[0]
+
+		var url string
+
+		if util.IsURL(arg) {
+			url = arg
+		} else if matched, _ := regexp.MatchString(`^[\w-]+/[\w-]+$`, arg); matched {
+			url = fmt.Sprintf("https://github.com/%s", arg)
+		}
+
+		ext, err := manager.InstallExtension(&manager.InstallOptions{
+			URL:          url,
+			SkipConfirm:  lo.Must(cmd.Flags().GetBool("yes")),
+			SkipValidate: lo.Must(cmd.Flags().GetBool("force")),
+		})
+		handleErr(err)
+
+		fmt.Printf("%s Successfully installed %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()))
 	},
 }

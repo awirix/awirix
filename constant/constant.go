@@ -12,7 +12,7 @@ const (
 )
 
 const (
-	Passport = "passport.toml"
-	Scraper  = "scraper.lua"
-	Tester   = "test.lua"
+	FilenamePassport = "passport.toml"
+	FilenameScraper  = "scraper.lua"
+	FilenameTester   = "test.lua"
 )

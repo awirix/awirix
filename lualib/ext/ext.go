@@ -1,13 +1,44 @@
 package passport
 
 import (
-	"github.com/vivi-app/vivi/lualib/ext/passport"
+	"github.com/vivi-app/vivi/extensions"
+	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/util"
 	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {
+	ext := L.Context().Value(true).(extensions.ExtensionContainer)
+
 	return util.NewTable(L, map[string]lua.LValue{
-		"passport": passport.New(L),
-	}, nil)
+		"path":    lua.LString(ext.Path()),
+		"version": lua.LString(ext.Passport().Version.String()),
+	}, map[string]lua.LGFunction{
+		"config": passportConfig,
+	})
+}
+
+func getPassportFromCtx(L *lua.LState) *passport.Passport {
+	return L.Context().Value(true).(extensions.ExtensionContainer).Passport()
+}
+
+func passportConfig(L *lua.LState) int {
+	p := getPassportFromCtx(L)
+	key := L.CheckString(1)
+
+	section, ok := p.Config[key]
+	if !ok {
+		L.RaiseError("passport config section %s not found", key)
+		return 1
+	}
+
+	value := section.Value()
+	lvalue, err := util.ToLValue(L, value)
+	if err != nil {
+		L.RaiseError(err.Error())
+		return 1
+	}
+
+	L.Push(lvalue)
+	return 0
 }

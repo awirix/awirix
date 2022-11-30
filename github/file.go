@@ -41,18 +41,11 @@ func (f *File) Setup() error {
 	return nil
 }
 
-func (f *File) Read(p []byte) (int, error) {
-	if f.contents.IsPresent() {
-		contents := f.contents.MustGet()
-		copy(p, contents)
-		return len(contents), nil
-	}
-
+func (f *File) Contents() ([]byte, error) {
 	err := f.Setup()
 	if err != nil {
-		return -1, err
+		return nil, err
 	}
 
-	copy(p, f.contents.MustGet())
-	return len(f.contents.MustGet()), nil
+	return f.contents.MustGet(), nil
 }
