@@ -1,4 +1,4 @@
-package constant
+package key
 
 const (
 	LogsWrite = "logs.write"

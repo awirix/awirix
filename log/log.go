@@ -3,12 +3,12 @@ package log
 import (
 	"errors"
 	"fmt"
-	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/where"
 	"github.com/samber/lo"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/key"
+	"github.com/vivi-app/vivi/where"
 	"os"
 	"path/filepath"
 	"time"
@@ -17,7 +17,7 @@ import (
 var writeLogs bool
 
 func Init() error {
-	writeLogs = viper.GetBool(constant.LogsWrite)
+	writeLogs = viper.GetBool(key.LogsWrite)
 
 	if !writeLogs {
 		return nil
@@ -42,7 +42,7 @@ func Init() error {
 	log.SetOutput(logFile)
 	log.SetFormatter(&log.TextFormatter{})
 
-	switch viper.GetString(constant.LogsLevel) {
+	switch viper.GetString(key.LogsLevel) {
 	case "panic":
 		log.SetLevel(log.PanicLevel)
 	case "fatal":

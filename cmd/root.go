@@ -4,8 +4,8 @@ import (
 	"fmt"
 	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/spf13/cobra"
+	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/log"
@@ -17,10 +17,10 @@ import (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     strings.ToLower(constant.App),
+	Use:     strings.ToLower(app.Name),
 	Short:   "Multimedia Metascraper",
-	Long:    constant.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
-	Version: constant.Version,
+	Long:    app.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
+	Version: app.Version,
 	Args:    cobra.NoArgs,
 }
 

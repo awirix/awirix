@@ -1,14 +1,14 @@
 package regexp
 
 import (
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 	"regexp"
 )
 
 func New(L *lua.LState) *lua.LTable {
 	registerRegexpType(L)
-	return util.NewTable(L, nil, map[string]lua.LGFunction{
+	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
 		"match":   match,
 		"compile": compile,
 	})

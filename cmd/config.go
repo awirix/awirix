@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/style"
 	"golang.org/x/exp/slices"
 	"os"
@@ -16,7 +17,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/config"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/where"
@@ -219,7 +219,7 @@ var configWriteCmd = &cobra.Command{
 			force          = lo.Must(cmd.Flags().GetBool("force"))
 			configFilePath = filepath.Join(
 				where.Config(),
-				fmt.Sprintf("%s.%s", constant.App, constant.ConfigFormat),
+				fmt.Sprintf("%s.%s", app.Name, config.Format),
 			)
 		)
 
@@ -251,7 +251,7 @@ var configDeleteCmd = &cobra.Command{
 	Short:   "Delete the config file",
 	Aliases: []string{"remove"},
 	Run: func(cmd *cobra.Command, args []string) {
-		configFilePath := filepath.Join(where.Config(), fmt.Sprintf("%s.%s", constant.App, constant.ConfigFormat))
+		configFilePath := filepath.Join(where.Config(), fmt.Sprintf("%s.%s", app.Name, config.Format))
 
 		exists, err := filesystem.Api().Exists(configFilePath)
 		handleErr(err)

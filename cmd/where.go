@@ -3,8 +3,8 @@ package cmd
 import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/where"
 	"os"
@@ -45,7 +45,7 @@ func init() {
 
 var whereCmd = &cobra.Command{
 	Use:   "where",
-	Short: "Show the paths for a files related to the " + constant.App,
+	Short: "Show the paths for a files related to the " + app.Name,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		headerStyle := style.NewColored(color.HiPurple, "").Bold(true).Render

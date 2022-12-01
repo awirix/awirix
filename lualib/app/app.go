@@ -2,15 +2,15 @@ package app
 
 import (
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/app"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 	"runtime"
 )
 
 func New(L *lua.LState) *lua.LTable {
-	return util.NewTable(L, map[string]lua.LValue{
-		"version": lua.LString(constant.Version),
+	return luautil.NewTable(L, map[string]lua.LValue{
+		"version": lua.LString(app.Version),
 		"os":      lua.LString(runtime.GOOS),
 		"arch":    lua.LString(runtime.GOARCH),
 	}, map[string]lua.LGFunction{

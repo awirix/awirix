@@ -10,6 +10,7 @@ const documentTypeName = "document"
 
 var documentMethods = map[string]lua.LGFunction{
 	"find": documentFind,
+	"html": documentHtml,
 }
 
 func registerDocumentType(L *lua.LState) {
@@ -53,5 +54,18 @@ func documentFind(L *lua.LState) int {
 
 	selection := document.Find(selector)
 	pushSelection(L, selection)
+	return 1
+}
+
+func documentHtml(L *lua.LState) int {
+	document := checkDocument(L, 1)
+	html, err := document.Html()
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	L.Push(lua.LString(html))
 	return 1
 }

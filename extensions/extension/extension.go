@@ -3,8 +3,8 @@ package extension
 import (
 	"context"
 	"fmt"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/extensions/passport"
+	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
@@ -47,7 +47,7 @@ func (e *Extension) Init() {
 }
 
 func (e *Extension) LoadPassport() error {
-	file, err := filesystem.Api().Open(filepath.Join(e.Path(), constant.FilenamePassport))
+	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Passport))
 	if err != nil {
 		return err
 	}
@@ -63,7 +63,7 @@ func (e *Extension) LoadPassport() error {
 }
 
 func (e *Extension) LoadScraper() error {
-	file, err := filesystem.Api().Open(filepath.Join(e.Path(), constant.FilenameScraper))
+	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Scraper))
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (e *Extension) LoadScraper() error {
 }
 
 func (e *Extension) LoadTester() error {
-	file, err := filesystem.Api().Open(filepath.Join(e.Path(), constant.FilenameTester))
+	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Tester))
 	if err != nil {
 		return err
 	}

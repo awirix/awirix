@@ -9,7 +9,6 @@ const regexpTypeName = "regexp"
 
 func registerRegexpType(L *lua.LState) {
 	mt := L.NewTypeMetatable(regexpTypeName)
-	// methods
 	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), regexpMethods))
 }
 

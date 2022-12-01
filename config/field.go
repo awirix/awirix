@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/style"
 	"reflect"
 	"strconv"
@@ -60,7 +60,7 @@ func (f *Field) Pretty() string {
 
 func (f *Field) Env() string {
 	env := strings.ToUpper(EnvKeyReplacer.Replace(f.Key))
-	appPrefix := strings.ToUpper(constant.App + "_")
+	appPrefix := strings.ToUpper(app.Name + "_")
 
 	if strings.HasPrefix(env, appPrefix) {
 		return env

@@ -2,6 +2,7 @@ package http
 
 import (
 	lua "github.com/yuin/gopher-lua"
+	"io"
 	"net/http"
 )
 
@@ -26,7 +27,6 @@ var responseMethods = map[string]lua.LGFunction{
 
 func registerResponseType(L *lua.LState) {
 	mt := L.NewTypeMetatable(responseTypeName)
-	L.SetGlobal("response", mt)
 	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), responseMethods))
 }
 
@@ -55,9 +55,8 @@ func responseStatusCode(L *lua.LState) int {
 func responseBody(L *lua.LState) int {
 	response := checkResponse(L, 1)
 
-	var b []byte
-	_, err := response.Body.Read(b)
 	defer response.Body.Close()
+	b, err := io.ReadAll(response.Body)
 
 	if err != nil {
 		L.Push(lua.LNil)

@@ -2,7 +2,7 @@ package js
 
 import (
 	"github.com/robertkrimen/otto"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -51,7 +51,7 @@ func vmValueExport(L *lua.LState) int {
 		return 2
 	}
 
-	lvalue, err := util.ToLValue(L, nativeValue)
+	lvalue, err := luautil.ToLValue(L, nativeValue)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))

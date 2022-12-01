@@ -4,15 +4,15 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/libopen/open"
-	"github.com/vivi-app/vivi/constant"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/executil"
+	"github.com/vivi-app/vivi/key"
 	lua "github.com/yuin/gopher-lua"
 	"runtime"
 )
 
 func openDefault(L *lua.LState) int {
 	url := L.CheckString(1)
-	app := L.CheckAny(2)
+	app := L.Get(2)
 
 	var err error
 	if app.Type() == lua.LTNil {
@@ -31,7 +31,7 @@ func openDefault(L *lua.LState) int {
 func playVideo(L *lua.LState) int {
 	url := L.CheckString(1)
 
-	if player := viper.GetString(constant.VideoDefaultPlayer); player != "auto" {
+	if player := viper.GetString(key.VideoDefaultPlayer); player != "auto" {
 		err := open.StartWith(url, player)
 
 		if err != nil {
@@ -50,7 +50,7 @@ func playVideo(L *lua.LState) int {
 	players = append(players, "mpv", "vlc")
 
 	for _, player := range players {
-		if !util.ProgramInPath(player) {
+		if !executil.ProgramInPath(player) {
 			fmt.Println("player not found:", player)
 			continue
 		}

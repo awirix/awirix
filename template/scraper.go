@@ -4,17 +4,17 @@ import (
 	"bytes"
 	_ "embed"
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/scraper"
 	"text/template"
 )
 
 //go:embed scraper.lua.tmpl
-var templateVideo string
+var templateScraper string
 
-func NewScraper() []byte {
-	tmpl := lo.Must(template.New(constant.ModuleScraper).Parse(templateVideo))
+func Scraper() []byte {
+	tmpl := lo.Must(template.New(scraper.Module).Parse(templateScraper))
 
-	info := newMeta(constant.ModuleScraper)
+	info := newMeta(scraper.Module)
 
 	var b bytes.Buffer
 	lo.Must0(tmpl.Execute(&b, info))

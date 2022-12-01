@@ -4,17 +4,17 @@ import (
 	"bytes"
 	_ "embed"
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/tester"
 	"text/template"
 )
 
 //go:embed test.lua.tmpl
-var templateTest string
+var templateTester string
 
-func NewTest() []byte {
-	tmpl := lo.Must(template.New("test").Parse(templateTest))
+func Tester() []byte {
+	tmpl := lo.Must(template.New(tester.Module).Parse(templateTester))
 
-	m := newMeta(constant.ModuleTest)
+	m := newMeta(tester.Module)
 
 	var b bytes.Buffer
 

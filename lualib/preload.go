@@ -1,7 +1,7 @@
 package lualib
 
 import (
-	"github.com/vivi-app/vivi/constant"
+	app2 "github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/lualib/api"
 	"github.com/vivi-app/vivi/lualib/app"
 	ext "github.com/vivi-app/vivi/lualib/ext"
@@ -10,7 +10,7 @@ import (
 )
 
 func Preload(L *lua.LState) {
-	L.PreloadModule(constant.App, Loader)
+	L.PreloadModule(app2.Name, Loader)
 }
 
 func Loader(L *lua.LState) int {

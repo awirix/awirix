@@ -1,4 +1,4 @@
-package util
+package luautil
 
 import (
 	"fmt"
@@ -78,6 +78,14 @@ func ToLValue(L *lua.LState, value any) (lua.LValue, error) {
 			}
 
 			table.RawSetString(k, lvalue)
+		}
+
+		return table, nil
+	case []string:
+		table := L.NewTable()
+
+		for i, v := range value {
+			table.RawSetInt(i+1, lua.LString(v))
 		}
 
 		return table, nil

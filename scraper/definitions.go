@@ -1,9 +1,6 @@
-package constant
+package scraper
 
-const (
-	ModuleScraper = "scraper"
-	ModuleTest    = "test"
-)
+const Module = "scraper"
 
 const (
 	FunctionSearch   = "search"
@@ -11,5 +8,4 @@ const (
 	FunctionPrepare  = "prepare"
 	FunctionPlay     = "play"
 	FunctionDownload = "download"
-	FunctionTest     = "test"
 )

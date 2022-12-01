@@ -6,12 +6,12 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/extensions/passport"
+	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/github"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/text"
 	"github.com/vivi-app/vivi/where"
 	"io"
 	"os"
@@ -28,7 +28,7 @@ type InstallOptions struct {
 }
 
 func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
-	if !util.IsURL(options.URL) {
+	if !text.IsURL(options.URL) {
 		return nil, fmt.Errorf("invalid URL")
 	}
 
@@ -36,7 +36,7 @@ func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 	repoName := filepath.Base(trimmed)
 	repoOwner := filepath.Base(filepath.Dir(trimmed))
 
-	path := filepath.Join(where.Extensions(), util.SanitizeFilename(repoOwner), util.SanitizeFilename(repoName))
+	path := filepath.Join(where.Extensions(), filename.Sanitize(repoOwner), filename.Sanitize(repoName))
 
 	if exists, err := filesystem.Api().Exists(path); err != nil {
 		return nil, err
@@ -65,19 +65,19 @@ func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 			return nil, err
 		}
 
-		progress("Searching for " + constant.FilenamePassport)
-		file, err := repo.GetFile(constant.FilenamePassport)
+		progress("Searching for " + filename.Passport)
+		file, err := repo.GetFile(filename.Passport)
 		if err != nil {
-			return nil, fmt.Errorf("repository does not contain a %s", constant.FilenamePassport)
+			return nil, fmt.Errorf("repository does not contain a %s", filename.Passport)
 		}
 
-		progress("Reading " + constant.FilenamePassport)
+		progress("Reading " + filename.Passport)
 		data, err := file.Contents()
 		if err != nil {
 			return nil, err
 		}
 
-		progress("Parsing " + constant.FilenamePassport)
+		progress("Parsing " + filename.Passport)
 		thePassport, err := passport.New(bytes.NewBuffer(data))
 		if err != nil {
 			return nil, fmt.Errorf("repository does not contain a valid passport: %s", err)

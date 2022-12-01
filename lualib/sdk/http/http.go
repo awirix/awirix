@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 	"net/http"
 	"strings"
@@ -12,8 +12,9 @@ func New(L *lua.LState) *lua.LTable {
 	registerRequestType(L)
 	registerHeaderType(L)
 	registerClientType(L)
+	registerCookieType(L)
 
-	return util.NewTable(L, nil, map[string]lua.LGFunction{
+	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
 		"get":         defaultClientGet,
 		"post":        defaultClientPost,
 		"new_request": newRequest,

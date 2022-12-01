@@ -2,13 +2,13 @@ package cmd
 
 import (
 	"github.com/samber/lo"
+	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/style"
 	"html/template"
 	"runtime"
 
 	"github.com/spf13/cobra"
-	"github.com/vivi-app/vivi/constant"
 )
 
 func init() {
@@ -19,11 +19,11 @@ func init() {
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "Print the version number of the " + constant.App,
+	Short: "Print the version number of the " + app.Name,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if lo.Must(cmd.Flags().GetBool("short")) {
-			_, err := cmd.OutOrStdout().Write([]byte(constant.Version + "\n"))
+			_, err := cmd.OutOrStdout().Write([]byte(app.Version + "\n"))
 			handleErr(err)
 			return
 		}
@@ -35,8 +35,8 @@ var versionCmd = &cobra.Command{
 			App      string
 			Compiler string
 		}{
-			Version:  constant.Version,
-			App:      constant.App,
+			Version:  app.Version,
+			App:      app.Name,
 			OS:       runtime.GOOS,
 			Arch:     runtime.GOARCH,
 			Compiler: runtime.Compiler,

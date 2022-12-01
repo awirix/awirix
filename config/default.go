@@ -2,19 +2,19 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/constant"
+	"github.com/vivi-app/vivi/key"
 )
 
 // fields is the config fields with their default values and descriptions
 var fields = []*Field{
 	// LOGS
 	{
-		constant.LogsWrite,
+		key.LogsWrite,
 		false,
 		"Write logs to file",
 	},
 	{
-		constant.LogsLevel,
+		key.LogsLevel,
 		"info",
 		`Logs level.
 Available options are: (from less to most verbose)
@@ -24,17 +24,17 @@ panic, fatal, error, warn, info, debug, trace`,
 
 	// PATH
 	{
-		constant.PathAnimeDownloads,
+		key.PathAnimeDownloads,
 		".",
 		"Path to anime downloads",
 	},
 	{
-		constant.PathMoviesDownloads,
+		key.PathMoviesDownloads,
 		".",
 		"Path to movies downloads",
 	},
 	{
-		constant.PathShowsDownloads,
+		key.PathShowsDownloads,
 		".",
 		"Path to shows downloads",
 	},
@@ -42,7 +42,7 @@ panic, fatal, error, warn, info, debug, trace`,
 
 	// VIDEO
 	{
-		constant.VideoDefaultPlayer,
+		key.VideoDefaultPlayer,
 		"auto",
 		`Default video player.
 'auto' is a special value that will try to use the most suitable player.`,
@@ -51,7 +51,7 @@ panic, fatal, error, warn, info, debug, trace`,
 
 	// EXTENSIONS
 	{
-		constant.ExtensionsSafeMode,
+		key.ExtensionsSafeMode,
 		true,
 		`Enable safe mode for extensions.
 If enabled, system commands will be disabled

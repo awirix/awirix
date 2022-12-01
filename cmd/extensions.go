@@ -10,7 +10,7 @@ import (
 	"github.com/vivi-app/vivi/extensions/manager"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/text"
 	"regexp"
 )
 
@@ -105,7 +105,7 @@ var extensionsListCmd = &cobra.Command{
 		fmt.Printf(
 			"%s %s installed\n",
 			style.Fg(color.Pink)(icon.Heart),
-			util.Quantify(len(extensions), "extension", "extensions"),
+			text.Quantify(len(extensions), "extension", "extensions"),
 		)
 	},
 }
@@ -157,7 +157,7 @@ var extensionsUninstallCmd = &cobra.Command{
 
 		var confirm bool
 		err = survey.AskOne(&survey.Confirm{
-			Message: fmt.Sprintf("Remove %s?", util.Quantify(len(selected), "extension", "extensions")),
+			Message: fmt.Sprintf("Remove %s?", text.Quantify(len(selected), "extension", "extensions")),
 			Default: false,
 		}, &confirm)
 		handleErr(err)
@@ -175,7 +175,7 @@ var extensionsUninstallCmd = &cobra.Command{
 		fmt.Printf(
 			"%s Successfully removed %s\n",
 			style.Fg(color.Green)(icon.Check),
-			util.Quantify(len(selected), "extension", "extensions"),
+			text.Quantify(len(selected), "extension", "extensions"),
 		)
 	},
 }
@@ -241,7 +241,7 @@ var extensionsAddCmd = &cobra.Command{
 
 		var url string
 
-		if util.IsURL(arg) {
+		if text.IsURL(arg) {
 			url = arg
 		} else if matched, _ := regexp.MatchString(`^[\w-]+/[\w-]+$`, arg); matched {
 			url = fmt.Sprintf("https://github.com/%s", arg)

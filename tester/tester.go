@@ -2,7 +2,6 @@ package tester
 
 import (
 	"fmt"
-	"github.com/vivi-app/vivi/constant"
 	lua "github.com/yuin/gopher-lua"
 	"io"
 )
@@ -13,7 +12,7 @@ type Tester struct {
 }
 
 func New(L *lua.LState, r io.Reader) (*Tester, error) {
-	lfunc, err := L.Load(r, constant.ModuleTest)
+	lfunc, err := L.Load(r, Module)
 	if err != nil {
 		return nil, err
 	}
@@ -36,11 +35,11 @@ func New(L *lua.LState, r io.Reader) (*Tester, error) {
 		return nil, fmt.Errorf("tester module must return a table")
 	}
 
-	functionTest := table.RawGet(lua.LString(constant.FunctionTest))
+	functionTest := table.RawGet(lua.LString(FunctionTest))
 	if functionTest.Type() == lua.LTFunction {
 		theTester.functionTest = functionTest.(*lua.LFunction)
 	} else {
-		return nil, fmt.Errorf("tester module must have a %s function", constant.FunctionTest)
+		return nil, fmt.Errorf("tester module must have a %s function", FunctionTest)
 	}
 
 	theTester.state = L

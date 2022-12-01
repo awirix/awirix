@@ -3,14 +3,14 @@ package passport
 import (
 	"github.com/vivi-app/vivi/extensions"
 	"github.com/vivi-app/vivi/extensions/passport"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {
 	ext := L.Context().Value(true).(extensions.ExtensionContainer)
 
-	return util.NewTable(L, map[string]lua.LValue{
+	return luautil.NewTable(L, map[string]lua.LValue{
 		"path":    lua.LString(ext.Path()),
 		"version": lua.LString(ext.Passport().Version.String()),
 	}, map[string]lua.LGFunction{
@@ -33,7 +33,7 @@ func passportConfig(L *lua.LState) int {
 	}
 
 	value := section.Value()
-	lvalue, err := util.ToLValue(L, value)
+	lvalue, err := luautil.ToLValue(L, value)
 	if err != nil {
 		L.RaiseError(err.Error())
 		return 1

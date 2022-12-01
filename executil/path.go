@@ -1,4 +1,4 @@
-package util
+package executil
 
 import (
 	"os/exec"
@@ -9,6 +9,5 @@ func ProgramInPath(program string) bool {
 	if _, err := exec.LookPath(strings.TrimSpace(program)); err != nil {
 		return false
 	}
-
 	return true
 }

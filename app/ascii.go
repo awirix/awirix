@@ -1,4 +1,4 @@
-package constant
+package app
 
 import (
 	_ "embed"

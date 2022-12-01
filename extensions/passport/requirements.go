@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
+	"github.com/vivi-app/vivi/executil"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/util"
 	"runtime"
 	"strings"
 )
@@ -39,7 +39,7 @@ func (d *Requirements) Info() string {
 		b.WriteString("Programs ")
 
 		for _, program := range d.Programs {
-			if util.ProgramInPath(program) {
+			if executil.ProgramInPath(program) {
 				b.WriteString(style.Fg(color.Green)(icon.Check))
 			} else {
 				b.WriteString(style.Fg(color.Red)(icon.Cross))
@@ -60,7 +60,7 @@ func (d *Requirements) Matches() bool {
 	}
 
 	for _, program := range d.Programs {
-		if !util.ProgramInPath(program) {
+		if !executil.ProgramInPath(program) {
 			return false
 		}
 	}

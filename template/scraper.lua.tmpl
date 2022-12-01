@@ -16,9 +16,9 @@ end
 
 --- Returns a list of nested medias for the search result entry.
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
+--- This function may be omitted if this extension does not provide exploring functionality.
 --- @param media stringer? The entry to explore.
 --- Nil will be passed if the `search` function is missing.
---- Might be the case if the site is dedicated to the single show/movie/book/...
 --- @return stringer[] # The list of episodes.
 function M.{{ .Fn.Explore }}(media)
    return {}

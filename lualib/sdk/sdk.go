@@ -8,18 +8,20 @@ import (
 	"github.com/vivi-app/vivi/lualib/sdk/js"
 	"github.com/vivi-app/vivi/lualib/sdk/json"
 	"github.com/vivi-app/vivi/lualib/sdk/regexp"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/lualib/sdk/strings"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {
-	return util.NewTable(L, map[string]lua.LValue{
-		"json":   json.New(L),
-		"html":   html.New(L),
-		"crypto": crypto.New(L),
-		"http":   http.New(L),
-		"regexp": regexp.New(L),
-		"js":     js.New(L),
-		"cmd":    cmd.New(L),
+	return luautil.NewTable(L, map[string]lua.LValue{
+		"json":    json.New(L),
+		"html":    html.New(L),
+		"crypto":  crypto.New(L),
+		"http":    http.New(L),
+		"regexp":  regexp.New(L),
+		"js":      js.New(L),
+		"cmd":     cmd.New(L),
+		"strings": strings.New(L),
 	}, nil)
 }

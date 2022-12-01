@@ -4,13 +4,12 @@ import (
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/extensions/passport"
+	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/language"
 	"github.com/vivi-app/vivi/semver"
 	"github.com/vivi-app/vivi/template"
-	"github.com/vivi-app/vivi/util"
 	"github.com/vivi-app/vivi/where"
 	"os"
 	"os/user"
@@ -107,7 +106,7 @@ func GenerateInteractive() (*Extension, error) {
 		}
 	}
 
-	path := filepath.Join(where.Extensions(), username, util.SanitizeFilename(p.ID))
+	path := filepath.Join(where.Extensions(), username, filename.Sanitize(p.ID))
 	err = filesystem.Api().MkdirAll(path, os.ModePerm)
 	if err != nil {
 		return nil, err
@@ -119,9 +118,9 @@ func GenerateInteractive() (*Extension, error) {
 	}
 
 	for _, t := range []lo.Tuple2[string, []byte]{
-		{constant.FilenamePassport, data},
-		{constant.FilenameScraper, template.NewScraper()},
-		{constant.FilenameTester, template.NewTest()},
+		{filename.Passport, data},
+		{filename.Scraper, template.Scraper()},
+		{filename.Tester, template.Tester()},
 	} {
 		err = filesystem.Api().WriteFile(filepath.Join(path, t.A), t.B, os.ModePerm)
 		if err != nil {

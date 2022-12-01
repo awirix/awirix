@@ -2,7 +2,7 @@ package js
 
 import (
 	"github.com/robertkrimen/otto"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 )
 
@@ -10,7 +10,6 @@ const vmTypeName = "js_vm"
 
 func registerVMType(L *lua.LState) {
 	mt := L.NewTypeMetatable(vmTypeName)
-	L.SetGlobal("js_vm", mt)
 	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), vmMethods))
 }
 
@@ -77,7 +76,7 @@ func vmSet(L *lua.LState) int {
 	name := L.CheckString(2)
 	lvalue := L.CheckAny(3)
 
-	value, err := util.FromLValue(lvalue)
+	value, err := luautil.FromLValue(lvalue)
 	if err != nil {
 		L.Push(lua.LString(err.Error()))
 		return 1

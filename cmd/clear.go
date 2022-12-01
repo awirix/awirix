@@ -3,12 +3,12 @@ package cmd
 import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/constant"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/util"
+	"github.com/vivi-app/vivi/text"
 	"github.com/vivi-app/vivi/where"
 )
 
@@ -36,7 +36,7 @@ func init() {
 
 var clearCmd = &cobra.Command{
 	Use:   "clear",
-	Short: "Clears sidelined files produced by the " + constant.App,
+	Short: "Clears sidelined files produced by the " + app.Name,
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		successStyle := style.Fg(color.Green)
@@ -44,7 +44,7 @@ var clearCmd = &cobra.Command{
 		for _, n := range clearTargets {
 			if lo.Must(cmd.Flags().GetBool(n.name)) {
 				handleErr(n.clear())
-				cmd.Printf("%s %s cleared\n", successStyle(icon.Check), util.Capitalize(n.name))
+				cmd.Printf("%s %s cleared\n", successStyle(icon.Check), text.Capitalize(n.name))
 				didSomething = true
 			}
 		}

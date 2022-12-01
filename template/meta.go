@@ -1,6 +1,10 @@
 package template
 
-import "github.com/vivi-app/vivi/constant"
+import (
+	"github.com/vivi-app/vivi/app"
+	"github.com/vivi-app/vivi/scraper"
+	"github.com/vivi-app/vivi/tester"
+)
 
 type funcs struct {
 	Search,
@@ -21,14 +25,14 @@ func newMeta(module string) *meta {
 	m := &meta{}
 
 	m.Module = module
-	m.App = constant.App
+	m.App = app.Name
 	m.Fn = &funcs{
-		Search:   constant.FunctionSearch,
-		Explore:  constant.FunctionExplore,
-		Prepare:  constant.FunctionPrepare,
-		Play:     constant.FunctionPlay,
-		Download: constant.FunctionDownload,
-		Test:     constant.FunctionTest,
+		Search:   scraper.FunctionSearch,
+		Explore:  scraper.FunctionExplore,
+		Prepare:  scraper.FunctionPrepare,
+		Play:     scraper.FunctionPlay,
+		Download: scraper.FunctionDownload,
+		Test:     tester.FunctionTest,
 	}
 
 	return m
