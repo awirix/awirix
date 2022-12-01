@@ -57,6 +57,12 @@ panic, fatal, error, warn, info, debug, trace`,
 If enabled, system commands will be disabled
 and the extension will be unable to access the filesystem.`,
 	},
+	{
+		key.ExtensionsAdvancedIOAutoCloseReaders,
+		true,
+		`Automatically close readers.
+If enabled, readers will be automatically closed after reading.`,
+	},
 	// EXTENSIONS
 }
 

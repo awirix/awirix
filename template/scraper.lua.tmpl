@@ -1,46 +1,59 @@
 {{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}}-- vim:ts=3 ss=3 sw=3 expandtab
 
---- Any table that have a string field named "string" used for string representation.
+--- Any table that have a string field named `string` used for string representation.
 --- @alias stringer { string: string, [any]: any }
+
+--- A io.Writer that can be used to write to a string.
+--- @alias writer { write: fun(self: writer, data: string): void }
 
 local M = {}
 
 --- Searches for the media
 --- This function may be omitted if this extension does not provide searching functionality.
 --- Might be the case if the site is dedicated to the single show/movie/book/...
+--- @param progress writer @The progress writer
 --- @param query string The query to search for.
 --- @return stringer[] # The media that match the query.
-function M.{{ .Fn.Search }}(query)
+function M.{{ .Fn.Search }}(progress, query)
+   progress:write("Searching for " .. query .. "...")
    return {}
 end
 
 --- Returns a list of nested medias for the search result entry.
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
 --- This function may be omitted if this extension does not provide exploring functionality.
+--- @param progress writer @The progress writer
 --- @param media stringer? The entry to explore.
 --- Nil will be passed if the `search` function is missing.
 --- @return stringer[] # The list of episodes.
-function M.{{ .Fn.Explore }}(media)
+function M.{{ .Fn.Explore }}(progress, media)
+   progress:write("Exploring " .. media.string .. "...")
    return {}
 end
 
 --- Prepares a media for watching/downloading.
 --- When you need to do some heavy operations before passing it further.
+--- @param progress writer @The progress writer
 --- @param media stringer The media to prepare.
 --- @return stringer # The prepared media
-function M.{{ .Fn.Prepare }}(media)
+function M.{{ .Fn.Prepare }}(progress, media)
+   progress:write("Preparing " .. media.string .. "...")
    return media
 end
 
 --- Opens a media
+--- @param progress writer @The progress writer
 --- @param media stringer The media to play (watch, read, open).
-function M.{{ .Fn.Play }}(media)
+function M.{{ .Fn.Play }}(progress, media)
+   progress:write("Playing " .. media.string .. "...")
    require('{{ .App }}').api.open(media.url)
 end
 
 --- Downloads a media.
+--- @param progress writer @The progress writer
 --- @param media stringer The media to download.
-function M.{{ .Fn.Download }}(media)
+function M.{{ .Fn.Download }}(progress, media)
+   progress:write("Downloading " .. media.string .. "...")
    require('{{ .App }}').api.download(media.string, media.url)
 end
 

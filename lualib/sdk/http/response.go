@@ -1,8 +1,8 @@
 package http
 
 import (
+	io2 "github.com/vivi-app/vivi/lualib/sdk/io"
 	lua "github.com/yuin/gopher-lua"
-	"io"
 	"net/http"
 )
 
@@ -54,17 +54,7 @@ func responseStatusCode(L *lua.LState) int {
 
 func responseBody(L *lua.LState) int {
 	response := checkResponse(L, 1)
-
-	defer response.Body.Close()
-	b, err := io.ReadAll(response.Body)
-
-	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
-	}
-
-	L.Push(lua.LString(b))
+	io2.PushReadCloser(L, response.Body)
 	return 1
 }
 
