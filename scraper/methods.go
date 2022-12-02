@@ -10,7 +10,7 @@ func (s *Scraper) Search(query string) ([]*Intermediate, error) {
 		Fn:      s.functionSearch,
 		NRet:    1,
 		Protect: true,
-	}, lua.LString(query))
+	}, s.progress, lua.LString(query))
 
 	if err != nil {
 		return nil, err

@@ -11,6 +11,7 @@ type Scraper struct {
 
 	functionSearch  *lua.LFunction
 	functionExplore *lua.LFunction
+	progress        *lua.LFunction
 }
 
 func (s *Scraper) HasSearch() bool {
@@ -19,6 +20,13 @@ func (s *Scraper) HasSearch() bool {
 
 func (s *Scraper) HasExplore() bool {
 	return s.functionExplore != nil
+}
+
+func (s *Scraper) SetProgress(progress func(string)) {
+	s.progress = s.state.NewFunction(func(L *lua.LState) int {
+		progress(L.ToString(1))
+		return 0
+	})
 }
 
 func New(L *lua.LState, r io.Reader) (*Scraper, error) {

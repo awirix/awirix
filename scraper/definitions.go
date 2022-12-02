@@ -9,3 +9,7 @@ const (
 	FunctionPlay     = "play"
 	FunctionDownload = "download"
 )
+
+const (
+	FieldDisplay = "display"
+)

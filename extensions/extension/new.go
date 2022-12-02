@@ -1,6 +1,7 @@
 package extension
 
 import (
+	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/pelletier/go-toml/v2"
 	"github.com/samber/lo"
@@ -107,6 +108,32 @@ func GenerateInteractive() (*Extension, error) {
 	}
 
 	path := filepath.Join(where.Extensions(), username, filename.Sanitize(p.ID))
+
+	exists, err := filesystem.Api().Exists(path)
+	if err != nil {
+		return nil, err
+	}
+
+	if exists {
+		var overwrite bool
+		err = survey.AskOne(&survey.Confirm{
+			Message: "Extension already exists, overwrite?",
+			Default: false,
+		}, &overwrite)
+		if err != nil {
+			return nil, err
+		}
+
+		if !overwrite {
+			return nil, fmt.Errorf("cancelled")
+		}
+
+		err = filesystem.Api().RemoveAll(path)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	err = filesystem.Api().MkdirAll(path, os.ModePerm)
 	if err != nil {
 		return nil, err

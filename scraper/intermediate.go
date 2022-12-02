@@ -7,11 +7,11 @@ import (
 
 type Intermediate struct {
 	internal lua.LValue
-	string   string
+	display  string
 }
 
 func (i *Intermediate) String() string {
-	return i.string
+	return i.display
 }
 
 func (i *Intermediate) Value() lua.LValue {
@@ -19,14 +19,14 @@ func (i *Intermediate) Value() lua.LValue {
 }
 
 func newIntermediate(table *lua.LTable) (*Intermediate, error) {
-	value := table.RawGet(lua.LString("string"))
-	str, ok := value.(lua.LString)
+	value := table.RawGet(lua.LString(FieldDisplay))
+	display, ok := value.(lua.LString)
 	if !ok {
-		return nil, fmt.Errorf("invalid intermediate 'string' field: expected 'string' got '%s'", value.Type().String())
+		return nil, fmt.Errorf("invalid intermediate `%s` field: expected 'display' got '%s'", FieldDisplay, value.Type().String())
 	}
 
 	return &Intermediate{
 		internal: table,
-		string:   string(str),
+		display:  string(display),
 	}, nil
 }
