@@ -79,6 +79,7 @@ func commandSetArgs(L *lua.LState) int {
 	cmd := checkCommand(L, 1)
 	args := checkArgs(L, 2)
 
+	// do not change the command itself
 	cmd.Args = append([]string{cmd.Args[0]}, args...)
 	return 0
 }

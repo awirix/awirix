@@ -54,6 +54,10 @@ func (p *Passport) Info() string {
 }
 
 func (p *Passport) Validate() error {
+	if p.Language == nil {
+		return fmt.Errorf("missing language")
+	}
+
 	if p.Repository != nil {
 		for _, t := range []*lo.Tuple2[string, string]{
 			{"name", p.Repository.Name},

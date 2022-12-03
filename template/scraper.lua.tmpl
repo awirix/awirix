@@ -3,6 +3,7 @@
 --- Table that have a string field named `{{ .Fields.Display }}` used for string representation.
 --- @alias media { {{ .Fields.Display }}: string, [any]: any }
 
+--- A function that is used to pass progress information to the vivi's ui.
 --- @alias progress fun(message: string)
 
 local M = {}
@@ -14,7 +15,7 @@ local M = {}
 --- @param query string The query to search for.
 --- @return media[] # The media that match the query.
 function M.{{ .Fn.Search }}(progress, query)
-   progress("Searching for " .. query .. "...")
+   progress('Searching for ' .. query .. '...')
    return {}
 end
 
@@ -26,7 +27,7 @@ end
 --- Nil will be passed if the `search` function is missing.
 --- @return media[] # The list of episodes.
 function M.{{ .Fn.Explore }}(progress, media)
-   progress("Exploring " .. media.{{ .Fields.Display }} .. "...")
+   progress('Exploring ' .. media.{{ .Fields.Display }} .. '...')
    return {}
 end
 
@@ -36,7 +37,7 @@ end
 --- @param media media The media to prepare.
 --- @return media # The prepared media
 function M.{{ .Fn.Prepare }}(progress, media)
-   progress("Preparing " .. media.{{ .Fields.Display }} .. "...")
+   progress('Preparing ' .. media.{{ .Fields.Display }} .. '...')
    return media
 end
 
@@ -44,18 +45,18 @@ end
 --- @param progress progress @The progress writer
 --- @param media media The media to play (watch, read, open).
 function M.{{ .Fn.Play }}(progress, media)
-   progress("Playing " .. media.{{ .Fields.Display }} .. "...")
+   progress('Playing ' .. media.{{ .Fields.Display }} .. '...')
    -- require('{{ .App }}').api.open(media.url)
-   error("Not implemented")
+   error('Not implemented')
 end
 
 --- Downloads a media.
 --- @param progress progress @The progress writer
 --- @param media media The media to download.
 function M.{{ .Fn.Download }}(progress, media)
-   progress("Downloading " .. media.{{ .Fields.Display }} .. "...")
+   progress('Downloading ' .. media.{{ .Fields.Display }} .. '...')
    -- require('{{ .App }}').api.download(media.{{ .Fields.Display }}, media.url)
-   error("Not implemented")
+   error('Not implemented')
 end
 
 return M
