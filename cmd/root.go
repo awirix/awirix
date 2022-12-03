@@ -10,6 +10,7 @@ import (
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/style"
+	"github.com/vivi-app/vivi/tui"
 	"github.com/vivi-app/vivi/where"
 	"os"
 	"strings"
@@ -22,6 +23,10 @@ var rootCmd = &cobra.Command{
 	Long:    app.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
 	Version: app.Version,
 	Args:    cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		err := tui.Run(&tui.Options{AltScreen: true})
+		handleErr(err)
+	},
 }
 
 func Execute() {

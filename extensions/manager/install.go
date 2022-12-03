@@ -13,7 +13,6 @@ import (
 	"github.com/vivi-app/vivi/github"
 	"github.com/vivi-app/vivi/text"
 	"github.com/vivi-app/vivi/where"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +20,6 @@ import (
 )
 
 type InstallOptions struct {
-	Progress     io.Writer
 	URL          string
 	SkipConfirm  bool
 	SkipValidate bool
@@ -44,10 +42,11 @@ func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 		return nil, fmt.Errorf("extension already installed: %s/%s", repoOwner, repoName)
 	}
 
-	s := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(os.Stderr))
+	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr), spinner.WithHiddenCursor(true), spinner.WithColor("cyan"))
 	progress := func(text string) {
 		s.Suffix = " " + text
 	}
+
 	progress(" Preparing...")
 	s.Start()
 	defer s.Stop()
@@ -110,9 +109,8 @@ func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 
 	progress("Cloning repository...")
 	_, err := git.PlainClone(path, false, &git.CloneOptions{
-		URL:      options.URL,
-		Progress: options.Progress,
-		Depth:    1,
+		URL:   options.URL,
+		Depth: 1,
 	})
 
 	if err != nil {

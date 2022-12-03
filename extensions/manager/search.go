@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
 )
@@ -36,7 +37,8 @@ func InstalledExtensions() ([]*extension.Extension, error) {
 
 			ext := extension.New(filepath.Join(path, d.Name()))
 			if err := ext.LoadPassport(); err != nil {
-				return nil, fmt.Errorf("failed to load passport for extension %s: %w", ext.String(), err)
+				log.Errorf("failed to load passport for extension %s: %w", ext.String(), err)
+				continue
 			}
 
 			extensions = append(extensions, ext)
