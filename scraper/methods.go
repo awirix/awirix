@@ -107,7 +107,7 @@ func (s *Scraper) Prepare(media *Media) (*Media, error) {
 	return s.checkMedia()
 }
 
-func (s *Scraper) Play(media *Media) error {
+func (s *Scraper) Stream(media *Media) error {
 	err := s.state.CallByParam(lua.P{
 		Fn:      s.functionStream,
 		NRet:    1,

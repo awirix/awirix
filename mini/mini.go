@@ -156,7 +156,7 @@ func Run(options *Options) error {
 
 	switch action {
 	case actionStream:
-		return theScraper.Play(media)
+		return theScraper.Stream(media)
 	case actionDownload:
 		return theScraper.Download(media)
 	default:
