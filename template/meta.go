@@ -17,6 +17,7 @@ type funcs struct {
 
 type fields struct {
 	Display string
+	About   string
 }
 
 type meta struct {
@@ -33,6 +34,7 @@ func newMeta(module string) *meta {
 	m.App = app.Name
 	m.Fields = &fields{
 		Display: scraper.FieldDisplay,
+		About:   scraper.FieldAbout,
 	}
 	m.Fn = &funcs{
 		Search:   scraper.FunctionSearch,

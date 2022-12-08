@@ -9,9 +9,9 @@ import (
 )
 
 type Repository struct {
-	Owner  string `toml:"owner"`
-	Name   string `toml:"name"`
-	Branch string `toml:"branch,omitempty"`
+	Owner  string `json:"owner" jsonschema:"required,description=The owner of the repository"`
+	Name   string `json:"name" jsonschema:"required,description=The name of the repository"`
+	Branch string `json:"branch,omitempty" jsonschema:"description=The branch of the repository,default=main"`
 
 	repo  option.Option[*github.Repository]
 	files option.Option[[]*File]
@@ -19,14 +19,6 @@ type Repository struct {
 
 func (r *Repository) URL() string {
 	return fmt.Sprintf("https://github.com/%s/%s", r.Owner, r.Name)
-}
-
-func (r *Repository) SVNURL() (string, error) {
-	if err := r.Setup(); err != nil {
-		return "", err
-	}
-
-	return r.repo.MustGet().GetSVNURL(), nil
 }
 
 func (r *Repository) GetFile(path string) (*File, error) {
@@ -97,7 +89,7 @@ func (r *Repository) Setup() error {
 	r.repo = option.Some(repo)
 
 	if r.Branch == "" {
-		r.Branch = repo.GetDefaultBranch()
+		r.Branch = repo.GetMasterBranch()
 	}
 
 	return nil

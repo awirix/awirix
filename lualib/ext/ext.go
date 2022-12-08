@@ -12,7 +12,7 @@ func New(L *lua.LState) *lua.LTable {
 
 	return luautil.NewTable(L, map[string]lua.LValue{
 		"path":    lua.LString(ext.Path()),
-		"version": lua.LString(ext.Passport().Version.String()),
+		"version": lua.LString(ext.Passport().Version().String()),
 	}, map[string]lua.LGFunction{
 		"config": passportConfig,
 	})

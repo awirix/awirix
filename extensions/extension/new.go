@@ -1,15 +1,15 @@
 package extension
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/pelletier/go-toml/v2"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/language"
-	"github.com/vivi-app/vivi/semver"
 	"github.com/vivi-app/vivi/template"
 	"github.com/vivi-app/vivi/where"
 	"os"
@@ -86,12 +86,12 @@ func GenerateInteractive() (*Extension, error) {
 	lang, _ := language.FromName(answers.Language)
 
 	p := &passport.Passport{
-		Name:     answers.Name,
-		ID:       passport.ToID(answers.Name),
-		About:    answers.About,
-		Version:  semver.MustParse("0.1.0"),
-		Language: lang,
-		NSFW:     answers.Nsfw,
+		Name:        answers.Name,
+		ID:          passport.ToID(answers.Name),
+		About:       answers.About,
+		VersionRaw:  "0.1.0",
+		LanguageRaw: lang.Code,
+		NSFW:        answers.Nsfw,
 		Config: map[string]*passport.ConfigSection{
 			"test": {
 				Display: "this is a test",
@@ -139,13 +139,16 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	data, err := toml.Marshal(p)
+	var data bytes.Buffer
+	encoder := json.NewEncoder(&data)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(p)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, t := range []lo.Tuple2[string, []byte]{
-		{filename.Passport, data},
+		{filename.Passport, data.Bytes()},
 		{filename.Scraper, template.Scraper()},
 		{filename.Tester, template.Tester()},
 	} {

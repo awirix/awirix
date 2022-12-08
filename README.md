@@ -1,2 +1,3 @@
-# VIVI
+# Vivi
 
+Multimedia metascraper 

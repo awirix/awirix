@@ -1,7 +1,8 @@
 {{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}}-- vim:ts=3 ss=3 sw=3 expandtab
 
---- Table that have a string field named `{{ .Fields.Display }}` used for string representation.
---- @alias media { {{ .Fields.Display }}: string, [any]: any }
+--- Table that have a string field named `{{ .Fields.Display }}` used for string representation
+--- with optional `{{ .Fields.About }}` for brief description.
+--- @alias media { {{ .Fields.Display }}: string, {{ .Fields.About }}: string|nil, [any]: any }
 
 --- A function that is used to pass progress information to the vivi's ui.
 --- @alias progress fun(message: string)

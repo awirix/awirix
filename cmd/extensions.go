@@ -89,7 +89,7 @@ var extensionsListCmd = &cobra.Command{
 				fmt.Printf(
 					"%s %s %s\n",
 					style.Fg(color.Purple)(e.Passport().Name),
-					style.Bold(e.Passport().Version.String()),
+					style.Bold(e.Passport().Version().String()),
 					style.Faint(e.Passport().About),
 				)
 			}
@@ -255,5 +255,30 @@ var extensionsAddCmd = &cobra.Command{
 		handleErr(err)
 
 		fmt.Printf("%s Successfully installed %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()))
+	},
+}
+
+func init() {
+	extensionsCmd.AddCommand(extensionsUpdateCmd)
+
+	extensionsUpdateCmd.Flags().StringP("path", "p", "", "path to the extension")
+	extensionsUpdateCmd.Flags().StringP("id", "i", "", "id of the extension")
+	extensionsUpdateCmd.MarkFlagsMutuallyExclusive("path", "id")
+	extensionsUpdateCmd.MarkFlagDirname("path")
+	extensionsUpdateCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
+}
+
+var extensionsUpdateCmd = &cobra.Command{
+	Use:     "update",
+	Short:   "Update an extension",
+	Aliases: []string{"upgrade"},
+	Args:    cobra.NoArgs,
+	PreRunE: preRunERequiredMutuallyExclusiveFlags([]string{"path", "id"}),
+	Run: func(cmd *cobra.Command, args []string) {
+		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
+
+		handleErr(manager.UpdateExtension(ext))
+
+		fmt.Printf("%s Successfully updated %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()))
 	},
 }

@@ -2,6 +2,10 @@ package color
 
 import "github.com/charmbracelet/lipgloss"
 
+func New(color string) lipgloss.Color {
+	return lipgloss.Color(color)
+}
+
 const (
 	Pink = lipgloss.Color("#ff79c6")
 )

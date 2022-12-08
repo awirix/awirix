@@ -6,8 +6,6 @@ import (
 )
 
 func ProgramInPath(program string) bool {
-	if _, err := exec.LookPath(strings.TrimSpace(program)); err != nil {
-		return false
-	}
-	return true
+	_, err := exec.LookPath(strings.TrimSpace(program))
+	return err == nil
 }

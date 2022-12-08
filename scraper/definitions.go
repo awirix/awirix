@@ -12,4 +12,5 @@ const (
 
 const (
 	FieldDisplay = "display"
+	FieldAbout   = "about"
 )

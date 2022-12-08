@@ -25,6 +25,17 @@ type InstallOptions struct {
 	SkipValidate bool
 }
 
+func confirm(msg string) (bool, error) {
+	var confirm bool
+
+	err := survey.AskOne(&survey.Confirm{
+		Message: fmt.Sprintf(msg),
+		Default: false,
+	}, &confirm)
+
+	return confirm, err
+}
+
 func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 	if !text.IsURL(options.URL) {
 		return nil, fmt.Errorf("invalid URL")
@@ -88,18 +99,13 @@ func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 			fmt.Println(thePassport.Info())
 			fmt.Println()
 
-			var confirm bool
-
-			err := survey.AskOne(&survey.Confirm{
-				Message: fmt.Sprintf("Install?"),
-				Default: false,
-			}, &confirm)
+			yes, err := confirm("Install?")
 
 			if err != nil {
 				return nil, err
 			}
 
-			if !confirm {
+			if !yes {
 				return nil, fmt.Errorf("installation cancelled")
 			}
 		}

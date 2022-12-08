@@ -12,8 +12,8 @@ import (
 )
 
 type Requirements struct {
-	OS       []string `toml:"os,omitempty"`
-	Programs []string `toml:"programs,omitempty"`
+	OS       map[string]bool `json:"os,omitempty" jsonschema:"title=OS,description=Operating systems that this extension is available on"`
+	Programs []string        `json:"programs,omitempty" jsonschema:"title=Programs,description=Programs that this extension requires to be in PATH,examples=[git, curl],type=array,items={type=string}"`
 }
 
 func (d *Requirements) Info() string {
@@ -22,14 +22,14 @@ func (d *Requirements) Info() string {
 	if len(d.OS) != 0 {
 		b.WriteString("OS ")
 
-		if lo.Contains(d.OS, runtime.GOOS) {
+		if enabled, ok := d.OS[runtime.GOOS]; ok && enabled {
 			b.WriteString(style.Fg(color.Green)(icon.Check))
 		} else {
 			b.WriteString(style.Fg(color.Red)(icon.Cross))
 		}
 
 		b.WriteString(style.Faint(" Available on: "))
-		b.WriteString(style.Faint(strings.Join(d.OS, ", ")))
+		b.WriteString(style.Faint(strings.Join(lo.Keys(d.OS), ", ")))
 		b.WriteString(style.Faint(fmt.Sprintf(". You're on: %s", runtime.GOOS)))
 
 		b.WriteRune('\n')
@@ -55,7 +55,7 @@ func (d *Requirements) Info() string {
 }
 
 func (d *Requirements) Matches() bool {
-	if len(d.OS) != 0 && !lo.Contains(d.OS, runtime.GOOS) {
+	if enabled, ok := d.OS[runtime.GOOS]; len(d.OS) != 0 && ok && !enabled {
 		return false
 	}
 

@@ -13,5 +13,5 @@ var (
 	Confirm   = bind("Confirm", "enter")
 	Cancel    = bind("Cancel", "esc")
 	Quit      = bind("Quit", "q")
-	ForceQuit = bind("Force Quit", "ctrl+c")
+	ForceQuit = bind("Force Quit", "ctrl+c", "ctrl+d")
 )

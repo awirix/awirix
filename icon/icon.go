@@ -10,4 +10,5 @@ const (
 	Warn     = "⚠"
 	Gear     = "⚙"
 	Ellipsis = "…"
+	CDot     = "•"
 )

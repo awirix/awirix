@@ -1,4 +1,4 @@
-package semver
+package version
 
 import (
 	"bytes"
@@ -218,7 +218,7 @@ func MustParse(v string) *Version {
 // String converts a Version object to a string.
 // Note, if the original version contained a leading v this version will not.
 // See the Original() method to retrieve the original value. Semantic Versions
-// don't contain a leading v per the spec. Instead it's optional on
+// don't contain a leading v per the spec. Instead, it's optional on
 // implementation.
 func (v *Version) String() string {
 	var buf bytes.Buffer
