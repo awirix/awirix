@@ -144,8 +144,9 @@ func Run(options *Options) error {
 	)
 
 	promptSelect = promptui.Select{
-		Label: "What do you want to do?",
-		Items: []string{actionPlay, actionDownload},
+		Label:  "What do you want to do?",
+		Items:  []string{actionPlay, actionDownload},
+		Stdout: os.Stderr,
 	}
 
 	_, action, err := promptSelect.Run()
