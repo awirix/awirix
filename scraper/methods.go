@@ -109,7 +109,7 @@ func (s *Scraper) Prepare(media *Media) (*Media, error) {
 
 func (s *Scraper) Play(media *Media) error {
 	err := s.state.CallByParam(lua.P{
-		Fn:      s.functionPlay,
+		Fn:      s.functionStream,
 		NRet:    1,
 		Protect: true,
 	}, s.progress, media.Value())

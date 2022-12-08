@@ -13,7 +13,7 @@ local M = {}
 --- This function may be omitted if this extension does not provide searching functionality.
 --- Might be the case if the site is dedicated to the single show/movie/book/...
 --- @param progress progress @The progress writer
---- @param query string The query to search for.
+--- @param query string @The query to search for.
 --- @return media[] # The media that match the query.
 function M.{{ .Fn.Search }}(progress, query)
    progress('Searching for ' .. query .. '...')
@@ -24,7 +24,7 @@ end
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
 --- This function may be omitted if this extension does not provide exploring functionality.
 --- @param progress progress @The progress writer
---- @param media media? The entry to explore.
+--- @param media media? @The entry to explore.
 --- Nil will be passed if the `search` function is missing.
 --- @return media[] # The list of episodes.
 function M.{{ .Fn.Explore }}(progress, media)
@@ -35,25 +35,25 @@ end
 --- Prepares a media for watching/downloading.
 --- When you need to do some heavy operations before passing it further.
 --- @param progress progress @The progress writer
---- @param media media The media to prepare.
+--- @param media media @The media to prepare.
 --- @return media # The prepared media
 function M.{{ .Fn.Prepare }}(progress, media)
    progress('Preparing ' .. media.{{ .Fields.Display }} .. '...')
    return media
 end
 
---- Opens a media
+--- Streams a media
 --- @param progress progress @The progress writer
---- @param media media The media to play (watch, read, open).
-function M.{{ .Fn.Play }}(progress, media)
-   progress('Playing ' .. media.{{ .Fields.Display }} .. '...')
+--- @param media media @The media to stream (watch, read, open).
+function M.{{ .Fn.Stream }}(progress, media)
+   progress('Streaming ' .. media.{{ .Fields.Display }} .. '...')
    -- require('{{ .App }}').api.open(media.url)
    error('Not implemented')
 end
 
 --- Downloads a media.
 --- @param progress progress @The progress writer
---- @param media media The media to download.
+--- @param media media @The media to download.
 function M.{{ .Fn.Download }}(progress, media)
    progress('Downloading ' .. media.{{ .Fields.Display }} .. '...')
    -- require('{{ .App }}').api.download(media.{{ .Fields.Display }}, media.url)

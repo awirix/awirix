@@ -6,7 +6,7 @@ const (
 	FunctionSearch   = "search"
 	FunctionExplore  = "explore"
 	FunctionPrepare  = "prepare"
-	FunctionPlay     = "play"
+	FunctionStream   = "stream"
 	FunctionDownload = "download"
 )
 

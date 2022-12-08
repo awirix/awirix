@@ -12,7 +12,7 @@ type Scraper struct {
 	functionSearch   *lua.LFunction
 	functionExplore  *lua.LFunction
 	functionPrepare  *lua.LFunction
-	functionPlay     *lua.LFunction
+	functionStream   *lua.LFunction
 	functionDownload *lua.LFunction
 	progress         *lua.LFunction
 }
@@ -57,22 +57,22 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, fmt.Errorf("scraper module must return a table, got %s", module.Type().String())
 	}
 
-	errorNotAFunction := func(val lua.LValue) error {
-		return fmt.Errorf("scraper module must return a function, got %s", val.Type().String())
+	errorNotAFunction := func(name string, val lua.LValue) error {
+		return fmt.Errorf("scraper module must return a function `%s`, got %s", name, val.Type().String())
 	}
 
 	functionSearch := table.RawGet(lua.LString(FunctionSearch))
 	if functionSearch.Type() == lua.LTFunction {
 		theScraper.functionSearch = functionSearch.(*lua.LFunction)
 	} else if functionSearch.Type() != lua.LTNil {
-		return nil, errorNotAFunction(functionSearch)
+		return nil, errorNotAFunction(FunctionSearch, functionSearch)
 	}
 
 	functionExplore := table.RawGet(lua.LString(FunctionExplore))
 	if functionExplore.Type() == lua.LTFunction {
 		theScraper.functionExplore = functionExplore.(*lua.LFunction)
 	} else if functionExplore.Type() != lua.LTNil {
-		return nil, errorNotAFunction(functionExplore)
+		return nil, errorNotAFunction(FunctionExplore, functionExplore)
 	}
 
 	if !theScraper.HasExplore() && !theScraper.HasSearch() {
@@ -83,21 +83,21 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 	if functionPrepare.Type() == lua.LTFunction {
 		theScraper.functionPrepare = functionPrepare.(*lua.LFunction)
 	} else {
-		return nil, errorNotAFunction(functionPrepare)
+		return nil, errorNotAFunction(FunctionPrepare, functionPrepare)
 	}
 
-	functionPlay := table.RawGet(lua.LString(FunctionPlay))
-	if functionPlay.Type() == lua.LTFunction {
-		theScraper.functionPlay = functionPlay.(*lua.LFunction)
+	functionStream := table.RawGet(lua.LString(FunctionStream))
+	if functionStream.Type() == lua.LTFunction {
+		theScraper.functionStream = functionStream.(*lua.LFunction)
 	} else {
-		return nil, errorNotAFunction(functionPlay)
+		return nil, errorNotAFunction(FunctionStream, functionStream)
 	}
 
 	functionDownload := table.RawGet(lua.LString(FunctionDownload))
 	if functionDownload.Type() == lua.LTFunction {
 		theScraper.functionDownload = functionDownload.(*lua.LFunction)
 	} else {
-		return nil, errorNotAFunction(functionDownload)
+		return nil, errorNotAFunction(FunctionDownload, functionDownload)
 	}
 
 	theScraper.state = L

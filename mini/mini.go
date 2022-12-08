@@ -139,13 +139,13 @@ func Run(options *Options) error {
 
 	theSpinner.Stop()
 	const (
-		actionPlay     = "Play"
+		actionStream   = "Stream"
 		actionDownload = "Download"
 	)
 
 	promptSelect = promptui.Select{
 		Label:  "What do you want to do?",
-		Items:  []string{actionPlay, actionDownload},
+		Items:  []string{actionStream, actionDownload},
 		Stdout: os.Stderr,
 	}
 
@@ -155,7 +155,7 @@ func Run(options *Options) error {
 	}
 
 	switch action {
-	case actionPlay:
+	case actionStream:
 		return theScraper.Play(media)
 	case actionDownload:
 		return theScraper.Download(media)

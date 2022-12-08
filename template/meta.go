@@ -10,7 +10,7 @@ type funcs struct {
 	Search,
 	Explore,
 	Prepare,
-	Play,
+	Stream,
 	Download,
 	Test string
 }
@@ -40,7 +40,7 @@ func newMeta(module string) *meta {
 		Search:   scraper.FunctionSearch,
 		Explore:  scraper.FunctionExplore,
 		Prepare:  scraper.FunctionPrepare,
-		Play:     scraper.FunctionPlay,
+		Stream:   scraper.FunctionStream,
 		Download: scraper.FunctionDownload,
 		Test:     tester.FunctionTest,
 	}
