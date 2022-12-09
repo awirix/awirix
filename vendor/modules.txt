@@ -146,7 +146,7 @@ github.com/go-git/go-git/v5/utils/merkletrie/index
 github.com/go-git/go-git/v5/utils/merkletrie/internal/frame
 github.com/go-git/go-git/v5/utils/merkletrie/noder
 github.com/go-git/go-git/v5/utils/sync
-# github.com/google/go-github/v48 v48.1.0
+# github.com/google/go-github/v48 v48.2.0
 ## explicit; go 1.17
 github.com/google/go-github/v48/github
 # github.com/google/go-querystring v1.1.0
@@ -242,6 +242,9 @@ github.com/muesli/reflow/wrap
 # github.com/muesli/termenv v0.13.0
 ## explicit; go 1.13
 github.com/muesli/termenv
+# github.com/mvdan/xurls v1.1.0
+## explicit
+github.com/mvdan/xurls
 # github.com/pdfcpu/pdfcpu v0.3.13
 ## explicit; go 1.17
 github.com/pdfcpu/pdfcpu/internal/corefont/metrics

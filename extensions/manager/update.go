@@ -66,6 +66,10 @@ func updatePull(progress func(string), ext *extension.Extension, repo *git.Repos
 }
 
 func updateClone(progress func(string), ext *extension.Extension) error {
+	if ext.Passport().Repository == nil {
+		return fmt.Errorf("no repository specified in the passport")
+	}
+
 	path := ext.Path()
 
 	// if pull failed, try to remove and download again
@@ -92,7 +96,7 @@ func updateClone(progress func(string), ext *extension.Extension) error {
 	cloned.Init()
 	err = cloned.LoadPassport()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to load passport: %w", err)
 	}
 
 	err = filesystem.Api().RemoveAll(path)

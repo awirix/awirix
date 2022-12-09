@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/manifoldco/promptui"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
@@ -30,47 +31,12 @@ func GenerateInteractive() (*Extension, error) {
 
 	username := usr.Username
 
-	var questions = []*survey.Question{
-		{
-			Name: "name",
-			Prompt: &survey.Input{
-				Message: "Name of the extension",
-			},
-			Validate: survey.Required,
-		},
-		{
-			Name: "about",
-			Prompt: &survey.Input{
-				Message: "About the extension",
-			},
-			Validate: survey.MaxLength(100),
-		},
-		{
-			Name: "nsfw",
-			Prompt: &survey.Confirm{
-				Message: "Is this extension NSFW?",
-			},
-		},
-		{
-			Name: "tags",
-			Prompt: &survey.Input{
-				Message: "Tags (comma separated)",
-			},
-		},
-		{
-			Name: "language",
-			Prompt: &survey.Select{
-				Renderer: survey.Renderer{},
-				Message:  "Language of the extension",
-				Options:  language.Names,
-				Default:  "English",
-				PageSize: 8,
-			},
-		},
-	}
+	var (
+		prompt promptui.Prompt
+		sel    promptui.Select
+	)
 
 	answers := struct {
-		Domain   string
 		Name     string
 		About    string
 		Nsfw     bool
@@ -78,7 +44,52 @@ func GenerateInteractive() (*Extension, error) {
 		Language string
 	}{}
 
-	err = survey.Ask(questions, &answers)
+	prompt = promptui.Prompt{
+		Label: "Name of the extension",
+	}
+
+	answers.Name, err = prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	prompt.Label = "About the extension"
+	answers.About, err = prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	prompt.Label = "NSFW (18+)"
+	prompt.IsConfirm = true
+	prompt.Default = "N"
+
+	_, err = prompt.Run()
+	answers.Nsfw = err == nil
+
+	prompt.Label = "Tags (separated by commas)"
+	prompt.IsConfirm = false
+
+	answers.Tags, err = prompt.Run()
+	if err != nil {
+		return nil, err
+	}
+
+	sel = promptui.Select{
+		Label: "Language",
+		Items: language.Names,
+		Size:  7,
+		Searcher: func(input string, index int) bool {
+			// TODO: fuzzy search
+			name := strings.ReplaceAll(strings.ToLower(language.Names[index]), " ", "")
+			input = strings.ReplaceAll(strings.ToLower(input), " ", "")
+
+			return strings.Contains(name, input)
+		},
+		CursorPos:         lo.IndexOf(language.Names, "English"),
+		StartInSearchMode: true,
+	}
+
+	_, answers.Language, err = sel.Run()
 	if err != nil {
 		return nil, err
 	}

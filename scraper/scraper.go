@@ -25,11 +25,40 @@ func (s *Scraper) HasExplore() bool {
 	return s.functionExplore != nil
 }
 
+func (s *Scraper) HasStream() bool {
+	return s.functionStream != nil
+}
+
+func (s *Scraper) HasDownload() bool {
+	return s.functionDownload != nil
+}
+
 func (s *Scraper) SetProgress(progress func(string)) {
 	s.progress = s.state.NewFunction(func(L *lua.LState) int {
 		progress(L.ToString(1))
 		return 0
 	})
+}
+
+func errOneOfRequired(functions ...*lua.LFunction) error {
+	// TODO: add names of the function
+	return fmt.Errorf("at least one of the following functions is required: %v", functions)
+}
+
+func errNotAFunction(name string, val lua.LValue) error {
+	return fmt.Errorf("scraper module must return a function `%s`, got %s", name, val.Type().String())
+}
+
+func getFunctionFromTable(table *lua.LTable, name string, required bool) (*lua.LFunction, error) {
+	function := table.RawGet(lua.LString(name))
+
+	if function.Type() == lua.LTFunction {
+		return function.(*lua.LFunction), nil
+	} else if function.Type() == lua.LTNil && !required {
+		return nil, nil
+	}
+
+	return nil, errNotAFunction(name, function)
 }
 
 func New(L *lua.LState, r io.Reader) (*Scraper, error) {
@@ -57,47 +86,37 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, fmt.Errorf("scraper module must return a table, got %s", module.Type().String())
 	}
 
-	errorNotAFunction := func(name string, val lua.LValue) error {
-		return fmt.Errorf("scraper module must return a function `%s`, got %s", name, val.Type().String())
+	theScraper.functionSearch, err = getFunctionFromTable(table, FunctionSearch, false)
+	if err != nil {
+		return nil, err
 	}
 
-	functionSearch := table.RawGet(lua.LString(FunctionSearch))
-	if functionSearch.Type() == lua.LTFunction {
-		theScraper.functionSearch = functionSearch.(*lua.LFunction)
-	} else if functionSearch.Type() != lua.LTNil {
-		return nil, errorNotAFunction(FunctionSearch, functionSearch)
-	}
-
-	functionExplore := table.RawGet(lua.LString(FunctionExplore))
-	if functionExplore.Type() == lua.LTFunction {
-		theScraper.functionExplore = functionExplore.(*lua.LFunction)
-	} else if functionExplore.Type() != lua.LTNil {
-		return nil, errorNotAFunction(FunctionExplore, functionExplore)
+	theScraper.functionExplore, err = getFunctionFromTable(table, FunctionExplore, false)
+	if err != nil {
+		return nil, err
 	}
 
 	if !theScraper.HasExplore() && !theScraper.HasSearch() {
-		return nil, fmt.Errorf("scraper module must return at least one of the functions `%s` or `%s`", FunctionSearch, FunctionExplore)
+		return nil, errOneOfRequired(theScraper.functionSearch, theScraper.functionExplore)
 	}
 
-	functionPrepare := table.RawGet(lua.LString(FunctionPrepare))
-	if functionPrepare.Type() == lua.LTFunction {
-		theScraper.functionPrepare = functionPrepare.(*lua.LFunction)
-	} else {
-		return nil, errorNotAFunction(FunctionPrepare, functionPrepare)
+	theScraper.functionPrepare, err = getFunctionFromTable(table, FunctionPrepare, true)
+	if err != nil {
+		return nil, err
 	}
 
-	functionStream := table.RawGet(lua.LString(FunctionStream))
-	if functionStream.Type() == lua.LTFunction {
-		theScraper.functionStream = functionStream.(*lua.LFunction)
-	} else {
-		return nil, errorNotAFunction(FunctionStream, functionStream)
+	theScraper.functionStream, err = getFunctionFromTable(table, FunctionStream, false)
+	if err != nil {
+		return nil, err
 	}
 
-	functionDownload := table.RawGet(lua.LString(FunctionDownload))
-	if functionDownload.Type() == lua.LTFunction {
-		theScraper.functionDownload = functionDownload.(*lua.LFunction)
-	} else {
-		return nil, errorNotAFunction(FunctionDownload, functionDownload)
+	theScraper.functionDownload, err = getFunctionFromTable(table, FunctionDownload, false)
+	if err != nil {
+		return nil, err
+	}
+
+	if !theScraper.HasDownload() && !theScraper.HasStream() {
+		return nil, errOneOfRequired(theScraper.functionDownload, theScraper.functionStream)
 	}
 
 	theScraper.state = L

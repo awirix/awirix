@@ -15,23 +15,22 @@ import (
 )
 
 func init() {
-	rootCmd.AddCommand(extensionsCmd)
+	rootCmd.AddCommand(xCmd)
 }
 
-var extensionsCmd = &cobra.Command{
-	Use:     "extensions",
-	Aliases: []string{"exts", "ext"},
-	Short:   "Manage extensions",
-	Args:    cobra.NoArgs,
+var xCmd = &cobra.Command{
+	Use:   "x",
+	Short: "Manage extensions",
+	Args:  cobra.NoArgs,
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsNewCmd)
+	xCmd.AddCommand(xNewCmd)
 
-	extensionsNewCmd.Flags().BoolP("print-path", "p", false, "print path")
+	xNewCmd.Flags().BoolP("print-path", "p", false, "print path")
 }
 
-var extensionsNewCmd = &cobra.Command{
+var xNewCmd = &cobra.Command{
 	Use:   "new",
 	Short: "Create a new extension",
 	Args:  cobra.NoArgs,
@@ -54,10 +53,10 @@ var extensionsNewCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsListCmd)
+	xCmd.AddCommand(xListCmd)
 }
 
-var extensionsListCmd = &cobra.Command{
+var xListCmd = &cobra.Command{
 	Use:     "list",
 	Short:   "List installed extensions",
 	Aliases: []string{"ls"},
@@ -111,12 +110,12 @@ var extensionsListCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsUninstallCmd)
+	xCmd.AddCommand(xUninstallCmd)
 
-	extensionsUninstallCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
+	xUninstallCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
 }
 
-var extensionsUninstallCmd = &cobra.Command{
+var xUninstallCmd = &cobra.Command{
 	Use:     "del",
 	Short:   "Uninstall an extension",
 	Aliases: []string{"rm", "remove", "uninstall"},
@@ -181,27 +180,26 @@ var extensionsUninstallCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsSelectCmd)
+	xCmd.AddCommand(xSelCmd)
 
-	extensionsSelectCmd.Flags().StringP("path", "p", "", "path to the extension")
-	extensionsSelectCmd.Flags().StringP("id", "i", "", "id of the extension")
-	extensionsSelectCmd.MarkFlagsMutuallyExclusive("path", "id")
-	extensionsSelectCmd.MarkFlagDirname("path")
-	extensionsSelectCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
+	xSelCmd.Flags().StringP("path", "p", "", "path to the extension")
+	xSelCmd.Flags().StringP("id", "i", "", "id of the extension")
+	xSelCmd.MarkFlagsMutuallyExclusive("path", "id")
+	xSelCmd.MarkFlagDirname("path")
+	xSelCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
 
-	extensionsSelectCmd.Flags().Bool("run", false, "run the selected extension")
-	extensionsSelectCmd.Flags().Bool("test", false, "test the selected extension")
-	extensionsSelectCmd.Flags().Bool("info", false, "show info about the extension")
-	extensionsSelectCmd.Flags().BoolP("json", "j", false, "output in json format")
+	xSelCmd.Flags().Bool("run", false, "run the selected extension")
+	xSelCmd.Flags().Bool("test", false, "test the selected extension")
+	xSelCmd.Flags().Bool("info", false, "show info about the extension")
+	xSelCmd.Flags().BoolP("json", "j", false, "output in json format")
 
-	extensionsSelectCmd.MarkFlagsMutuallyExclusive("run", "test", "info")
+	xSelCmd.MarkFlagsMutuallyExclusive("run", "test", "info")
 }
 
-var extensionsSelectCmd = &cobra.Command{
-	Use:     "select",
-	Short:   "Select an extension to perform an action on",
-	Aliases: []string{"sel"},
-	Args:    cobra.NoArgs,
+var xSelCmd = &cobra.Command{
+	Use:   "sel",
+	Short: "Select an extension to perform an action on",
+	Args:  cobra.NoArgs,
 	PreRunE: preRunERequiredMutuallyExclusiveFlags(
 		[]string{"path", "id"},
 		[]string{"run", "test", "info"},
@@ -223,15 +221,15 @@ var extensionsSelectCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsAddCmd)
+	xCmd.AddCommand(xAddCmd)
 
-	extensionsAddCmd.Flags().BoolP("yes", "y", false, "skip install confirmation")
-	extensionsAddCmd.Flags().BoolP("force", "f", false, "skip passport validation")
+	xAddCmd.Flags().BoolP("yes", "y", false, "skip install confirmation")
+	xAddCmd.Flags().BoolP("force", "f", false, "skip passport validation")
 
-	extensionsAddCmd.MarkFlagsMutuallyExclusive("yes", "force")
+	xAddCmd.MarkFlagsMutuallyExclusive("yes", "force")
 }
 
-var extensionsAddCmd = &cobra.Command{
+var xAddCmd = &cobra.Command{
 	Use:     "add",
 	Short:   "Install an extension",
 	Aliases: []string{"install"},
@@ -259,26 +257,28 @@ var extensionsAddCmd = &cobra.Command{
 }
 
 func init() {
-	extensionsCmd.AddCommand(extensionsUpdateCmd)
-
-	extensionsUpdateCmd.Flags().StringP("path", "p", "", "path to the extension")
-	extensionsUpdateCmd.Flags().StringP("id", "i", "", "id of the extension")
-	extensionsUpdateCmd.MarkFlagsMutuallyExclusive("path", "id")
-	extensionsUpdateCmd.MarkFlagDirname("path")
-	extensionsUpdateCmd.RegisterFlagCompletionFunc("id", completionExtensionsIDs)
+	xCmd.AddCommand(xUpCmd)
 }
 
-var extensionsUpdateCmd = &cobra.Command{
-	Use:     "update",
-	Short:   "Update an extension",
-	Aliases: []string{"upgrade"},
-	Args:    cobra.NoArgs,
-	PreRunE: preRunERequiredMutuallyExclusiveFlags([]string{"path", "id"}),
+var xUpCmd = &cobra.Command{
+	Use:   "up",
+	Short: "Update extensions",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
+		extensions, err := manager.InstalledExtensions()
+		handleErr(err)
 
-		handleErr(manager.UpdateExtension(ext))
+		var updated int
+		for _, ext := range extensions {
+			err = manager.UpdateExtension(ext)
+			if err != nil {
+				fmt.Printf("%s %s %s\n", style.Fg(color.Red)(icon.Cross), style.Fg(color.Purple)(ext.String()), err)
+			} else {
+				fmt.Printf("%s %s %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()), "updated")
+				updated++
+			}
+		}
 
-		fmt.Printf("%s Successfully updated %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()))
+		fmt.Printf("%s Successfully updated %s\n", style.Fg(color.Green)(icon.Check), text.Quantify(updated, "extension", "extensions"))
 	},
 }

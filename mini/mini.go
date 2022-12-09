@@ -138,18 +138,31 @@ func Run(options *Options) error {
 	}
 
 	theSpinner.Stop()
+
 	const (
 		actionStream   = "Stream"
 		actionDownload = "Download"
 	)
 
+	var actions = make([]string, 0)
+
+	if theScraper.HasStream() {
+		actions = append(actions, actionStream)
+	}
+
+	if theScraper.HasDownload() {
+		actions = append(actions, actionDownload)
+	}
+
+	var action string
+
 	promptSelect = promptui.Select{
 		Label:  "What do you want to do?",
-		Items:  []string{actionStream, actionDownload},
+		Items:  actions,
 		Stdout: os.Stderr,
 	}
 
-	_, action, err := promptSelect.Run()
+	_, action, err = promptSelect.Run()
 	if err != nil {
 		return err
 	}

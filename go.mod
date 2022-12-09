@@ -10,12 +10,13 @@ require (
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
 	github.com/go-git/go-git/v5 v5.5.0
-	github.com/google/go-github/v48 v48.1.0
+	github.com/google/go-github/v48 v48.2.0
 	github.com/invopop/jsonschema v0.7.0
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/ka-weihe/fast-levenshtein v0.0.0-20201227151214-4c99ee36a1ba
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/manifoldco/promptui v0.9.0
+	github.com/mvdan/xurls v1.1.0
 	github.com/pdfcpu/pdfcpu v0.3.13
 	github.com/pelletier/go-toml/v2 v2.0.6
 	github.com/robertkrimen/otto v0.2.1

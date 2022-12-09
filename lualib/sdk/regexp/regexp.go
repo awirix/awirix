@@ -1,6 +1,7 @@
 package regexp
 
 import (
+	"github.com/mvdan/xurls"
 	"github.com/vivi-app/vivi/luautil"
 	lua "github.com/yuin/gopher-lua"
 	"regexp"
@@ -8,7 +9,18 @@ import (
 
 func New(L *lua.LState) *lua.LTable {
 	registerRegexpType(L)
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
+
+	toLValue := func(r *regexp.Regexp) *lua.LUserData {
+		ud := L.NewUserData()
+		ud.Value = r
+		L.SetMetatable(ud, L.GetTypeMetatable(regexpTypeName))
+		return ud
+	}
+
+	return luautil.NewTable(L, map[string]lua.LValue{
+		"urls_relaxed": toLValue(xurls.Relaxed),
+		"urls_strict":  toLValue(xurls.Strict),
+	}, map[string]lua.LGFunction{
 		"match":   match,
 		"compile": compile,
 	})
