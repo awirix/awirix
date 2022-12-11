@@ -9,7 +9,6 @@ type Media struct {
 	internal lua.LValue
 	display  string
 	about    string
-	hasAbout bool
 }
 
 func (i *Media) String() string {
@@ -18,10 +17,6 @@ func (i *Media) String() string {
 
 func (i *Media) Value() lua.LValue {
 	return i.internal
-}
-
-func (i *Media) HasAbout() bool {
-	return i.hasAbout
 }
 
 func (i *Media) About() string {
@@ -45,6 +40,5 @@ func newMedia(table *lua.LTable) (*Media, error) {
 		internal: table,
 		display:  string(display),
 		about:    string(about),
-		hasAbout: ok,
 	}, nil
 }

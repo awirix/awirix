@@ -11,7 +11,7 @@ local M = {}
 
 --- Searches for the media
 --- This function may be omitted if this extension does not provide searching functionality.
---- Might be the case if the site is dedicated to the single show/movie/book/...
+--- Might be the case if it is dedicated to the single show/movie/book/...
 --- @param progress progress @The progress writer
 --- @param query string @The query to search for.
 --- @return media[] # The media that match the query.
@@ -20,20 +20,23 @@ function M.{{ .Fn.Search }}(progress, query)
    return {}
 end
 
---- Returns a list of nested medias for the search result entry.
+--- Returns a list of nested medias for media entry.
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
---- This function may be omitted if this extension does not provide exploring functionality.
 --- @param progress progress @The progress writer
 --- @param media media? @The entry to explore.
---- Nil will be passed if the `search` function is missing.
---- @return media[] # The list of episodes.
-function M.{{ .Fn.Explore }}(progress, media)
-   progress('Exploring ' .. media.{{ .Fields.Display }} .. '...')
+--- Nil will be passed to the first layer if the `search` function is missing.
+--- @return media[] # The list of nested medias.
+local function layer(progress, media)
+   progress('Layer ' .. media.{{ .Fields.Display }} .. '...')
    return {}
 end
 
+--- Layers may be omitted if this extension does not provide such functionality.
+M.{{ .Fields.Layers }} = { ["First Layer"] = layer }
+
 --- Prepares a media for watching/downloading.
 --- When you need to do some heavy operations before passing it further.
+--- E.g. decode a video stream url, calculate a hash of the file, etc.
 --- @param progress progress @The progress writer
 --- @param media media @The media to prepare.
 --- @return media # The prepared media
@@ -43,21 +46,27 @@ function M.{{ .Fn.Prepare }}(progress, media)
 end
 
 --- Streams a media
+--- May be omitted if the extension does not provide streaming functionality.
+--- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
 --- @param progress progress @The progress writer
 --- @param media media @The media to stream (watch, read, open).
 function M.{{ .Fn.Stream }}(progress, media)
    progress('Streaming ' .. media.{{ .Fields.Display }} .. '...')
-   -- require('{{ .App }}').api.open(media.url)
    error('Not implemented')
+
+   -- Example: require('{{ .App }}').api.open(media.url)
 end
 
 --- Downloads a media.
+--- May be omitted if this extension does not provide downloading functionality.
+--- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
 --- @param progress progress @The progress writer
 --- @param media media @The media to download.
 function M.{{ .Fn.Download }}(progress, media)
    progress('Downloading ' .. media.{{ .Fields.Display }} .. '...')
-   -- require('{{ .App }}').api.download(media.{{ .Fields.Display }}, media.url)
    error('Not implemented')
+
+   -- Example: require('{{ .App }}').api.download(media.url, media.{{ .Fields.Display }})
 end
 
 return M

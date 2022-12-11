@@ -45,7 +45,7 @@ func readCloserRead(L *lua.LState) int {
 		return 2
 	}
 	defer func() {
-		if viper.GetBool(key.ExtensionsAdvancedIOAutoCloseReaders) {
+		if viper.GetBool(key.ExtensionsIOAutoCloseReaders) {
 			_ = r.Close()
 		}
 	}()

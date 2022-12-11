@@ -38,8 +38,6 @@ var xNewCmd = &cobra.Command{
 		ext, err := extension.GenerateInteractive()
 		handleErr(err)
 
-		handleErr(ext.LoadPassport())
-
 		fmt.Printf(
 			"%s Created %s extension\n",
 			style.Fg(color.Green)(icon.Check),
@@ -53,11 +51,11 @@ var xNewCmd = &cobra.Command{
 }
 
 func init() {
-	xCmd.AddCommand(xListCmd)
+	xCmd.AddCommand(xLsCmd)
 }
 
-var xListCmd = &cobra.Command{
-	Use:     "list",
+var xLsCmd = &cobra.Command{
+	Use:     "ls",
 	Short:   "List installed extensions",
 	Aliases: []string{"ls"},
 	Args:    cobra.NoArgs,
@@ -116,10 +114,9 @@ func init() {
 }
 
 var xUninstallCmd = &cobra.Command{
-	Use:     "del",
-	Short:   "Uninstall an extension",
-	Aliases: []string{"rm", "remove", "uninstall"},
-	Args:    cobra.NoArgs,
+	Use:   "del",
+	Short: "Uninstall an extension",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions, err := manager.InstalledExtensions()
 		handleErr(err)
@@ -206,7 +203,6 @@ var xSelCmd = &cobra.Command{
 	),
 	Run: func(cmd *cobra.Command, args []string) {
 		ext := loadExtension(cmd.Flag("path"), cmd.Flag("id"))
-		ext.Init()
 
 		switch {
 		case lo.Must(cmd.Flags().GetBool("run")):
@@ -268,17 +264,27 @@ var xUpCmd = &cobra.Command{
 		extensions, err := manager.InstalledExtensions()
 		handleErr(err)
 
-		var updated int
 		for _, ext := range extensions {
-			err = manager.UpdateExtension(ext)
-			if err != nil {
-				fmt.Printf("%s %s %s\n", style.Fg(color.Red)(icon.Cross), style.Fg(color.Purple)(ext.String()), err)
-			} else {
-				fmt.Printf("%s %s %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()), "updated")
-				updated++
+			if ext.Passport().Repository == nil {
+				printWarning(fmt.Sprintf("skipping %s, no repository specified", style.Fg(color.Purple)(ext.String())))
+				continue
 			}
-		}
 
-		fmt.Printf("%s Successfully updated %s\n", style.Fg(color.Green)(icon.Check), text.Quantify(updated, "extension", "extensions"))
+			updated, err := manager.UpdateExtension(ext)
+
+			if err != nil {
+				printError(fmt.Sprintf("failed to update %s: %s", style.Fg(color.Purple)(ext.String()), err))
+				continue
+			}
+
+			var outcome string
+			if updated.Passport().Version().Compare(ext.Passport().Version()) > 0 {
+				outcome = fmt.Sprintf("updated %s => %s", ext.Passport().Version(), updated.Passport().Version())
+			} else {
+				outcome = "already up to date"
+			}
+
+			printSuccess(fmt.Sprintf("%s %s", style.Fg(color.Purple)(ext.String()), outcome))
+		}
 	},
 }

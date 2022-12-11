@@ -58,10 +58,15 @@ If enabled, system commands will be disabled
 and the extension will be unable to access the filesystem.`,
 	},
 	{
-		key.ExtensionsAdvancedIOAutoCloseReaders,
+		key.ExtensionsIOAutoCloseReaders,
 		true,
 		`Automatically close readers.
 If enabled, readers will be automatically closed after reading.`,
+	},
+	{
+		key.ExtensionsUpdateTryPull,
+		false,
+		"Try to perform git pull instead of cloning the repo when updating.",
 	},
 	// EXTENSIONS
 }

@@ -16,6 +16,7 @@ const (
 )
 
 const (
-	ExtensionsSafeMode                   = "extensions.safe_mode"
-	ExtensionsAdvancedIOAutoCloseReaders = "extensions.advanced.io.auto_close_readers"
+	ExtensionsSafeMode           = "extensions.safe_mode"
+	ExtensionsUpdateTryPull      = "extensions.update.try_pull"
+	ExtensionsIOAutoCloseReaders = "extensions.io.auto_close_readers"
 )

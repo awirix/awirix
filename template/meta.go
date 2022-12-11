@@ -8,7 +8,6 @@ import (
 
 type funcs struct {
 	Search,
-	Explore,
 	Prepare,
 	Stream,
 	Download,
@@ -18,6 +17,7 @@ type funcs struct {
 type fields struct {
 	Display string
 	About   string
+	Layers  string
 }
 
 type meta struct {
@@ -38,7 +38,6 @@ func newMeta(module string) *meta {
 	}
 	m.Fn = &funcs{
 		Search:   scraper.FunctionSearch,
-		Explore:  scraper.FunctionExplore,
 		Prepare:  scraper.FunctionPrepare,
 		Stream:   scraper.FunctionStream,
 		Download: scraper.FunctionDownload,

@@ -2,6 +2,7 @@ package scraper
 
 import (
 	"fmt"
+	"github.com/vivi-app/vivi/log"
 	lua "github.com/yuin/gopher-lua"
 	"io"
 )
@@ -10,19 +11,20 @@ type Scraper struct {
 	state *lua.LState
 
 	functionSearch   *lua.LFunction
-	functionExplore  *lua.LFunction
 	functionPrepare  *lua.LFunction
 	functionStream   *lua.LFunction
 	functionDownload *lua.LFunction
-	progress         *lua.LFunction
+
+	layers   []*Layer
+	progress *lua.LFunction
 }
 
 func (s *Scraper) HasSearch() bool {
 	return s.functionSearch != nil
 }
 
-func (s *Scraper) HasExplore() bool {
-	return s.functionExplore != nil
+func (s *Scraper) HasLayers() bool {
+	return s.layers != nil || len(s.layers) > 0
 }
 
 func (s *Scraper) HasStream() bool {
@@ -35,7 +37,9 @@ func (s *Scraper) HasDownload() bool {
 
 func (s *Scraper) SetProgress(progress func(string)) {
 	s.progress = s.state.NewFunction(func(L *lua.LState) int {
-		progress(L.ToString(1))
+		msg := L.ToString(1)
+		progress(msg)
+		log.Tracef("progress: %s", msg)
 		return 0
 	})
 }
@@ -50,7 +54,7 @@ func errNotAFunction(name string, val lua.LValue) error {
 }
 
 func getFunctionFromTable(table *lua.LTable, name string, required bool) (*lua.LFunction, error) {
-	function := table.RawGet(lua.LString(name))
+	function := table.RawGetString(name)
 
 	if function.Type() == lua.LTFunction {
 		return function.(*lua.LFunction), nil
@@ -59,6 +63,41 @@ func getFunctionFromTable(table *lua.LTable, name string, required bool) (*lua.L
 	}
 
 	return nil, errNotAFunction(name, function)
+}
+
+func getLayers(table *lua.LTable) (layers []*Layer, err error) {
+	field := table.RawGetString(FieldLayers)
+
+	if field.Type() == lua.LTNil {
+		return nil, nil
+	} else if field.Type() != lua.LTTable {
+		return nil, fmt.Errorf("layers field must be a table, got %s", field.Type().String())
+	}
+
+	table = field.(*lua.LTable)
+
+	table.ForEach(func(key lua.LValue, value lua.LValue) {
+		if err != nil {
+			return
+		}
+
+		if key.Type() != lua.LTString {
+			err = fmt.Errorf("each layer name must be a string, got %s", key.Type().String())
+			return
+		}
+
+		if value.Type() != lua.LTFunction {
+			err = fmt.Errorf("each layer must be a function, got %s", value.Type().String())
+			return
+		}
+
+		layers = append(layers, &Layer{
+			Name:        string(key.(lua.LString)),
+			luaFunction: value.(*lua.LFunction),
+		})
+	})
+
+	return
 }
 
 func New(L *lua.LState, r io.Reader) (*Scraper, error) {
@@ -91,13 +130,13 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, err
 	}
 
-	theScraper.functionExplore, err = getFunctionFromTable(table, FunctionExplore, false)
+	theScraper.layers, err = getLayers(table)
 	if err != nil {
 		return nil, err
 	}
 
-	if !theScraper.HasExplore() && !theScraper.HasSearch() {
-		return nil, errOneOfRequired(theScraper.functionSearch, theScraper.functionExplore)
+	if !theScraper.HasLayers() && !theScraper.HasSearch() {
+		return nil, fmt.Errorf("scraper must implement `search` function or have more than 0 layers")
 	}
 
 	theScraper.functionPrepare, err = getFunctionFromTable(table, FunctionPrepare, true)

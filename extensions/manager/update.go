@@ -4,13 +4,15 @@ import (
 	"fmt"
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
+	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/key"
 	"os"
 	"time"
 )
 
-func UpdateExtension(ext *extension.Extension) error {
+func UpdateExtension(ext *extension.Extension) (*extension.Extension, error) {
 	theSpinner := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(os.Stderr), spinner.WithColor("cyan"))
 	progress := func(text string) {
 		theSpinner.Suffix = " " + text
@@ -20,21 +22,32 @@ func UpdateExtension(ext *extension.Extension) error {
 	theSpinner.Start()
 	defer theSpinner.Stop()
 
-	if err := ext.LoadPassport(); err != nil {
-		return err
-	}
-
 	path := ext.Path()
-	repo, err := git.PlainOpen(path)
 
-	if err == nil {
-		err = updatePull(progress, ext, repo)
+	// Will try to pull first, if that fails, it will clone
+	if viper.GetBool(key.ExtensionsUpdateTryPull) {
+		var repo *git.Repository
+		repo, err := git.PlainOpen(path)
+
 		if err == nil {
-			return nil
+			err = updatePull(progress, ext, repo)
+			if err == nil {
+				return extension.New(ext.Path())
+			}
 		}
 	}
 
-	return updateClone(progress, ext)
+	err := updateClone(progress, ext)
+	if err != nil {
+		return nil, err
+	}
+
+	updated, err := extension.New(ext.Path())
+	if err != nil {
+		return nil, err
+	}
+
+	return updated, nil
 }
 
 func updatePull(progress func(string), ext *extension.Extension, repo *git.Repository) (err error) {
@@ -72,7 +85,6 @@ func updateClone(progress func(string), ext *extension.Extension) error {
 
 	path := ext.Path()
 
-	// if pull failed, try to remove and download again
 	tmpPath, err := filesystem.Api().TempDir("", ext.Passport().Name)
 	if err != nil {
 		return err
@@ -92,9 +104,7 @@ func updateClone(progress func(string), ext *extension.Extension) error {
 	}
 
 	progress("Moving files")
-	cloned := extension.New(tmpPath)
-	cloned.Init()
-	err = cloned.LoadPassport()
+	_, err = extension.New(tmpPath)
 	if err != nil {
 		return fmt.Errorf("failed to load passport: %w", err)
 	}

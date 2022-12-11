@@ -22,7 +22,7 @@ type Extension struct {
 	state    *lua.LState
 }
 
-func (e *Extension) Init() {
+func (e *Extension) initState() {
 	if e.state != nil {
 		return
 	}
@@ -44,7 +44,7 @@ func (e *Extension) Init() {
 	e.state = state
 }
 
-func (e *Extension) LoadPassport() error {
+func (e *Extension) loadPassport() error {
 	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Passport))
 	if err != nil {
 		return err
@@ -61,9 +61,7 @@ func (e *Extension) LoadPassport() error {
 }
 
 func (e *Extension) LoadScraper() error {
-	if e.state == nil {
-		return fmt.Errorf("extension not initialized")
-	}
+	e.initState()
 
 	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Scraper))
 	if err != nil {
@@ -126,10 +124,4 @@ func (e *Extension) Tester() *tester.Tester {
 
 func (e *Extension) Path() string {
 	return e.path
-}
-
-// IsUpdatable returns true if it would be possible to update this extension.
-// Do not use this to check if the extension is up-to-date.
-func (e *Extension) IsUpdatable() bool {
-	return e.Passport().Repository != nil
 }

@@ -19,8 +19,14 @@ import (
 	"strings"
 )
 
-func New(path string) *Extension {
-	return &Extension{path: path}
+func New(path string) (*Extension, error) {
+	ext := &Extension{path: path}
+	err := ext.loadPassport()
+	if err != nil {
+		return nil, err
+	}
+
+	return ext, nil
 }
 
 func GenerateInteractive() (*Extension, error) {
@@ -169,5 +175,5 @@ func GenerateInteractive() (*Extension, error) {
 		}
 	}
 
-	return New(path), nil
+	return New(path)
 }

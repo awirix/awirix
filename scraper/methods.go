@@ -75,22 +75,28 @@ func (s *Scraper) Search(query string) ([]*Media, error) {
 	return s.checkMediaSlice()
 }
 
-func (s *Scraper) Explore(media *Media) ([]*Media, error) {
-	if !s.HasExplore() {
-		panic("scraper does not have an explore function")
+func (s *Scraper) Layers() (layers []*Layer, err error) {
+	if !s.HasLayers() {
+		panic("scraper does not have any layers")
 	}
 
-	err := s.state.CallByParam(lua.P{
-		Fn:      s.functionExplore,
-		NRet:    1,
-		Protect: true,
-	}, s.progress, media.Value())
+	for _, layer := range s.layers {
+		layer.Function = func(media *Media) (subMedias []*Media, err error) {
+			err = s.state.CallByParam(lua.P{
+				Fn:      layer.luaFunction,
+				NRet:    1,
+				Protect: true,
+			}, s.progress, media.Value())
+			if err != nil {
+				return nil, err
+			}
 
-	if err != nil {
-		return nil, err
+			return s.checkMediaSlice()
+		}
 	}
 
-	return s.checkMediaSlice()
+	layers = s.layers
+	return
 }
 
 func (s *Scraper) Prepare(media *Media) (*Media, error) {

@@ -125,13 +125,9 @@ func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
 
 	s.Stop()
 
-	ext := extension.New(path)
-
-	if !options.SkipValidate {
-		err = ext.LoadPassport()
-		if err != nil {
-			return nil, err
-		}
+	ext, err := extension.New(path)
+	if err != nil {
+		return nil, err
 	}
 
 	return ext, nil
