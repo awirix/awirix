@@ -35,6 +35,7 @@ func newMeta(module string) *meta {
 	m.Fields = &fields{
 		Display: scraper.FieldDisplay,
 		About:   scraper.FieldAbout,
+		Layers:  scraper.FieldLayers,
 	}
 	m.Fn = &funcs{
 		Search:   scraper.FunctionSearch,

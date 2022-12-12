@@ -73,7 +73,7 @@ var xLsCmd = &cobra.Command{
 			authors[ext.Author()] = nil
 		}
 
-		printForDomain := func(author string) {
+		printForAuthor := func(author string) {
 			fmt.Println(
 				style.
 					New().
@@ -94,7 +94,7 @@ var xLsCmd = &cobra.Command{
 
 		for author, _ := range authors {
 			if _, ok := byAuthor[author]; ok {
-				printForDomain(author)
+				printForAuthor(author)
 				fmt.Println()
 			}
 		}

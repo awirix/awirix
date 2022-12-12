@@ -164,12 +164,16 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	for _, t := range []lo.Tuple2[string, []byte]{
+	for _, t := range []struct {
+		filename string
+		contents []byte
+	}{
 		{filename.Passport, data.Bytes()},
 		{filename.Scraper, template.Scraper()},
 		{filename.Tester, template.Tester()},
+		{filename.EditorConfig, template.EditorConfig()},
 	} {
-		err = filesystem.Api().WriteFile(filepath.Join(path, t.A), t.B, os.ModePerm)
+		err = filesystem.Api().WriteFile(filepath.Join(path, t.filename), t.contents, os.ModePerm)
 		if err != nil {
 			return nil, err
 		}

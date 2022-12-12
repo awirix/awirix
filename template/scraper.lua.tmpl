@@ -24,17 +24,21 @@ end
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
 --- @param progress progress @The progress writer
 --- @param media media? @The entry to explore.
---- Nil will be passed to the first layer if the `search` function is missing.
 --- @return media[] # The list of nested medias.
 local function layer(progress, media)
    progress('Layer ' .. media.{{ .Fields.Display }} .. '...')
    return {}
 end
 
---- Layers may be omitted if this extension does not provide such functionality.
+--- Each layer returns a list of sub-media for the given one.
+--- For example, you can search for a show, then selected show will be passed to the first layer that's responsible for returning show's seasons.
+--- After that, the selected season will be passed to the second layer that would return season's episodes.
+--- Layers may be omitted (nil or 0 length) if this extension does not provide such functionality (e.g. just search and watch, no seasons, no episodes).
+--- If `search` function is omitted, first layer will receive a `nil` instead of the media.
+--- @type table<string, fun(progress: progress, media: media|nil): media[]>[]
 M.{{ .Fields.Layers }} = { ["First Layer"] = layer }
 
---- Prepares a media for watching/downloading.
+--- Prepares a media for streaming/downloading.
 --- When you need to do some heavy operations before passing it further.
 --- E.g. decode a video stream url, calculate a hash of the file, etc.
 --- @param progress progress @The progress writer

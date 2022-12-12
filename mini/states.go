@@ -149,18 +149,20 @@ func stateDoAction(s *state) error {
 	const (
 		optionQuit            = "Quit"
 		optionSelectExtension = "Select Extension"
-		optionSearchNew       = "Search New"
 		optionSearch          = "Search"
-		optionLayer           = "Back to the first layer" // TODO: use actual name of the first layer
-		// TODO: stream & download
+		// TODO: stream & download again
 	)
 
 	options := []string{optionSelectExtension}
 	if s.Extension.Scraper().HasSearch() {
-		options = append(options, optionSearchNew, optionSearch)
+		options = append(options, optionSearch)
 	}
 
+	var optionLayer string
+
 	if s.Extension.Scraper().HasLayers() {
+		layers, _ := s.Extension.Scraper().Layers()
+		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].Name)
 		options = append(options, optionLayer)
 	}
 
@@ -177,10 +179,8 @@ func stateDoAction(s *state) error {
 		return nil
 	case optionSelectExtension:
 		return stateSelectExtension()
-	case optionSearchNew:
-		return stateInputQuery(s)
 	case optionSearch:
-		return stateSearchMedia(s)
+		return stateInputQuery(s)
 	case optionLayer:
 		s.LastSelectedMedia = s.LastSelectedSearchMedia
 		return stateLayers(s)
