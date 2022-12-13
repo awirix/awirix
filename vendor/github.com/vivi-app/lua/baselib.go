@@ -69,6 +69,11 @@ func baseCollectGarbage(L *LState) int {
 }
 
 func baseDoFile(L *LState) int {
+	if L.Options.SafeMode {
+		L.RaiseError("dofile is not available in safe mode")
+		return 0
+	}
+
 	src := L.ToString(1)
 	top := L.GetTop()
 	fn, err := L.LoadFile(src)
@@ -168,6 +173,11 @@ func loadaux(L *LState, reader io.Reader, chunkname string) int {
 }
 
 func baseLoad(L *LState) int {
+	if L.Options.SafeMode {
+		L.RaiseError("load() is not available in safe mode")
+		return 0
+	}
+
 	fn := L.CheckFunction(1)
 	chunkname := L.OptString(2, "?")
 	top := L.GetTop()
@@ -196,6 +206,11 @@ func baseLoad(L *LState) int {
 }
 
 func baseLoadFile(L *LState) int {
+	if L.Options.SafeMode {
+		L.RaiseError("loadfile is not available in safe mode")
+		return 0
+	}
+
 	var reader io.Reader
 	var chunkname string
 	var err error
@@ -216,6 +231,11 @@ func baseLoadFile(L *LState) int {
 }
 
 func baseLoadString(L *LState) int {
+	if L.Options.SafeMode {
+		L.RaiseError("loadstring is not available in safe mode")
+		return 0
+	}
+
 	return loadaux(L, strings.NewReader(L.CheckString(1)), L.OptString(2, "<string>"))
 }
 
@@ -283,12 +303,12 @@ func basePCall(L *LState) int {
 func basePrint(L *LState) int {
 	top := L.GetTop()
 	for i := 1; i <= top; i++ {
-		fmt.Print(L.ToStringMeta(L.Get(i)).String())
+		fmt.Fprint(L.Options.Stdout, L.ToStringMeta(L.Get(i)).String())
 		if i != top {
-			fmt.Print("\t")
+			fmt.Fprint(L.Options.Stdout, "\t")
 		}
 	}
-	fmt.Println("")
+	fmt.Fprintln(L.Options.Stdout, "")
 	return 0
 }
 

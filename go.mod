@@ -27,7 +27,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/vivi-app/libopen v1.0.0
-	github.com/yuin/gopher-lua v0.0.0-20220504180219-658193537a64
+	github.com/vivi-app/lua v1.0.1
 	golang.org/x/exp v0.0.0-20221208152030-732eee02a75a
 )
 

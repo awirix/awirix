@@ -2,8 +2,8 @@ package sha512
 
 import (
 	"crypto/sha512"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {

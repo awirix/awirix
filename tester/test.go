@@ -1,6 +1,6 @@
 package tester
 
-import lua "github.com/yuin/gopher-lua"
+import lua "github.com/vivi-app/lua"
 
 func (t *Tester) Test() error {
 	err := t.state.CallByParam(lua.P{

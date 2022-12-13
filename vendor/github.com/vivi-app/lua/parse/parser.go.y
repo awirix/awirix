@@ -2,7 +2,7 @@
 package parse
 
 import (
-  "github.com/yuin/gopher-lua/ast"
+  "github.com/vivi-app/lua/ast"
 )
 %}
 %type<stmts> chunk

@@ -3,8 +3,8 @@ package json
 import (
 	"encoding/json"
 	"errors"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {

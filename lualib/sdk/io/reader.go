@@ -2,8 +2,8 @@ package io
 
 import (
 	"github.com/spf13/viper"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/key"
-	lua "github.com/yuin/gopher-lua"
 	"io"
 	"strings"
 )

@@ -3,13 +3,13 @@ package extension
 import (
 	"context"
 	"fmt"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
 	"github.com/vivi-app/vivi/vm"
-	lua "github.com/yuin/gopher-lua"
 	"path/filepath"
 	"strings"
 )

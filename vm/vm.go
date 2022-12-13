@@ -1,8 +1,8 @@
 package vm
 
 import (
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/lualib"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func New() *lua.LState {

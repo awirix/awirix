@@ -1,6 +1,7 @@
 package sdk
 
 import (
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/lualib/sdk/cmd"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto"
 	"github.com/vivi-app/vivi/lualib/sdk/html"
@@ -11,7 +12,6 @@ import (
 	"github.com/vivi-app/vivi/lualib/sdk/regexp"
 	"github.com/vivi-app/vivi/lualib/sdk/strings"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {

@@ -36,7 +36,9 @@ end
 --- Layers may be omitted (nil or 0 length) if this extension does not provide such functionality (e.g. just search and watch, no seasons, no episodes).
 --- If `search` function is omitted, first layer will receive a `nil` instead of the media.
 --- @type table<string, fun(progress: progress, media: media|nil): media[]>[]
-M.{{ .Fields.Layers }} = { ["First Layer"] = layer }
+M.{{ .Fields.Layers }} = {
+   ['First Layer'] = layer
+}
 
 --- Prepares a media for streaming/downloading.
 --- When you need to do some heavy operations before passing it further.

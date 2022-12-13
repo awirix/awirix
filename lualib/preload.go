@@ -1,12 +1,12 @@
 package lualib
 
 import (
+	lua "github.com/vivi-app/lua"
 	app2 "github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/lualib/api"
 	"github.com/vivi-app/vivi/lualib/app"
 	ext "github.com/vivi-app/vivi/lualib/ext"
 	"github.com/vivi-app/vivi/lualib/sdk"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func Preload(L *lua.LState) {

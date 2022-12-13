@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/libopen/open"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/executil"
 	"github.com/vivi-app/vivi/key"
-	lua "github.com/yuin/gopher-lua"
 	"runtime"
 )
 

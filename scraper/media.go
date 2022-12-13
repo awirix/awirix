@@ -2,7 +2,7 @@ package scraper
 
 import (
 	"fmt"
-	lua "github.com/yuin/gopher-lua"
+	lua "github.com/vivi-app/lua"
 )
 
 type Media struct {

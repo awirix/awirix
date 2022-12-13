@@ -2,7 +2,7 @@ package html
 
 import (
 	"github.com/PuerkitoBio/goquery"
-	lua "github.com/yuin/gopher-lua"
+	lua "github.com/vivi-app/lua"
 	"strings"
 )
 

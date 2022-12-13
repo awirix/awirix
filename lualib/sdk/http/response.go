@@ -1,8 +1,8 @@
 package http
 
 import (
+	lua "github.com/vivi-app/lua"
 	io2 "github.com/vivi-app/vivi/lualib/sdk/io"
-	lua "github.com/yuin/gopher-lua"
 	"net/http"
 )
 

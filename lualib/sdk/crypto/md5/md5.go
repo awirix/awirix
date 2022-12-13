@@ -2,8 +2,8 @@ package md5
 
 import (
 	"crypto/md5"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {

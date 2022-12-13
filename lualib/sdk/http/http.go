@@ -1,8 +1,8 @@
 package http
 
 import (
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 	"net/http"
 	"strings"
 )
@@ -15,11 +15,11 @@ func New(L *lua.LState) *lua.LTable {
 	registerCookieType(L)
 
 	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"get":         defaultClientGet,
-		"post":        defaultClientPost,
-		"new_request": newRequest,
-		"new_header":  newHeader,
-		"new_client":  newClient,
+		"get":     defaultClientGet,
+		"post":    defaultClientPost,
+		"request": newRequest,
+		"header":  newHeader,
+		"client":  newClient,
 	})
 }
 

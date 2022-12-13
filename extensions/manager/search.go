@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
 )
@@ -34,9 +35,11 @@ func InstalledExtensions() ([]*extension.Extension, error) {
 				continue
 			}
 
-			ext, err := extension.New(filepath.Join(path, d.Name()))
+			extensionPath := filepath.Join(path, d.Name())
+			ext, err := extension.New(extensionPath)
 			if err != nil {
-				return nil, err
+				log.Errorf("failed to load extension at '%s': %s", extensionPath, err)
+				continue
 			}
 
 			extensions = append(extensions, ext)

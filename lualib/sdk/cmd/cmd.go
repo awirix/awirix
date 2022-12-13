@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/kballard/go-shellquote"
 	"github.com/samber/lo"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/extensions"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 	"os/exec"
 )
 

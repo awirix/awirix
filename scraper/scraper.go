@@ -2,8 +2,8 @@ package scraper
 
 import (
 	"fmt"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/log"
-	lua "github.com/yuin/gopher-lua"
 	"io"
 )
 

@@ -2,9 +2,9 @@ package app
 
 import (
 	"github.com/spf13/viper"
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 	"runtime"
 )
 

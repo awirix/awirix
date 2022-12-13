@@ -1,7 +1,7 @@
 package http
 
 import (
-	lua "github.com/yuin/gopher-lua"
+	lua "github.com/vivi-app/lua"
 	"io"
 	"net/http"
 	"strings"
@@ -11,6 +11,7 @@ const requestTypeName = "request"
 
 var requestMethods = map[string]lua.LGFunction{
 	"set_header":     requestSetHeader,
+	"header":         requestGetHeader,
 	"set_basic_auth": requestSetBasicAuth,
 }
 
@@ -69,24 +70,16 @@ func requestSetHeader(L *lua.LState) int {
 	return 0
 }
 
+func requestGetHeader(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	pushHeader(L, &request.Header)
+	return 1
+}
+
 func requestSetBasicAuth(L *lua.LState) int {
 	request := checkRequest(L, 1)
 	username := L.CheckString(2)
 	password := L.CheckString(3)
 	request.SetBasicAuth(username, password)
 	return 0
-}
-
-func requestDo(L *lua.LState) int {
-	request := checkRequest(L, 1)
-	client := http.DefaultClient
-	response, err := client.Do(request)
-	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
-	}
-
-	pushResponse(L, response)
-	return 1
 }

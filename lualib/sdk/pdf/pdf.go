@@ -3,9 +3,9 @@ package pdf
 import (
 	"bytes"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
+	lua "github.com/vivi-app/lua"
 	io2 "github.com/vivi-app/vivi/lualib/sdk/io"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 	"io"
 )
 

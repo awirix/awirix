@@ -55,10 +55,9 @@ func init() {
 }
 
 var xLsCmd = &cobra.Command{
-	Use:     "ls",
-	Short:   "List installed extensions",
-	Aliases: []string{"ls"},
-	Args:    cobra.NoArgs,
+	Use:   "ls",
+	Short: "List installed extensions",
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions, err := manager.InstalledExtensions()
 		handleErr(err)

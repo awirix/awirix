@@ -1,6 +1,6 @@
 package scraper
 
-import lua "github.com/yuin/gopher-lua"
+import lua "github.com/vivi-app/lua"
 
 const Module = "scraper"
 

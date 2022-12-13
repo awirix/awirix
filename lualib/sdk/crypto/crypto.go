@@ -1,13 +1,13 @@
 package crypto
 
 import (
+	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto/aes"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto/base64"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto/md5"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto/sha1"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto/sha256"
 	"github.com/vivi-app/vivi/luautil"
-	lua "github.com/yuin/gopher-lua"
 )
 
 func New(L *lua.LState) *lua.LTable {

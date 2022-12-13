@@ -158,7 +158,7 @@ func GenerateInteractive() (*Extension, error) {
 
 	var data bytes.Buffer
 	encoder := json.NewEncoder(&data)
-	encoder.SetIndent("", "  ")
+	encoder.SetIndent("", "    ")
 	err = encoder.Encode(p)
 	if err != nil {
 		return nil, err
