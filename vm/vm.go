@@ -1,15 +1,23 @@
 package vm
 
 import (
-	lua "github.com/vivi-app/lua"
+	"github.com/spf13/viper"
+	"github.com/vivi-app/lua"
+	"github.com/vivi-app/vivi/key"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/lualib"
 )
 
-func New() *lua.LState {
-	L := lua.NewState()
+type Options struct {
+	Silent bool
+}
 
-	// Load the standard libraries except for the debug, io and os
-	for _, openLib := range []lua.LGFunction{
+func New(options *Options) *lua.LState {
+	if options == nil {
+		options = &Options{}
+	}
+
+	libs := []lua.LGFunction{
 		lua.OpenBase,
 		lua.OpenTable,
 		lua.OpenString,
@@ -17,11 +25,27 @@ func New() *lua.LState {
 		lua.OpenCoroutine,
 		lua.OpenChannel,
 		lua.OpenPackage,
-	} {
-		openLib(L)
+	}
+
+	luaOptions := &lua.Options{
+		SkipOpenLibs: true,
+		SafeMode:     viper.GetBool(key.ExtensionsSafeMode),
+	}
+
+	if !luaOptions.SafeMode {
+		libs = append(libs, lua.OpenIo, lua.OpenOs)
+	}
+
+	if options.Silent {
+		luaOptions.Stdout = &log.Writer{}
+	}
+
+	L := lua.NewState(luaOptions)
+
+	for _, lib := range libs {
+		lib(L)
 	}
 
 	lualib.Preload(L)
-
 	return L
 }

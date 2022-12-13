@@ -9,7 +9,7 @@ require (
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
-	github.com/go-git/go-git/v5 v5.5.0
+	github.com/go-git/go-git/v5 v5.5.1
 	github.com/google/go-github/v48 v48.2.0
 	github.com/invopop/jsonschema v0.7.0
 	github.com/ivanpirog/coloredcobra v1.0.1
@@ -27,8 +27,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/vivi-app/libopen v1.0.0
-	github.com/vivi-app/lua v1.0.1
-	golang.org/x/exp v0.0.0-20221208152030-732eee02a75a
+	github.com/vivi-app/lua v1.1.0
+	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
 )
 
 require (

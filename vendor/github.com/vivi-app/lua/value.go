@@ -206,7 +206,7 @@ type LState struct {
 	Env     *LTable
 	Panic   func(*LState)
 	Dead    bool
-	Options Options
+	Options *Options
 
 	stop         int32
 	reg          *registry

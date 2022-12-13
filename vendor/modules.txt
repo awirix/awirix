@@ -100,7 +100,7 @@ github.com/go-git/go-billy/v5/helper/polyfill
 github.com/go-git/go-billy/v5/memfs
 github.com/go-git/go-billy/v5/osfs
 github.com/go-git/go-billy/v5/util
-# github.com/go-git/go-git/v5 v5.5.0
+# github.com/go-git/go-git/v5 v5.5.1
 ## explicit; go 1.13
 github.com/go-git/go-git/v5
 github.com/go-git/go-git/v5/config
@@ -333,7 +333,7 @@ github.com/subosito/gotenv
 # github.com/vivi-app/libopen v1.0.0
 ## explicit
 github.com/vivi-app/libopen/open
-# github.com/vivi-app/lua v1.0.1
+# github.com/vivi-app/lua v1.1.0
 ## explicit; go 1.17
 github.com/vivi-app/lua
 github.com/vivi-app/lua/ast
@@ -362,7 +362,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20221208152030-732eee02a75a
+# golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices

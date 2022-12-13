@@ -8,6 +8,7 @@ import (
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
+	"github.com/vivi-app/vivi/vm"
 )
 
 func notFound() {
@@ -15,6 +16,7 @@ func notFound() {
 }
 
 type state struct {
+	Options   *Options
 	Extension *extension.Extension
 	Query     string
 	LastSelectedMedia,
@@ -22,20 +24,19 @@ type state struct {
 	Action string
 }
 
-func stateSelectExtension() (err error) {
+func stateSelectExtension(s *state) (err error) {
 	exts, err := manager.InstalledExtensions()
 	if err != nil {
 		return err
 	}
-
-	s := &state{}
 
 	s.Extension, err = selectOne[*extension.Extension]("Select an extension to use", exts, renderExtension)
 	if err != nil {
 		return err
 	}
 
-	err = s.Extension.LoadScraper()
+	// redirect all stdout to log
+	err = s.Extension.LoadScraper(&vm.Options{Silent: !s.Options.Debug})
 	if err != nil {
 		return err
 	}
@@ -178,7 +179,7 @@ func stateDoAction(s *state) error {
 	case optionQuit:
 		return nil
 	case optionSelectExtension:
-		return stateSelectExtension()
+		return stateSelectExtension(s)
 	case optionSearch:
 		return stateInputQuery(s)
 	case optionLayer:

@@ -22,12 +22,12 @@ type Extension struct {
 	state    *lua.LState
 }
 
-func (e *Extension) initState() {
+func (e *Extension) initState(options *vm.Options) {
 	if e.state != nil {
 		return
 	}
 
-	state := vm.New()
+	state := vm.New(options)
 
 	// this is hideous, but it works
 	state.SetContext(context.WithValue(context.Background(), true, e))
@@ -60,8 +60,8 @@ func (e *Extension) loadPassport() error {
 	return nil
 }
 
-func (e *Extension) LoadScraper() error {
-	e.initState()
+func (e *Extension) LoadScraper(options *vm.Options) error {
+	e.initState(options)
 
 	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Scraper))
 	if err != nil {

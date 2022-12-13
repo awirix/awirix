@@ -1,3 +1,5 @@
 package mini
 
-type Options struct{}
+type Options struct {
+	Debug bool
+}

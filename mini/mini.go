@@ -21,5 +21,5 @@ func Run(options *Options) error {
 		options = &Options{}
 	}
 
-	return stateSelectExtension()
+	return stateSelectExtension(&state{Options: options})
 }

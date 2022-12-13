@@ -205,7 +205,7 @@ var xSelCmd = &cobra.Command{
 
 		switch {
 		case lo.Must(cmd.Flags().GetBool("run")):
-			handleErr(ext.LoadScraper())
+			handleErr(ext.LoadScraper(nil))
 		case lo.Must(cmd.Flags().GetBool("test")):
 			handleErr(ext.LoadTester())
 			handleErr(ext.Tester().Test())

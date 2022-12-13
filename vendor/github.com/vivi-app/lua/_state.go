@@ -107,7 +107,7 @@ type Options struct {
 	MinimizeStackMemory bool
 	// Stdout used for print function. Defaults to os.Stdout.
 	Stdout io.Writer
-	// SafeMode disables the use of `load`, `loadfile`, `dofile`, `loadstring` functions. Defaults to false.
+	// SafeMode disables the use of potentially unsafe functions. Defaults to false.
 	SafeMode bool
 }
 
@@ -564,7 +564,7 @@ func panicWithoutTraceback(L *LState) {
 	panic(err)
 }
 
-func newLState(options Options) *LState {
+func newLState(options *Options) *LState {
 	al := newAllocator(32)
 	ls := &LState{
 		G:       newGlobal(),
@@ -1190,32 +1190,36 @@ func (ls *LState) setFieldString(obj LValue, key string, value LValue) {
 
 /* api methods {{{ */
 
-func NewState(opts ...Options) *LState {
+func NewState(options *Options) *LState {
 	var ls *LState
-	if len(opts) == 0 {
-		ls = newLState(Options{
+	if options == nil {
+		ls = newLState(&Options{
 			CallStackSize: CallStackSize,
 			RegistrySize:  RegistrySize,
 			Stdout:        os.Stdout,
 		})
 		ls.OpenLibs()
 	} else {
-		if opts[0].CallStackSize < 1 {
-			opts[0].CallStackSize = CallStackSize
+		if options.Stdout == nil {
+			options.Stdout = os.Stdout
 		}
-		if opts[0].RegistrySize < 128 {
-			opts[0].RegistrySize = RegistrySize
+
+		if options.CallStackSize < 1 {
+			options.CallStackSize = CallStackSize
 		}
-		if opts[0].RegistryMaxSize < opts[0].RegistrySize {
-			opts[0].RegistryMaxSize = 0 // disable growth if max size is smaller than initial size
+		if options.RegistrySize < 128 {
+			options.RegistrySize = RegistrySize
+		}
+		if options.RegistryMaxSize < options.RegistrySize {
+			options.RegistryMaxSize = 0 // disable growth if max size is smaller than initial size
 		} else {
 			// if growth enabled, grow step is set
-			if opts[0].RegistryGrowStep < 1 {
-				opts[0].RegistryGrowStep = RegistryGrowStep
+			if options.RegistryGrowStep < 1 {
+				options.RegistryGrowStep = RegistryGrowStep
 			}
 		}
-		ls = newLState(opts[0])
-		if !opts[0].SkipOpenLibs {
+		ls = newLState(options)
+		if !options.SkipOpenLibs {
 			ls.OpenLibs()
 		}
 	}
