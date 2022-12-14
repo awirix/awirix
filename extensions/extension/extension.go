@@ -69,7 +69,7 @@ func (e *Extension) LoadScraper(options *vm.Options) error {
 	}
 	defer file.Close()
 
-	theScraper, err := scraper.New(e.state, file)
+	theScraper, err := scraper.New(context.Background(), e.state, file)
 	if err != nil {
 		return err
 	}

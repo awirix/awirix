@@ -3,10 +3,10 @@ package extension
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/manifoldco/promptui"
-	"github.com/samber/lo"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
@@ -37,77 +37,103 @@ func GenerateInteractive() (*Extension, error) {
 
 	username := usr.Username
 
-	var (
-		prompt promptui.Prompt
-		sel    promptui.Select
-	)
+	if err != nil {
+		return nil, err
+	}
 
 	answers := struct {
 		Name     string
 		About    string
 		Nsfw     bool
-		Tags     string
+		Tags     []string
 		Language string
 	}{}
 
-	prompt = promptui.Prompt{
-		Label: "Name of the extension",
-	}
+	err = survey.Ask([]*survey.Question{
+		{
+			Name: "name",
+			Prompt: &survey.Input{
+				Message: "Extension name",
+			},
+			Validate: survey.ComposeValidators(survey.Required, func(val any) error {
+				name := strings.TrimSpace(val.(string))
+				if strings.Contains(name, " ") {
+					return errors.New("extension name cannot contain spaces")
+				}
 
-	answers.Name, err = prompt.Run()
-	if err != nil {
-		return nil, err
-	}
-
-	prompt.Label = "About the extension"
-	answers.About, err = prompt.Run()
-	if err != nil {
-		return nil, err
-	}
-
-	prompt.Label = "NSFW (18+)"
-	prompt.IsConfirm = true
-	prompt.Default = "N"
-
-	_, err = prompt.Run()
-	answers.Nsfw = err == nil
-
-	prompt.Label = "Tags (separated by commas)"
-	prompt.IsConfirm = false
-
-	answers.Tags, err = prompt.Run()
-	if err != nil {
-		return nil, err
-	}
-
-	sel = promptui.Select{
-		Label: "Language",
-		Items: language.Names,
-		Size:  7,
-		Searcher: func(input string, index int) bool {
-			// TODO: fuzzy search
-			name := strings.ReplaceAll(strings.ToLower(language.Names[index]), " ", "")
-			input = strings.ReplaceAll(strings.ToLower(input), " ", "")
-
-			return strings.Contains(name, input)
+				return nil
+			}),
 		},
-		CursorPos:         lo.IndexOf(language.Names, "English"),
-		StartInSearchMode: true,
-	}
+		{
+			Name: "about",
+			Prompt: &survey.Input{
+				Message: "Extension description",
+			},
+			Validate: survey.MaxLength(100),
+		},
+		{
+			Name: "nsfw",
+			Prompt: &survey.Confirm{
+				Message: "Is this extension NSFW?",
+			},
+		},
+		{
+			Name: "tags",
+			Prompt: &survey.Input{
+				Message: "Extension tags (comma separated)",
+			},
+			Validate: func(val any) error {
+				v := strings.Trim(val.(string), ", ")
 
-	_, answers.Language, err = sel.Run()
+				if len(strings.Split(v, ",")) > 5 {
+					return errors.New("extension cannot have more than 5 tags")
+				}
+
+				return nil
+			},
+			Transform: func(ans any) (newAns any) {
+				var tags []string
+				for _, tag := range strings.Split(ans.(string), ",") {
+					tags = append(tags, strings.TrimSpace(tag))
+				}
+
+				return tags
+			},
+		},
+		{
+			Name: "language",
+			Prompt: &survey.Select{
+				Message:  "Extension language",
+				Options:  language.Names,
+				PageSize: 10,
+				Default:  "English",
+				Filter: func(filter string, value string, index int) bool {
+					if fuzzy.MatchFold(filter, value) {
+						return true
+					}
+
+					return fuzzy.MatchFold(filter, language.NativeNames[index])
+				},
+			},
+			Transform: func(ans any) (newAns any) {
+				name := ans.(survey.OptionAnswer).Value
+				lang, _ := language.FromName(name)
+				return survey.OptionAnswer{Value: lang.Code}
+			},
+		},
+	}, &answers)
+
 	if err != nil {
 		return nil, err
 	}
-
-	lang, _ := language.FromName(answers.Language)
 
 	p := &passport.Passport{
 		Name:        answers.Name,
 		ID:          passport.ToID(answers.Name),
 		About:       answers.About,
 		VersionRaw:  "0.1.0",
-		LanguageRaw: lang.Code,
+		Tags:        answers.Tags,
+		LanguageRaw: answers.Language,
 		NSFW:        answers.Nsfw,
 		Config: map[string]*passport.ConfigSection{
 			"test": {
@@ -116,12 +142,6 @@ func GenerateInteractive() (*Extension, error) {
 				Default: false,
 			},
 		},
-	}
-
-	if answers.Tags != "" {
-		for _, tag := range strings.Split(answers.Tags, ",") {
-			p.Tags = append(p.Tags, strings.TrimSpace(tag))
-		}
 	}
 
 	path := filepath.Join(where.Extensions(), username, filename.Sanitize(p.ID))
@@ -134,7 +154,7 @@ func GenerateInteractive() (*Extension, error) {
 	if exists {
 		var overwrite bool
 		err = survey.AskOne(&survey.Confirm{
-			Message: "Extension already exists, overwrite?",
+			Message: "Extension with the same name already exists, overwrite?",
 			Default: false,
 		}, &overwrite)
 		if err != nil {

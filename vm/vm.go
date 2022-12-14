@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"context"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/key"
@@ -9,7 +10,8 @@ import (
 )
 
 type Options struct {
-	Silent bool
+	Silent  bool
+	Context context.Context
 }
 
 func New(options *Options) *lua.LState {
@@ -47,5 +49,10 @@ func New(options *Options) *lua.LState {
 	}
 
 	lualib.Preload(L)
+
+	if options.Context != nil {
+		L.SetContext(options.Context)
+	}
+
 	return L
 }

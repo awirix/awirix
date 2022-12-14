@@ -1,5 +1,10 @@
 {{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}}-- vim:ts=3 ss=3 sw=3 expandtab
 
+------------------------------------------------------
+-- Learn Lua: learnxinyminutes.com/docs/lua         --
+-- Style Guide: github.com/luarocks/lua-style-guide --
+------------------------------------------------------
+
 --- Table that have a string field named `{{ .Fields.Display }}` used for string representation
 --- with optional `{{ .Fields.About }}` for brief description.
 --- @alias media { {{ .Fields.Display }}: string, {{ .Fields.About }}: string|nil, [any]: any }
@@ -12,8 +17,8 @@ local M = {}
 --- Searches for the media
 --- This function may be omitted if this extension does not provide searching functionality.
 --- Might be the case if it is dedicated to the single show/movie/book/...
---- @param progress progress @The progress writer
---- @param query string @The query to search for.
+--- @param progress progress The progress writer
+--- @param query string The query to search for.
 --- @return media[] # The media that match the query.
 function M.{{ .Fn.Search }}(progress, query)
    progress('Searching for ' .. query .. '...')
@@ -22,10 +27,11 @@ end
 
 --- Returns a list of nested medias for media entry.
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
---- @param progress progress @The progress writer
---- @param media media? @The entry to explore.
+--- @param progress progress The progress writer
+--- @param media media? The entry to explore.
 --- @return media[] # The list of nested medias.
 local function layer(progress, media)
+   assert(media, 'media expected')
    progress('Layer ' .. media.{{ .Fields.Display }} .. '...')
    return {}
 end
@@ -43,8 +49,8 @@ M.{{ .Fields.Layers }} = {
 --- Prepares a media for streaming/downloading.
 --- When you need to do some heavy operations before passing it further.
 --- E.g. decode a video stream url, calculate a hash of the file, etc.
---- @param progress progress @The progress writer
---- @param media media @The media to prepare.
+--- @param progress progress The progress writer
+--- @param media media The media to prepare.
 --- @return media # The prepared media
 function M.{{ .Fn.Prepare }}(progress, media)
    progress('Preparing ' .. media.{{ .Fields.Display }} .. '...')
@@ -54,8 +60,8 @@ end
 --- Streams a media
 --- May be omitted if the extension does not provide streaming functionality.
 --- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
---- @param progress progress @The progress writer
---- @param media media @The media to stream (watch, read, open).
+--- @param progress progress The progress writer
+--- @param media media The media to stream (watch, read, open).
 function M.{{ .Fn.Stream }}(progress, media)
    progress('Streaming ' .. media.{{ .Fields.Display }} .. '...')
    error('Not implemented')
@@ -66,8 +72,8 @@ end
 --- Downloads a media.
 --- May be omitted if this extension does not provide downloading functionality.
 --- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
---- @param progress progress @The progress writer
---- @param media media @The media to download.
+--- @param progress progress The progress writer
+--- @param media media The media to download.
 function M.{{ .Fn.Download }}(progress, media)
    progress('Downloading ' .. media.{{ .Fields.Display }} .. '...')
    error('Not implemented')

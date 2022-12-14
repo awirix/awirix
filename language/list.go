@@ -1,5 +1,7 @@
 package language
 
+import "golang.org/x/exp/slices"
+
 var (
 	Codes       []string
 	Names       []string
@@ -18,6 +20,10 @@ func init() {
 		NativeNames[i] = lang.NativeName
 		i++
 	}
+
+	slices.Sort(Codes)
+	slices.Sort(Names)
+	slices.Sort(NativeNames)
 }
 
 // Languages is a map of all ISO 639-1 languages using the two character lowercase language code as key.
