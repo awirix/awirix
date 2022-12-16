@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"syscall"
 )
 
@@ -64,6 +65,10 @@ func errorIfFileIsClosed(L *LState, file *lFile) {
 }
 
 func newFile(L *LState, file *os.File, path string, flag int, perm os.FileMode, writable, readable bool) (*LUserData, error) {
+	if L.Options.WorkingDir != "" {
+		path = filepath.Join(L.Options.WorkingDir, path)
+	}
+
 	ud := L.NewUserData()
 	var err error
 	if file == nil {

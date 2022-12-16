@@ -36,7 +36,7 @@ func stateSelectExtension(s *state) (err error) {
 	}
 
 	// redirect all stdout to log
-	err = s.Extension.LoadScraper(&vm.Options{Silent: !s.Options.Debug})
+	err = s.Extension.LoadScraper(vm.Options{Silent: !s.Options.Debug})
 	if err != nil {
 		return err
 	}

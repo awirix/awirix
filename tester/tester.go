@@ -24,6 +24,9 @@ func New(L *lua.LState, r io.Reader) (*Tester, error) {
 		NRet:    1,
 		Protect: true,
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	module := L.Get(-1)
 	theTester := &Tester{}
@@ -31,7 +34,6 @@ func New(L *lua.LState, r io.Reader) (*Tester, error) {
 	// get script return value
 	table, ok := module.(*lua.LTable)
 	if !ok {
-		fmt.Printf(module.Type().String(), module.String())
 		return nil, fmt.Errorf("tester module must return a table")
 	}
 

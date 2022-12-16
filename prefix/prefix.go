@@ -1,4 +1,4 @@
-package app
+package prefix
 
 import "github.com/vivi-app/vivi/app"
 

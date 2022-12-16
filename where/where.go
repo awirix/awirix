@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/key"
-	app2 "github.com/vivi-app/vivi/prefix"
+	"github.com/vivi-app/vivi/prefix"
 	"os"
 	"path/filepath"
 )
@@ -27,40 +27,43 @@ func Config() string {
 // Logs path
 // Will create the directory if it doesn't exist
 func Logs() string {
-	return mkdir(filepath.Join(Config(), "logs"))
+	path := viper.GetString(key.PathLogs)
+	if len(path) == 0 {
+		path = filepath.Join(Config(), "logs")
+	}
+
+	return mkdir(path)
 }
 
 // Cache path
 // Will create the directory if it doesn't exist
 func Cache() string {
-	genericCacheDir, err := os.UserCacheDir()
+	osCacheDir, err := os.UserCacheDir()
 	if err != nil {
-		genericCacheDir = "."
+		osCacheDir = "."
 	}
 
-	cacheDir := filepath.Join(genericCacheDir, app2.Cache)
+	cacheDir := filepath.Join(osCacheDir, prefix.Cache)
 	return mkdir(cacheDir)
 }
 
 // Temp path
 // Will create the directory if it doesn't exist
 func Temp() string {
-	tempDir := filepath.Join(os.TempDir(), app2.Temp)
+	tempDir := filepath.Join(os.TempDir(), prefix.Temp)
 	return mkdir(tempDir)
 }
 
 func Downloads() string {
-	path := viper.GetString(key.PathAnimeDownloads)
-	path = os.ExpandEnv(path)
-	absPath, err := filepath.Abs(path)
-
-	if err == nil {
-		path = absPath
-	}
-
+	path := viper.GetString(key.PathDownloads)
 	return mkdir(path)
 }
 
 func Extensions() string {
-	return mkdir(filepath.Join(Config(), "extensions"))
+	path := viper.GetString(key.PathExtensions)
+	if len(path) == 0 {
+		path = filepath.Join(Config(), "extensions")
+	}
+
+	return mkdir(path)
 }

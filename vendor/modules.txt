@@ -282,7 +282,7 @@ github.com/robertkrimen/otto/file
 github.com/robertkrimen/otto/parser
 github.com/robertkrimen/otto/registry
 github.com/robertkrimen/otto/token
-# github.com/samber/lo v1.36.0
+# github.com/samber/lo v1.37.0
 ## explicit; go 1.18
 github.com/samber/lo
 # github.com/sergi/go-diff v1.2.0
@@ -328,7 +328,7 @@ github.com/subosito/gotenv
 # github.com/vivi-app/libopen v1.0.0
 ## explicit
 github.com/vivi-app/libopen/open
-# github.com/vivi-app/lua v1.1.0
+# github.com/vivi-app/lua v1.3.0
 ## explicit; go 1.17
 github.com/vivi-app/lua
 github.com/vivi-app/lua/ast
@@ -357,7 +357,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
+# golang.org/x/exp v0.0.0-20221215174704-0915cd710c24
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices

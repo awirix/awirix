@@ -10,15 +10,12 @@ import (
 )
 
 type Options struct {
-	Silent  bool
-	Context context.Context
+	Silent     bool
+	WorkingDir string
+	Context    context.Context
 }
 
-func New(options *Options) *lua.LState {
-	if options == nil {
-		options = &Options{}
-	}
-
+func New(options Options) *lua.LState {
 	libs := []lua.LGFunction{
 		lua.OpenBase,
 		lua.OpenTable,
@@ -31,10 +28,10 @@ func New(options *Options) *lua.LState {
 
 	luaOptions := &lua.Options{
 		SkipOpenLibs: true,
-		SafeMode:     viper.GetBool(key.ExtensionsSafeMode),
+		WorkingDir:   options.WorkingDir,
 	}
 
-	if !luaOptions.SafeMode {
+	if !viper.GetBool(key.ExtensionsSafeMode) {
 		libs = append(libs, lua.OpenIo, lua.OpenOs)
 	}
 

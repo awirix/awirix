@@ -24,21 +24,21 @@ panic, fatal, error, warn, info, debug, trace`,
 
 	// PATH
 	{
-		key.PathAnimeDownloads,
+		key.PathDownloads,
 		".",
-		"Path to anime downloads",
+		"Default downloads path",
 	},
 	{
-		key.PathMoviesDownloads,
-		".",
-		"Path to movies downloads",
+		key.PathExtensions,
+		"",
+		"Extensions path. Leave empty for default",
 	},
 	{
-		key.PathShowsDownloads,
-		".",
-		"Path to shows downloads",
+		key.PathLogs,
+		"",
+		"Logs path. Leave empty for default",
 	},
-	// END PATH
+	// END
 
 	// VIDEO
 	{
@@ -56,6 +56,16 @@ panic, fatal, error, warn, info, debug, trace`,
 		`Enable safe mode for extensions.
 If enabled, system commands will be disabled
 and the extension will be unable to access the filesystem.`,
+	},
+	{
+		key.ExtensionsTemplateEditorConfig,
+		true,
+		"Generate .editorconfig file when creating new extension",
+	},
+	{
+		key.ExtensionsTemplateStylua,
+		true,
+		"Generate stylua.toml file when creating new extension",
 	},
 	{
 		key.ExtensionsIOAutoCloseReaders,

@@ -20,15 +20,15 @@ require (
 	github.com/pdfcpu/pdfcpu v0.3.13
 	github.com/pelletier/go-toml/v2 v2.0.6
 	github.com/robertkrimen/otto v0.2.1
-	github.com/samber/lo v1.36.0
+	github.com/samber/lo v1.37.0
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/afero v1.9.3
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
 	github.com/vivi-app/libopen v1.0.0
-	github.com/vivi-app/lua v1.1.0
-	golang.org/x/exp v0.0.0-20221212164502-fae10dda9338
+	github.com/vivi-app/lua v1.3.0
+	golang.org/x/exp v0.0.0-20221215174704-0915cd710c24
 )
 
 require (

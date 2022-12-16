@@ -21,6 +21,8 @@ import (
 
 func New(path string) (*Extension, error) {
 	ext := &Extension{path: path}
+
+	// extensions must have valid passports
 	err := ext.loadPassport()
 	if err != nil {
 		return nil, err
@@ -42,6 +44,7 @@ func GenerateInteractive() (*Extension, error) {
 	}
 
 	answers := struct {
+		Preset   string
 		Name     string
 		About    string
 		Nsfw     bool
@@ -121,6 +124,15 @@ func GenerateInteractive() (*Extension, error) {
 				return survey.OptionAnswer{Value: lang.Code}
 			},
 		},
+		{
+			Name: "Preset",
+			Prompt: &survey.Select{
+				Message: "Programming language preset",
+				Options: []string{template.PresetLua.String(), template.PresetFennel.String()},
+				Default: template.PresetLua.String(),
+				VimMode: true,
+			},
+		},
 	}, &answers)
 
 	if err != nil {
@@ -178,22 +190,19 @@ func GenerateInteractive() (*Extension, error) {
 
 	var data bytes.Buffer
 	encoder := json.NewEncoder(&data)
+	// 4 spaces indent
 	encoder.SetIndent("", "    ")
 	err = encoder.Encode(p)
 	if err != nil {
 		return nil, err
 	}
 
-	for _, t := range []struct {
-		filename string
-		contents []byte
-	}{
-		{filename.Passport, data.Bytes()},
-		{filename.Scraper, template.Scraper()},
-		{filename.Tester, template.Tester()},
-		{filename.EditorConfig, template.EditorConfig()},
-	} {
-		err = filesystem.Api().WriteFile(filepath.Join(path, t.filename), t.contents, os.ModePerm)
+	preset, _ := template.PresetFromString(answers.Preset)
+	tmpl := template.Generate(preset)
+	tmpl[filename.Passport] = data.Bytes()
+
+	for filename, contents := range tmpl {
+		err = filesystem.Api().WriteFile(filepath.Join(path, filename), contents, os.ModePerm)
 		if err != nil {
 			return nil, err
 		}
