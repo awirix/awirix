@@ -20,6 +20,14 @@ import (
 )
 
 func New(path string) (*Extension, error) {
+	if !filepath.IsAbs(path) {
+		var err error
+		path, err = filepath.Abs(path)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	ext := &Extension{path: path}
 
 	// extensions must have valid passports

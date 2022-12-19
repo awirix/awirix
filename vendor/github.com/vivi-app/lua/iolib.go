@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
@@ -65,8 +66,29 @@ func errorIfFileIsClosed(L *LState, file *lFile) {
 }
 
 func newFile(L *LState, file *os.File, path string, flag int, perm os.FileMode, writable, readable bool) (*LUserData, error) {
-	if L.Options.WorkingDir != "" {
+	if L.Options.WorkingDir != "" && !filepath.IsAbs(path) {
 		path = filepath.Join(L.Options.WorkingDir, path)
+	}
+
+	path = filepath.Clean(path)
+
+	if L.Options.IsolateIO {
+		var abs string
+		if filepath.IsAbs(path) {
+			abs = path
+		} else {
+			var err error
+			abs, err = filepath.Abs(path)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if !strings.HasPrefix(abs, L.Options.WorkingDir) {
+			return nil, fmt.Errorf("file %s is outside of the working directory", path)
+		}
+
+		// pass further
 	}
 
 	ud := L.NewUserData()

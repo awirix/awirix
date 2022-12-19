@@ -109,6 +109,8 @@ type Options struct {
 	Stdout io.Writer
 	// WorkingDir is the working directory for the state. Defaults to current one.
 	WorkingDir string
+	// IsolateIO is a flag that tells whether the state should isolate its IO operations to the working directory.
+	IsolateIO bool
 }
 
 /* }}} */

@@ -24,15 +24,17 @@ func New(options Options) *lua.LState {
 		lua.OpenCoroutine,
 		lua.OpenChannel,
 		lua.OpenPackage,
+		lua.OpenIo,
 	}
 
 	luaOptions := &lua.Options{
 		SkipOpenLibs: true,
 		WorkingDir:   options.WorkingDir,
+		IsolateIO:    viper.GetBool(key.ExtensionsSafeMode),
 	}
 
 	if !viper.GetBool(key.ExtensionsSafeMode) {
-		libs = append(libs, lua.OpenIo, lua.OpenOs)
+		libs = append(libs, lua.OpenOs)
 	}
 
 	if options.Silent {

@@ -168,28 +168,44 @@ func loadaux(L *LState, reader io.Reader, chunkname string) int {
 }
 
 func baseLoad(L *LState) int {
-	fn := L.CheckFunction(1)
+	// TODO: support strings as the first argument
+	arg := L.CheckAny(1)
+	var (
+		fn  *LFunction
+		buf []string
+	)
+
+	if arg.Type() == LTFunction {
+		fn = arg.(*LFunction)
+	} else if arg.Type() == LTString {
+		buf = append(buf, arg.String())
+	} else {
+		L.RaiseError("load: argument must be a function or a string")
+		return 0
+	}
+
 	chunkname := L.OptString(2, "?")
 	top := L.GetTop()
-	buf := []string{}
-	for {
-		L.SetTop(top)
-		L.Push(fn)
-		L.Call(0, 1)
-		ret := L.reg.Pop()
-		if ret == LNil {
-			break
-		} else if LVCanConvToString(ret) {
-			str := ret.String()
-			if len(str) > 0 {
-				buf = append(buf, string(str))
-			} else {
+	if fn != nil {
+		for {
+			L.SetTop(top)
+			L.Push(fn)
+			L.Call(0, 1)
+			ret := L.reg.Pop()
+			if ret == LNil {
 				break
+			} else if LVCanConvToString(ret) {
+				str := ret.String()
+				if len(str) > 0 {
+					buf = append(buf, string(str))
+				} else {
+					break
+				}
+			} else {
+				L.Push(LNil)
+				L.Push(LString("reader function must return a string"))
+				return 2
 			}
-		} else {
-			L.Push(LNil)
-			L.Push(LString("reader function must return a string"))
-			return 2
 		}
 	}
 	return loadaux(L, strings.NewReader(strings.Join(buf, "")), chunkname)
