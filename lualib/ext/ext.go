@@ -40,5 +40,5 @@ func passportConfig(L *lua.LState) int {
 	}
 
 	L.Push(lvalue)
-	return 0
+	return 1
 }

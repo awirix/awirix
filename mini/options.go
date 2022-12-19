@@ -1,5 +1,6 @@
 package mini
 
 type Options struct {
-	Debug bool
+	Debug      bool
+	EditConfig bool
 }

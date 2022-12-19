@@ -1,4 +1,4 @@
-{{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}};; vim:ts=4 ss=4 sw=4 expandtab
+{{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}};; vim:ts=2 ss=2 sw=2 expandtab
 
 ;; Learn Fennel: fennel-lang.org/tutorial
 ;; Style Guide: fennel-lang.org/style
@@ -6,25 +6,25 @@
 (local module {"layers" {}})
 
 (fn module.search [progress query]
-    (progress (.. "Searching for " query))
-    (let [medias {}]
-        medias))
+  (progress (.. "Searching for " query))
+  (let [medias {}]
+   medias))
 
 (fn layer [progress media]
-    (progress (.. "Layer " media.display))
-    (let [medias {}]
-        medias))
+  (progress (.. "Layer " media.display))
+  (let [medias {}]
+  medias))
 
 (tset module.layers "First Layer" layer)
 
 (fn module.prepare [progress media]
-    (progress (.. "Preparing " media.display))
-    media)
+  (progress (.. "Preparing " media.display))
+  media)
 
 (fn module.stream [progress media]
-    (progress (.. "Watching " media.display)))
+  (progress (.. "Watching " media.display)))
 
 (fn module.download [progress media]
-    (progress (.. "Downloading " media.display)))
+  (progress (.. "Downloading " media.display)))
 
 module

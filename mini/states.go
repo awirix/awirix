@@ -2,17 +2,26 @@ package mini
 
 import (
 	"fmt"
+	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/extensions/manager"
+	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/vm"
+	"golang.org/x/exp/slices"
 )
 
 func notFound() {
-	fmt.Printf("%s not found, try again\n", style.Fg(color.Red)(icon.Cross))
+	theSpinner.Stop()
+	defer theSpinner.Start()
+	fmt.Printf(
+		"%s %s\n",
+		style.New().Foreground(color.Red).Bold(true).Render(icon.Cross),
+		style.Fg(color.Red)("not found, try again"),
+	)
 }
 
 type state struct {
@@ -41,6 +50,38 @@ func stateSelectExtension(s *state) (err error) {
 		return err
 	}
 
+	if s.Options.EditConfig {
+		return stateExtensionConfig(s)
+	}
+
+	if s.Extension.Scraper().HasSearch() {
+		return stateInputQuery(s)
+	}
+
+	return stateLayers(s)
+}
+
+func stateExtensionConfig(s *state) (err error) {
+	type sectionWithName *lo.Tuple2[string, *passport.ConfigSection]
+	var sections = make([]sectionWithName, 0)
+	for name, section := range s.Extension.Passport().Config {
+		sections = append(sections, &lo.Tuple2[string, *passport.ConfigSection]{A: name, B: section})
+	}
+
+	slices.SortFunc(sections, func(a, b sectionWithName) bool {
+		return a.A < b.A
+	})
+
+	for _, t := range sections {
+		section := t.B
+		value, err := getConfigValue(section)
+		if err != nil {
+			return err
+		}
+
+		section.SetValue(value)
+	}
+
 	if s.Extension.Scraper().HasSearch() {
 		return stateInputQuery(s)
 	}
@@ -49,7 +90,7 @@ func stateSelectExtension(s *state) (err error) {
 }
 
 func stateInputQuery(s *state) (err error) {
-	s.Query, err = getString("Enter a search query")
+	s.Query, err = getString("Enter a search query", "")
 	if err != nil {
 		return
 	}

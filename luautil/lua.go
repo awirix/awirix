@@ -60,7 +60,7 @@ func ToLValue(L *lua.LState, value any) (lua.LValue, error) {
 	case bool:
 		return lua.LBool(value), nil
 	case uint, uint8, uint16, uint32, uint64, int, int8, int16, int32, int64, float32, float64:
-		f, err := strconv.ParseFloat(fmt.Sprintf("%v", value), 64)
+		f, err := strconv.ParseFloat(fmt.Sprint(value), 64)
 		if err != nil {
 			return nil, err
 		}

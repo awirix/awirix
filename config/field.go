@@ -20,6 +20,24 @@ type Field struct {
 	Description  string
 }
 
+// typeName returns the type of the field without reflection
+func (f *Field) typeName() string {
+	switch f.DefaultValue.(type) {
+	case string:
+		return "string"
+	case int:
+		return "int"
+	case bool:
+		return "bool"
+	case []string:
+		return "[]string"
+	case []int:
+		return "[]int"
+	default:
+		return "unknown"
+	}
+}
+
 var prettyTemplate = lo.Must(template.New("pretty").Funcs(template.FuncMap{
 	"faint":  style.Faint,
 	"bold":   style.Bold,

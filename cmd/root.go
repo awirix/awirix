@@ -55,8 +55,8 @@ func handleErr(err error) {
 		_, _ = fmt.Fprintf(
 			os.Stderr,
 			"%s %s\n",
-			style.Fg(color.Red)(icon.Cross),
-			strings.Trim(err.Error(), " \n"),
+			style.New().Foreground(color.Red).Bold(true).Render(icon.Cross),
+			style.Fg(color.Red)(strings.Trim(err.Error(), " \n")),
 		)
 		os.Exit(1)
 	}
