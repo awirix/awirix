@@ -8,7 +8,7 @@ import (
 )
 
 func New(L *lua.LState) *lua.LTable {
-	ext := L.Context().Value(true).(extensions.ExtensionContainer)
+	ext := L.Context().Value("extension").(extensions.ExtensionContainer)
 
 	return luautil.NewTable(L, map[string]lua.LValue{
 		"path":    lua.LString(ext.Path()),
@@ -19,7 +19,7 @@ func New(L *lua.LState) *lua.LTable {
 }
 
 func getPassportFromCtx(L *lua.LState) *passport.Passport {
-	return L.Context().Value(true).(extensions.ExtensionContainer).Passport()
+	return L.Context().Value("extension").(extensions.ExtensionContainer).Passport()
 }
 
 func passportConfig(L *lua.LState) int {

@@ -17,17 +17,8 @@ const (
 	FieldLayers  = "layers"
 )
 
-type LayerTakesType int
-
-const (
-	LayerTakesNone LayerTakesType = iota + 1
-	LayerTakesString
-	LayerTakesMedia
-)
-
 type Layer struct {
 	Name        string
-	Takes       LayerTakesType
 	Function    func(media *Media) (subMedias []*Media, err error)
 	luaFunction *lua.LFunction
 }

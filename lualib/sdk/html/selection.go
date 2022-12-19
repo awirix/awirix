@@ -82,8 +82,8 @@ func selectionEach(L *lua.LState) int {
 
 	pushSelection(L, selection.Each(func(i int, selection *goquery.Selection) {
 		L.Push(callback)
-		L.Push(lua.LNumber(i))
 		pushSelection(L, selection)
+		L.Push(lua.LNumber(i))
 
 		if err := L.PCall(2, lua.MultRet, nil); err != nil {
 			L.RaiseError(err.Error())

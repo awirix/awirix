@@ -1,9 +1,9 @@
 package extension
 
 import (
-	"context"
 	"fmt"
-	lua "github.com/vivi-app/lua"
+	"github.com/vivi-app/lua"
+	"github.com/vivi-app/vivi/context"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
@@ -20,6 +20,8 @@ type Extension struct {
 	scraper  *scraper.Scraper
 	tester   *tester.Tester
 	state    *lua.LState
+
+	ctx *context.Context
 }
 
 func (e *Extension) initState(options vm.Options) {
@@ -30,8 +32,9 @@ func (e *Extension) initState(options vm.Options) {
 	options.WorkingDir = e.Path()
 	state := vm.New(options)
 
-	// this is hideous, but it works
-	state.SetContext(context.WithValue(context.Background(), true, e))
+	// this is hideous, but works
+	e.ctx.Set("extension", e)
+	state.SetContext(e.ctx)
 
 	// add local files to the path
 	pkg := state.GetGlobal("package").(*lua.LTable)
@@ -70,7 +73,7 @@ func (e *Extension) LoadScraper(options vm.Options) error {
 	}
 	defer file.Close()
 
-	theScraper, err := scraper.New(context.Background(), e.state, file)
+	theScraper, err := scraper.New(e.state, file)
 	if err != nil {
 		return err
 	}

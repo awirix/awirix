@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+	"github.com/vivi-app/vivi/context"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
@@ -28,7 +29,10 @@ func New(path string) (*Extension, error) {
 		}
 	}
 
-	ext := &Extension{path: path}
+	ext := &Extension{
+		path: path,
+		ctx:  context.New(),
+	}
 
 	// extensions must have valid passports
 	err := ext.loadPassport()

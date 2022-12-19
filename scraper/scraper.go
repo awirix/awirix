@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"context"
 	"fmt"
 	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/log"
@@ -101,7 +100,7 @@ func getLayers(table *lua.LTable) (layers []*Layer, err error) {
 	return
 }
 
-func New(ctx context.Context, L *lua.LState, r io.Reader) (*Scraper, error) {
+func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 	lfunc, err := L.Load(r, Module)
 	if err != nil {
 		return nil, err
