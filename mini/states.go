@@ -195,11 +195,16 @@ func stateDoAction(s *state) error {
 		return fmt.Errorf("unknown action %s", action)
 	}
 
+	return stateDoNext(s)
+}
+
+func stateDoNext(s *state) error {
 	const (
 		optionQuit            = "Quit"
 		optionSelectExtension = "Select Extension"
 		optionSearch          = "Search"
-		// TODO: stream & download again
+		optionStream          = "Stream"
+		optionDownload        = "Download"
 	)
 
 	options := []string{optionSelectExtension}
@@ -215,7 +220,7 @@ func stateDoAction(s *state) error {
 		options = append(options, optionLayer)
 	}
 
-	options = append(options, optionQuit)
+	options = append(options, optionQuit, optionStream, optionDownload)
 
 	clearScreen()
 	option, err := selectOne[string]("Done! What to do next?", options, func(s string) string { return s })
@@ -233,6 +238,20 @@ func stateDoAction(s *state) error {
 	case optionLayer:
 		s.LastSelectedMedia = s.LastSelectedSearchMedia
 		return stateLayers(s)
+	case optionStream:
+		err = s.Extension.Scraper().Stream(s.LastSelectedMedia)
+		if err != nil {
+			return err
+		}
+
+		return stateDoNext(s)
+	case optionDownload:
+		err = s.Extension.Scraper().Download(s.LastSelectedMedia)
+		if err != nil {
+			return err
+		}
+
+		return stateDoNext(s)
 	default:
 		return fmt.Errorf("unknown option %s", option)
 	}
