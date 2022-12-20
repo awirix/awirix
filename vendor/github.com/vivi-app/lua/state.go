@@ -115,6 +115,8 @@ type Options struct {
 	WorkingDir string
 	// IsolateIO is a flag that tells whether the state should isolate its IO operations to the working directory.
 	IsolateIO bool
+	// TempDir is the temporary directory name. Defaults to os.TempDir().
+	TempDir string
 }
 
 /* }}} */

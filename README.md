@@ -4,7 +4,7 @@
 
 Vivi is currently a **heavy work in progress** project that aims to replace **all** existing media scrapers.
 Watch movies, anime, read manga, download torrents, you name it!
-Literally limitless possibilites due to *extension-based* structure powered by *Lua Scripts*.
+Literally limitless possibilities due to *extension-based* structure powered by *Lua Scripts*.
 
 At this stage, there's not much to show (in fact, by "not much" I mean nothing),
 it's not even an alpha version, more like a draft, so you probably don't want to use it right now.

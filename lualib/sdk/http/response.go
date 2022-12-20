@@ -1,9 +1,10 @@
 package http
 
 import (
-	lua "github.com/vivi-app/lua"
-	io2 "github.com/vivi-app/vivi/lualib/sdk/io"
+	"github.com/vivi-app/lua"
+	"io"
 	"net/http"
+	"strings"
 )
 
 const responseTypeName = "response"
@@ -54,7 +55,28 @@ func responseStatusCode(L *lua.LState) int {
 
 func responseBody(L *lua.LState) int {
 	response := checkResponse(L, 1)
-	io2.PushReadCloser(L, response.Body)
+	var b strings.Builder
+
+	if response.ContentLength != -1 {
+		b.Grow(int(response.ContentLength))
+		_, err := io.Copy(&b, response.Body)
+		if err != nil {
+			L.Push(lua.LNil)
+			L.Push(lua.LString(err.Error()))
+			return 2
+		}
+	} else {
+		bytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			L.Push(lua.LNil)
+			L.Push(lua.LString(err.Error()))
+			return 2
+		}
+
+		b.Write(bytes)
+	}
+
+	L.Push(lua.LString(b.String()))
 	return 1
 }
 

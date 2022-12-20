@@ -10,7 +10,6 @@ import (
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/vm"
 	"golang.org/x/exp/slices"
 )
 
@@ -44,11 +43,13 @@ func stateSelectExtension(s *state) (err error) {
 		return err
 	}
 
-	// redirect all stdout to log
-	err = s.Extension.LoadScraper(vm.Options{Silent: !s.Options.Debug})
+	progress("Loading scraper")
+	err = s.Extension.LoadScraper(s.Options.Debug)
 	if err != nil {
 		return err
 	}
+
+	s.Extension.Scraper().SetProgress(progress)
 
 	if s.Options.EditConfig {
 		return stateExtensionConfig(s)
@@ -157,6 +158,12 @@ func stateDoAction(s *state) error {
 		actionStream   = "Stream"
 		actionDownload = "Download"
 	)
+
+	prepared, err := s.Extension.Scraper().Prepare(s.LastSelectedMedia)
+	if err != nil {
+		return err
+	}
+	s.LastSelectedMedia = prepared
 
 	var actions = make([]string, 0)
 

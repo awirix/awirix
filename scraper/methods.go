@@ -67,7 +67,7 @@ func (s *Scraper) Search(query string) ([]*Media, error) {
 		Fn:      s.functionSearch,
 		NRet:    1,
 		Protect: true,
-	}, s.progress, lua.LString(query))
+	}, lua.LString(query), s.progress)
 
 	if err != nil {
 		return nil, err
@@ -87,7 +87,7 @@ func (s *Scraper) Layers() (layers []*Layer, err error) {
 				Fn:      layer.luaFunction,
 				NRet:    1,
 				Protect: true,
-			}, s.progress, media.Value())
+			}, media.Value(), s.progress)
 			if err != nil {
 				return nil, err
 			}
@@ -105,7 +105,7 @@ func (s *Scraper) Prepare(media *Media) (*Media, error) {
 		Fn:      s.functionPrepare,
 		NRet:    1,
 		Protect: true,
-	}, s.progress, media.Value())
+	}, media.Value(), s.progress)
 
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (s *Scraper) Stream(media *Media) error {
 		Fn:      s.functionStream,
 		NRet:    1,
 		Protect: true,
-	}, s.progress, media.Value())
+	}, media.Value(), s.progress)
 
 	if err != nil {
 		return err
@@ -133,7 +133,7 @@ func (s *Scraper) Download(media *Media) error {
 		Fn:      s.functionDownload,
 		NRet:    1,
 		Protect: true,
-	}, s.progress, media.Value())
+	}, media.Value(), s.progress)
 
 	if err != nil {
 		return err

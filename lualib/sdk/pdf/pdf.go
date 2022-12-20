@@ -3,10 +3,10 @@ package pdf
 import (
 	"bytes"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
-	lua "github.com/vivi-app/lua"
-	io2 "github.com/vivi-app/vivi/lualib/sdk/io"
+	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luautil"
 	"io"
+	"strings"
 )
 
 func New(L *lua.LState) *lua.LTable {
@@ -20,22 +20,32 @@ func fromImages(L *lua.LState) int {
 	readers := make([]io.Reader, 0)
 
 	images.ForEach(func(key, value lua.LValue) {
-		reader, ok := value.(*lua.LUserData).Value.(io.Reader)
-		if !ok {
-			L.RaiseError("pdf.from_images: expected a table of io.Reader")
+		if value.Type() != lua.LTString {
+			L.RaiseError("pdf.from_images: expected a table of strings")
 			return
 		}
 
-		readers = append(readers, reader)
+		readers = append(
+			readers,
+			strings.NewReader(value.String()),
+		)
 	})
 
 	pdf, err := convertImagesToPDF(readers)
 	if err != nil {
-		L.RaiseError(err.Error())
-		return 0
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
 	}
 
-	io2.PushReadCloser(L, io.NopCloser(pdf))
+	contents, err := io.ReadAll(pdf)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	L.Push(lua.LString(contents))
 	return 1
 }
 

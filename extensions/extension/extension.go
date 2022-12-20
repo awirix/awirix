@@ -9,9 +9,7 @@ import (
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
-	"github.com/vivi-app/vivi/vm"
 	"path/filepath"
-	"strings"
 )
 
 type Extension struct {
@@ -22,30 +20,6 @@ type Extension struct {
 	state    *lua.LState
 
 	ctx *context.Context
-}
-
-func (e *Extension) initState(options vm.Options) {
-	if e.state != nil {
-		return
-	}
-
-	options.WorkingDir = e.Path()
-	state := vm.New(options)
-
-	// this is hideous, but works
-	e.ctx.Set("extension", e)
-	state.SetContext(e.ctx)
-
-	// add local files to the path
-	pkg := state.GetGlobal("package").(*lua.LTable)
-	paths := strings.Split(pkg.RawGetString("path").String(), ";")
-	viviPaths := []string{
-		filepath.Join(e.Path(), "?.lua"),
-	}
-	paths = append(viviPaths, paths...)
-	pkg.RawSetString("path", lua.LString(strings.Join(paths, ";")))
-
-	e.state = state
 }
 
 func (e *Extension) loadPassport() error {
@@ -64,8 +38,8 @@ func (e *Extension) loadPassport() error {
 	return nil
 }
 
-func (e *Extension) LoadScraper(options vm.Options) error {
-	e.initState(options)
+func (e *Extension) LoadScraper(debug bool) error {
+	e.initState(debug)
 
 	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Scraper))
 	if err != nil {
@@ -83,8 +57,8 @@ func (e *Extension) LoadScraper(options vm.Options) error {
 	return nil
 }
 
-func (e *Extension) LoadTester(options vm.Options) error {
-	e.initState(options)
+func (e *Extension) LoadTester(debug bool) error {
+	e.initState(debug)
 
 	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Tester))
 	if err != nil {

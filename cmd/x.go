@@ -11,7 +11,6 @@ import (
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/text"
-	"github.com/vivi-app/vivi/vm"
 	"regexp"
 )
 
@@ -206,9 +205,9 @@ var xSelCmd = &cobra.Command{
 
 		switch {
 		case lo.Must(cmd.Flags().GetBool("run")):
-			handleErr(ext.LoadScraper(vm.Options{}))
+			handleErr(ext.LoadScraper(false))
 		case lo.Must(cmd.Flags().GetBool("test")):
-			handleErr(ext.LoadTester(vm.Options{}))
+			handleErr(ext.LoadTester(false))
 			handleErr(ext.Tester().Test())
 		case lo.Must(cmd.Flags().GetBool("info")):
 			fmt.Println(ext.Passport().Info())

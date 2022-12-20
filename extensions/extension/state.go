@@ -1,21 +1,21 @@
-package vm
+package extension
 
 import (
-	"context"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/key"
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/lualib"
+	"github.com/vivi-app/vivi/where"
+	"path/filepath"
+	"strings"
 )
 
-type Options struct {
-	Silent     bool
-	WorkingDir string
-	Context    context.Context
-}
+func (e *Extension) initState(debug bool) {
+	if e.state != nil {
+		return
+	}
 
-func New(options Options) *lua.LState {
 	libs := []lua.LGFunction{
 		lua.OpenBase,
 		lua.OpenTable,
@@ -29,15 +29,16 @@ func New(options Options) *lua.LState {
 
 	luaOptions := &lua.Options{
 		SkipOpenLibs: true,
-		WorkingDir:   options.WorkingDir,
+		WorkingDir:   e.Path(),
 		IsolateIO:    viper.GetBool(key.ExtensionsSafeMode),
+		TempDir:      where.Temp(),
 	}
 
 	if !viper.GetBool(key.ExtensionsSafeMode) {
 		libs = append(libs, lua.OpenOs)
 	}
 
-	if options.Silent {
+	if !debug {
 		luaOptions.Stdout = &log.Writer{}
 	}
 
@@ -49,9 +50,18 @@ func New(options Options) *lua.LState {
 
 	lualib.Preload(L)
 
-	if options.Context != nil {
-		L.SetContext(options.Context)
-	}
+	// this is hideous, but works
+	e.ctx.Set("extension", e)
+	L.SetContext(e.ctx)
 
-	return L
+	// add local files to the path
+	pkg := L.GetGlobal("package").(*lua.LTable)
+	paths := strings.Split(pkg.RawGetString("path").String(), ";")
+	viviPaths := []string{
+		filepath.Join(e.Path(), "?.lua"),
+	}
+	paths = append(viviPaths, paths...)
+	pkg.RawSetString("path", lua.LString(strings.Join(paths, ";")))
+
+	e.state = L
 }

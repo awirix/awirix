@@ -108,7 +108,12 @@ func GenerateInteractive() (*Extension, error) {
 			},
 			Transform: func(ans any) (newAns any) {
 				var tags []string
-				for _, tag := range strings.Split(ans.(string), ",") {
+
+				for _, tag := range strings.Split(strings.Trim(ans.(string), ", "), ",") {
+					if tag == "" {
+						continue
+					}
+
 					tags = append(tags, strings.TrimSpace(tag))
 				}
 

@@ -10,25 +10,7 @@ import (
 	"runtime"
 )
 
-func openDefault(L *lua.LState) int {
-	url := L.CheckString(1)
-	app := L.Get(2)
-
-	var err error
-	if app.Type() == lua.LTNil {
-		err = open.Start(url)
-	} else {
-		err = open.StartWith(url, app.String())
-	}
-
-	if err != nil {
-		L.RaiseError(fmt.Sprintf("error while opening url: %s", err))
-	}
-
-	return 0
-}
-
-func playVideo(L *lua.LState) int {
+func watch(L *lua.LState) int {
 	url := L.CheckString(1)
 
 	if player := viper.GetString(key.VideoDefaultPlayer); player != "auto" {
@@ -51,7 +33,6 @@ func playVideo(L *lua.LState) int {
 
 	for _, player := range players {
 		if !executil.ProgramInPath(player) {
-			fmt.Println("player not found:", player)
 			continue
 		}
 

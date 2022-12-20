@@ -17,20 +17,20 @@ local M = {}
 --- Searches for the media
 --- This function may be omitted if this extension does not provide searching functionality.
 --- Might be the case if it is dedicated to the single show/movie/book/...
---- @param progress progress The progress writer
 --- @param query string The query to search for.
+--- @param progress progress The progress writer
 --- @return media[] # The media that match the query.
-function M.{{ .Fn.Search }}(progress, query)
+function M.{{ .Fn.Search }}(query, progress)
    progress('Searching for ' .. query .. '...')
    return {}
 end
 
 --- Returns a list of nested medias for media entry.
 --- E.g. it should return list of episodes for the show, chapters for the book and so on.
---- @param progress progress The progress writer
 --- @param media media? The entry to explore.
+--- @param progress progress The progress writer
 --- @return media[] # The list of nested medias.
-local function layer(progress, media)
+local function layer(media, progress)
    assert(media, 'media expected')
    progress('Layer ' .. media.{{ .Fields.Display }} .. '...')
    return {}
@@ -49,10 +49,10 @@ M.{{ .Fields.Layers }} = {
 --- Prepares a media for streaming/downloading.
 --- When you need to do some heavy operations before passing it further.
 --- E.g. decode a video stream url, calculate a hash of the file, etc.
---- @param progress progress The progress writer
 --- @param media media The media to prepare.
+--- @param progress progress The progress writer
 --- @return media # The prepared media
-function M.{{ .Fn.Prepare }}(progress, media)
+function M.{{ .Fn.Prepare }}(media, progress)
    progress('Preparing ' .. media.{{ .Fields.Display }} .. '...')
    return media
 end
@@ -60,9 +60,9 @@ end
 --- Streams a media
 --- May be omitted if the extension does not provide streaming functionality.
 --- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
---- @param progress progress The progress writer
 --- @param media media The media to stream (watch, read, open).
-function M.{{ .Fn.Stream }}(progress, media)
+--- @param progress progress The progress writer
+function M.{{ .Fn.Stream }}(media, progress)
    progress('Streaming ' .. media.{{ .Fields.Display }} .. '...')
    error('Not implemented')
 
@@ -72,9 +72,9 @@ end
 --- Downloads a media.
 --- May be omitted if this extension does not provide downloading functionality.
 --- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
---- @param progress progress The progress writer
 --- @param media media The media to download.
-function M.{{ .Fn.Download }}(progress, media)
+--- @param progress progress The progress writer
+function M.{{ .Fn.Download }}(media, progress)
    progress('Downloading ' .. media.{{ .Fields.Display }} .. '...')
    error('Not implemented')
 

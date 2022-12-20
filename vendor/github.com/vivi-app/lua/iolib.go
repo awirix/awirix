@@ -379,7 +379,7 @@ func fileReadAux(L *LState, file *lFile, idx int) int {
 			if err != nil {
 				goto errreturn
 			}
-			L.Push(LString(string(buf)))
+			L.Push(LString(buf))
 		case LString:
 			options := L.CheckString(i)
 			if len(options) > 0 && options[0] != '*' {
@@ -728,7 +728,7 @@ func ioType(L *LState) int {
 }
 
 func ioTmpFile(L *LState) int {
-	file, err := ioutil.TempFile("", "")
+	file, err := os.CreateTemp(L.Options.TempDir, "")
 	if err != nil {
 		L.Push(LNil)
 		L.Push(LString(err.Error()))
