@@ -17,8 +17,7 @@ const (
 
 const (
 	ExtensionsSafeMode             = "extensions.safe_mode"
-	ExtensionsTemplateStylua       = "extensions.template.stylua"
-	ExtensionsTemplateEditorConfig = "extensions.template.editor_config"
+	ExtensionsTemplateEditorConfig = "extensions.template.editorconfig"
+	ExtensionsTemplateGitignore    = "extensions.template.gitignore"
 	ExtensionsUpdateTryPull        = "extensions.update.try_pull"
-	ExtensionsIOAutoCloseReaders   = "extensions.io.auto_close_readers"
 )

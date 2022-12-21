@@ -6,4 +6,5 @@ const (
 	Tester       = "tester.lua"
 	EditorConfig = ".editorconfig"
 	Stylua       = "stylua.toml"
+	Gitignore    = ".gitignore"
 )

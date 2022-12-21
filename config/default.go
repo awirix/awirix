@@ -63,15 +63,9 @@ and the extension will be unable to access the filesystem.`,
 		"Generate .editorconfig file when creating new extension",
 	},
 	{
-		key.ExtensionsTemplateStylua,
+		key.ExtensionsTemplateGitignore,
 		true,
-		"Generate stylua.toml file when creating new extension",
-	},
-	{
-		key.ExtensionsIOAutoCloseReaders,
-		true,
-		`Automatically close readers.
-If enabled, readers will be automatically closed after reading.`,
+		"Generate .gitignore file when creating new extension",
 	},
 	{
 		key.ExtensionsUpdateTryPull,

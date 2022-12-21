@@ -1,10 +1,12 @@
 package template
 
 import (
+	"embed"
 	"fmt"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/key"
+	"io/fs"
 )
 
 type Preset int
@@ -12,6 +14,7 @@ type Preset int
 const (
 	PresetLua Preset = iota + 1
 	PresetFennel
+	PresetTypescript
 )
 
 func (p Preset) String() string {
@@ -20,6 +23,8 @@ func (p Preset) String() string {
 		return "Lua"
 	case PresetFennel:
 		return "Fennel"
+	case PresetTypescript:
+		return "Typescript"
 	default:
 		return "Unknown"
 	}
@@ -31,44 +36,64 @@ func PresetFromString(preset string) (Preset, bool) {
 		return PresetLua, true
 	case PresetFennel.String():
 		return PresetFennel, true
+	case PresetTypescript.String():
+		return PresetTypescript, true
 	default:
 		return 0, false
 	}
 }
 
-func Generate(preset Preset) (templates map[string][]byte) {
+func Generate(preset Preset) (map[string][]byte, error) {
 	var tmpl = make(map[string][]byte)
 
 	if viper.GetBool(key.ExtensionsTemplateEditorConfig) {
-		tmpl[filename.EditorConfig] = EditorConfig()
+		tmpl[filename.EditorConfig] = templateEditorConfig
+	}
+
+	if viper.GetBool(key.ExtensionsTemplateGitignore) {
+		tmpl[filename.Gitignore] = templateGitignore
+	}
+
+	bind := func(f *embed.FS, m map[string][]byte) error {
+		return fs.WalkDir(f, ".", func(path string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+
+			if d.IsDir() {
+				return nil
+			}
+
+			contents, err := f.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			m[d.Name()] = execTemplate(string(contents))
+
+			return nil
+		})
 	}
 
 	switch preset {
 	case PresetLua:
-		tmpl[filename.Scraper] = LuaScraper()
-		tmpl[filename.Tester] = LuaTester()
-
-		if viper.GetBool(key.ExtensionsTemplateStylua) {
-			tmpl[filename.Stylua] = Stylua()
+		err := bind(&luaTemplates, tmpl)
+		if err != nil {
+			return nil, err
 		}
 	case PresetFennel:
-		const (
-			scraperFnl = "scraper.fnl"
-			testerFnl  = "tester.fnl"
-		)
-
-		runFennel := func(source string) []byte {
-			return []byte(fmt.Sprintf(`return require('fennel').install().dofile('%s')`, source))
+		err := bind(&fennelTemplates, tmpl)
+		if err != nil {
+			return nil, err
 		}
-
-		tmpl[scraperFnl] = FennelScraper()
-		tmpl[filename.Scraper] = runFennel(scraperFnl)
-
-		tmpl[testerFnl] = FennelTester()
-		tmpl[filename.Tester] = runFennel(testerFnl)
-
-		tmpl["fennel.lua"] = fennelSource
+	case PresetTypescript:
+		err := bind(&typescriptTemplates, tmpl)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		return nil, fmt.Errorf("unknown preset")
 	}
 
-	return tmpl
+	return tmpl, nil
 }

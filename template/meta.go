@@ -1,9 +1,13 @@
 package template
 
 import (
+	"bytes"
+	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
+	"strings"
+	"text/template"
 )
 
 type funcs struct {
@@ -20,30 +24,40 @@ type fields struct {
 	Layers  string
 }
 
-type meta struct {
-	Module string
+type metaInfo struct {
 	Fields *fields
 	App    string
 	Fn     *funcs
 }
 
-func newMeta(module string) *meta {
-	m := &meta{}
+var meta *metaInfo
 
-	m.Module = module
-	m.App = app.Name
-	m.Fields = &fields{
+func init() {
+	meta = &metaInfo{}
+
+	meta.App = app.Name
+	meta.Fields = &fields{
 		Display: scraper.FieldDisplay,
 		About:   scraper.FieldAbout,
 		Layers:  scraper.FieldLayers,
 	}
-	m.Fn = &funcs{
+	meta.Fn = &funcs{
 		Search:   scraper.FunctionSearch,
 		Prepare:  scraper.FunctionPrepare,
 		Stream:   scraper.FunctionStream,
 		Download: scraper.FunctionDownload,
 		Test:     tester.FunctionTest,
 	}
+}
 
-	return m
+func execTemplate(tmpl string) []byte {
+	if strings.Contains(tmpl, "template:skip") {
+		return []byte(tmpl)
+	}
+
+	parsed := lo.Must(template.New("").Parse(tmpl))
+	var b bytes.Buffer
+	lo.Must0(parsed.Execute(&b, meta))
+
+	return b.Bytes()
 }

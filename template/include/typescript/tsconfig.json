@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "lib": [
+            "esnext"
+        ],
+        "moduleResolution": "node",
+        "types": [
+            "lua-types/5.1"
+        ],
+        "strict": true
+    },
+    "tstl": {
+        "luaTarget": "5.1",
+        "noImplicitSelf": true,
+        "noResolvePaths": [
+            "vivi"
+        ]
+    }
+}

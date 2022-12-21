@@ -1,9 +1,7 @@
-{{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}}-- vim:ts=3 ss=3 sw=3 expandtab
+-- vim:ts=3 ss=3 sw=3 expandtab
 
-------------------------------------------------------
--- Learn Lua: learnxinyminutes.com/docs/lua         --
--- Style Guide: github.com/luarocks/lua-style-guide --
-------------------------------------------------------
+-- Learn Lua:   learnxinyminutes.com/docs/lua
+-- Style Guide: github.com/luarocks/lua-style-guide
 
 --- Table that have a string field named `{{ .Fields.Display }}` used for string representation
 --- with optional `{{ .Fields.About }}` for brief description.

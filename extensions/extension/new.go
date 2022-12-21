@@ -145,7 +145,7 @@ func GenerateInteractive() (*Extension, error) {
 			Name: "Preset",
 			Prompt: &survey.Select{
 				Message: "Programming language preset",
-				Options: []string{template.PresetLua.String(), template.PresetFennel.String()},
+				Options: []string{template.PresetLua.String(), template.PresetFennel.String(), template.PresetTypescript.String()},
 				Default: template.PresetLua.String(),
 				VimMode: true,
 			},
@@ -215,7 +215,11 @@ func GenerateInteractive() (*Extension, error) {
 	}
 
 	preset, _ := template.PresetFromString(answers.Preset)
-	tmpl := template.Generate(preset)
+	tmpl, err := template.Generate(preset)
+	if err != nil {
+		return nil, err
+	}
+
 	tmpl[filename.Passport] = data.Bytes()
 
 	for filename, contents := range tmpl {
