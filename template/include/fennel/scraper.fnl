@@ -13,14 +13,14 @@
 (tset module.{{ .Fields.Layers }} "First Layer" layer)
 
 (fn module.{{ .Fn.Prepare }} [media progress]
-  (progress (.. "Preparing " media.display))
+  (progress (.. "Preparing " media.{{ .Fields.Display }}))
   media)
 
 (fn module.{{ .Fn.Stream }} [media progress]
-  (progress (.. "Streaming " media.display)))
+  (progress (.. "Streaming " media.{{ .Fields.Display }})))
 
 (fn module.{{ .Fn.Download }} [media progress]
-  (progress (.. "Downloading " media.display)))
+  (progress (.. "Downloading " media.{{ .Fields.Display }})))
 
 module
 

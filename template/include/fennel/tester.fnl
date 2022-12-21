@@ -1,5 +1,3 @@
-{{- /*gotype:github.com/vivi-app/vivi/template.meta*/ -}};; vim:ts=2 ss=2 sw=2 expandtab
-
 (local module {})
 
 (fn module.{{ .Fn.Test }} []

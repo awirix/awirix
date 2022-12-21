@@ -14,7 +14,7 @@ type Preset int
 const (
 	PresetLua Preset = iota + 1
 	PresetFennel
-	PresetTypescript
+	PresetTypescriptToLua
 )
 
 func (p Preset) String() string {
@@ -23,8 +23,8 @@ func (p Preset) String() string {
 		return "Lua"
 	case PresetFennel:
 		return "Fennel"
-	case PresetTypescript:
-		return "Typescript"
+	case PresetTypescriptToLua:
+		return "TypeScriptToLua"
 	default:
 		return "Unknown"
 	}
@@ -36,8 +36,8 @@ func PresetFromString(preset string) (Preset, bool) {
 		return PresetLua, true
 	case PresetFennel.String():
 		return PresetFennel, true
-	case PresetTypescript.String():
-		return PresetTypescript, true
+	case PresetTypescriptToLua.String():
+		return PresetTypescriptToLua, true
 	default:
 		return 0, false
 	}
@@ -60,6 +60,7 @@ func Generate(preset Preset) (map[string][]byte, error) {
 				return err
 			}
 
+			fmt.Println(path, d.Name())
 			if d.IsDir() {
 				return nil
 			}
@@ -86,7 +87,7 @@ func Generate(preset Preset) (map[string][]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-	case PresetTypescript:
+	case PresetTypescriptToLua:
 		err := bind(&typescriptTemplates, tmpl)
 		if err != nil {
 			return nil, err

@@ -145,7 +145,7 @@ func GenerateInteractive() (*Extension, error) {
 			Name: "Preset",
 			Prompt: &survey.Select{
 				Message: "Programming language preset",
-				Options: []string{template.PresetLua.String(), template.PresetFennel.String(), template.PresetTypescript.String()},
+				Options: []string{template.PresetLua.String(), template.PresetFennel.String(), template.PresetTypescriptToLua.String()},
 				Default: template.PresetLua.String(),
 				VimMode: true,
 			},
