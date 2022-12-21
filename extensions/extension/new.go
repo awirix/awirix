@@ -215,7 +215,7 @@ func GenerateInteractive() (*Extension, error) {
 	}
 
 	preset, _ := template.PresetFromString(answers.Preset)
-	tmpl, err := template.Generate(preset)
+	tmpl, err := template.Generate(p, preset)
 	if err != nil {
 		return nil, err
 	}

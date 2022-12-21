@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/app"
+	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
 	"strings"
@@ -25,9 +26,10 @@ type fields struct {
 }
 
 type metaInfo struct {
-	Fields *fields
-	App    string
-	Fn     *funcs
+	Fields   *fields
+	App      string
+	Passport *passport.Passport
+	Fn       *funcs
 }
 
 var meta *metaInfo

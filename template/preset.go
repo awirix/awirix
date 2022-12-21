@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/spf13/viper"
+	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/key"
 	"io/fs"
@@ -43,7 +44,8 @@ func PresetFromString(preset string) (Preset, bool) {
 	}
 }
 
-func Generate(preset Preset) (map[string][]byte, error) {
+func Generate(passport *passport.Passport, preset Preset) (map[string][]byte, error) {
+	meta.Passport = passport
 	var tmpl = make(map[string][]byte)
 
 	if viper.GetBool(key.ExtensionsTemplateEditorConfig) {
