@@ -1,7 +1,7 @@
 -- vim:ts=3 ss=3 sw=3 expandtab
 
--- Learn Lua:   learnxinyminutes.com/docs/lua
--- Style Guide: github.com/luarocks/lua-style-guide
+-- Learn Lua:   https://learnxinyminutes.com/docs/lua
+-- Style Guide: https://github.com/luarocks/lua-style-guide
 
 --- Table that have a string field named `{{ .Fields.Display }}` used for string representation
 --- with optional `{{ .Fields.About }}` for brief description.
@@ -18,7 +18,7 @@ local M = {}
 --- @param query string The query to search for.
 --- @param progress progress The progress writer
 --- @return media[] # The media that match the query.
-function M.{{ .Fn.Search }}(query, progress)
+function M.search(query, progress)
    progress('Searching for ' .. query .. '...')
    return {}
 end
@@ -30,7 +30,7 @@ end
 --- @return media[] # The list of nested medias.
 local function layer(media, progress)
    assert(media, 'media expected')
-   progress('Layer ' .. media.{{ .Fields.Display }} .. '...')
+   progress('Layer ' .. media.display .. '...')
    return {}
 end
 
@@ -40,7 +40,7 @@ end
 --- Layers may be omitted (nil or 0 length) if this extension does not provide such functionality (e.g. just search and watch, no seasons, no episodes).
 --- If `search` function is omitted, first layer will receive a `nil` instead of the media.
 --- @type table<string, fun(progress: progress, media: media|nil): media[]>[]
-M.{{ .Fields.Layers }} = {
+M.layers = {
    ['First Layer'] = layer
 }
 
@@ -50,8 +50,8 @@ M.{{ .Fields.Layers }} = {
 --- @param media media The media to prepare.
 --- @param progress progress The progress writer
 --- @return media # The prepared media
-function M.{{ .Fn.Prepare }}(media, progress)
-   progress('Preparing ' .. media.{{ .Fields.Display }} .. '...')
+function M.prepare(media, progress)
+   progress('Preparing ' .. media.display .. '...')
    return media
 end
 
@@ -60,8 +60,8 @@ end
 --- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
 --- @param media media The media to stream (watch, read, open).
 --- @param progress progress The progress writer
-function M.{{ .Fn.Stream }}(media, progress)
-   progress('Streaming ' .. media.{{ .Fields.Display }} .. '...')
+function M.stream(media, progress)
+   progress('Streaming ' .. media.display .. '...')
    error('Not implemented')
 
    -- Example: require('{{ .App }}').api.open(media.url)
@@ -72,8 +72,8 @@ end
 --- However, at least one of the `{{ .Fn.Stream }}` or `{{ .Fn.Download }}` functions must be present.
 --- @param media media The media to download.
 --- @param progress progress The progress writer
-function M.{{ .Fn.Download }}(media, progress)
-   progress('Downloading ' .. media.{{ .Fields.Display }} .. '...')
+function M.download(media, progress)
+   progress('Downloading ' .. media.display .. '...')
    error('Not implemented')
 
    -- Example: require('{{ .App }}').api.download(media.url, media.{{ .Fields.Display }})

@@ -5,12 +5,12 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{json,lua,fnl}]
+[*.{json,lua,tl,fnl,ts}]
 indent_style = space
 
-[*.lua]
+[*.{lua,tl}]
 indent_size = 3
 quote_type = single
 
-[*.{fnl,json}]
+[*.{fnl,json,ts}]
 indent_size = 4

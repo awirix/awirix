@@ -3,7 +3,7 @@
 local M = {}
 
 --- Tests this extension.
-function M.{{ .Fn.Test }}()
+function M.test()
 	assert(2 + 2 == 4, 'Math is broken')
 end
 

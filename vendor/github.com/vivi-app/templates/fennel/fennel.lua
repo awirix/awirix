@@ -1,4 +1,3 @@
---template:skip
 package.preload["fennel.repl"] = package.preload["fennel.repl"] or function(...)
   local utils = require("fennel.utils")
   local parser = require("fennel.parser")

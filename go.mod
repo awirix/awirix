@@ -29,7 +29,9 @@ require (
 	github.com/spf13/viper v1.14.0
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
+	github.com/vivi-app/templates v0.1.0
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
+	golang.org/x/term v0.3.0
 )
 
 require (
@@ -83,7 +85,6 @@ require (
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.4.0 // indirect
 	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/term v0.3.0 // indirect
 	golang.org/x/text v0.5.0 // indirect
 	golang.org/x/tools v0.4.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect

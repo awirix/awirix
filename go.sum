@@ -235,6 +235,7 @@ github.com/kr/pty v1.1.1/go.mod h1:pFQYn66WHrOpPYNljwOMqo10TkYh1fy3cYio2l3bCsQ=
 github.com/kr/text v0.1.0/go.mod h1:4Jbv+DJW3UT/LiOwJeYQe1efqtUx/iVham/4vfdArNI=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
+github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0SNc=
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/lithammer/fuzzysearch v1.1.5 h1:Ag7aKU08wp0R9QCfF4GoGST9HbmAIeLP7xwMrOBEp1c=
 github.com/lithammer/fuzzysearch v1.1.5/go.mod h1:1R1LRNk7yKid1BaQkmuLQaHruxcC4HmAH30Dh61Ih1Q=
@@ -350,6 +351,8 @@ github.com/vivi-app/libopen v1.0.0 h1:QOPxhlaUVs19WynaLFXPDddO0zQpMm0rZnVcSmylR7
 github.com/vivi-app/libopen v1.0.0/go.mod h1:nfTJ+t23vbyebw9xJYj1vQv8O+1P1Nit2m2Rg90LUK0=
 github.com/vivi-app/lua v1.5.0 h1:4nB/G2JImMDQvE9ucyOjsxnPdO9U+o5ukkq4DBpy/SE=
 github.com/vivi-app/lua v1.5.0/go.mod h1:dyreQL+dKurMwBe4Dos+tSd33znmw7poABLAuaWPHjM=
+github.com/vivi-app/templates v0.1.0 h1:wopHwsd/RozjTl7zlnkart9NwbcHiF7rwhl7HZ+uk0k=
+github.com/vivi-app/templates v0.1.0/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

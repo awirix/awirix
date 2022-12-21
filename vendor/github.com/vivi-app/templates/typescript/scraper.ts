@@ -11,13 +11,13 @@ interface Media {
   /**
    * Used for the string representation inside vivi's interface.
    */
-  {{ .Fields.Display }}: string
+  display: string
 
   /**
    * Optional field that, if present, will be used
    * as a short description of the media.
    */
-  {{ .Fields.About }}?: string
+  about?: string
 
   // Any other fields will be preserved when passing media
   // between states. Feel free to add them, e.g. `url` field
@@ -34,14 +34,14 @@ type Progress = (message: string) => void
  * This function may be omitted if this extension does not provide searching functionality.
  * Might be the case if it is dedicated to the single show/movie/book/...
  */
-export function {{ .Fn.Search }}(query: string, progress: Progress): Media[] {
+export function search(query: string, progress: Progress): Media[] {
   progress(`Searching for ${query}`)
 
   return []
 }
 
 function layer(media: Media, progress: Progress): Media[] {
-  progress(`Layer ${media.{{ .Fields.Display }}}`)
+  progress(`Layer ${media.display}`)
 
   return []
 }
@@ -53,7 +53,7 @@ function layer(media: Media, progress: Progress): Media[] {
  * Layers may be omitted (nil or 0 length) if this extension does not provide such functionality (e.g. just search and watch, no seasons, no episodes).
  * If `search` function is omitted, first layer will receive a `null` instead of the media.
  */
-export const {{ .Fields.Layers }} = {
+export const layers = {
   "First Layer": layer
 } as {
   [name: string]: (media: Media, progress: Progress) => Media[]
@@ -64,8 +64,8 @@ export const {{ .Fields.Layers }} = {
  * When you need to do some heavy operations before passing it further.
  * E.g. decode a video stream url, calculate a hash of the file, etc.
  */
-export function {{ .Fn.Prepare }}(media: Media, progress: Progress): Media {
-  progress(`Preparing ${media.{{ .Fields.Display}}}`)
+export function prepare(media: Media, progress: Progress): Media {
+  progress(`Preparing ${media.display}`)
 
   return media
 }
@@ -75,9 +75,10 @@ export function {{ .Fn.Prepare }}(media: Media, progress: Progress): Media {
  * May be omitted if the extension does not provide streaming functionality.
  * However, at least one of the `stream` or `download` functions must be present.
  */
-export function {{ .Fn.Stream }}(media: Media, progress: Progress) {
-  progress(`Streaming ${media.{{ .Fields.Display }}}`)
+export function stream(media: Media, progress: Progress) {
+  progress(`Streaming ${media.display}`)
 
+  // @ts-ignore
   error('Not implemented')
 }
 
@@ -86,8 +87,9 @@ export function {{ .Fn.Stream }}(media: Media, progress: Progress) {
  * May be omitted if this extension does not provide downloading functionality.
  * However, at least one of the `stream` or `download` functions must be present.
  */
-export function {{ .Fn.Download }}(media: Media, progress: Progress) {
-  progress(`Downloading ${media.{{ .Fields.Display }}}`)
+export function download(media: Media, progress: Progress) {
+  progress(`Downloading ${media.display}`)
 
+  // @ts-ignore
   error('Not implemented')
 }

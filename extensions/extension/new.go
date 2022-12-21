@@ -7,12 +7,12 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+	"github.com/vivi-app/templates"
 	"github.com/vivi-app/vivi/context"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/language"
-	"github.com/vivi-app/vivi/template"
 	"github.com/vivi-app/vivi/where"
 	"os"
 	"os/user"
@@ -145,8 +145,8 @@ func GenerateInteractive() (*Extension, error) {
 			Name: "Preset",
 			Prompt: &survey.Select{
 				Message: "Programming language preset",
-				Options: []string{template.PresetLua.String(), template.PresetFennel.String(), template.PresetTypescriptToLua.String()},
-				Default: template.PresetLua.String(),
+				Options: []string{templates.PresetLua.String(), templates.PresetFennel.String(), templates.PresetTypescript.String()},
+				Default: 0,
 				VimMode: true,
 			},
 		},
@@ -214,16 +214,25 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	preset, _ := template.PresetFromString(answers.Preset)
-	tmpl, err := template.Generate(p, preset)
+	preset, err := templates.PresetString(answers.Preset)
 	if err != nil {
 		return nil, err
 	}
 
-	tmpl[filename.Passport] = data.Bytes()
+	tree, err := templates.Get(preset, templates.Info{
+		Name:  p.Name,
+		About: p.About,
+		NSFW:  p.NSFW,
+	})
 
-	for filename, contents := range tmpl {
-		err = filesystem.Api().WriteFile(filepath.Join(path, filename), contents, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	tree[filename.Passport] = &data
+
+	for name, contents := range tree {
+		err = filesystem.Api().WriteFile(filepath.Join(path, name), contents.Bytes(), os.ModePerm)
 		if err != nil {
 			return nil, err
 		}

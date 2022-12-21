@@ -1,6 +1,6 @@
-# {{ .Passport.Name }} {{ if .Passport.NSFW }}🔞{{ end }}
+# {{ .Name }} {{ if .NSFW }}🔞{{ end }}
 
-{{ .Passport.About }}
+{{ .About }}
 
 > Typescript scraper for [vivi](https://github.com/vivi-app/vivi)
 
