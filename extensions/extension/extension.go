@@ -9,6 +9,7 @@ import (
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/tester"
+	"github.com/vivi-app/vivi/where"
 	"path/filepath"
 )
 
@@ -104,4 +105,8 @@ func (e *Extension) Tester() *tester.Tester {
 
 func (e *Extension) Path() string {
 	return e.path
+}
+
+func (e *Extension) Downloads() string {
+	return filepath.Join(where.Downloads(), e.Passport().ID)
 }

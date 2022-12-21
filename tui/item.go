@@ -62,9 +62,9 @@ func (l *lItem) description() string {
 		return b.String()
 	case *scraper.Media:
 		return item.About()
+	default:
+		return "No description"
 	}
-
-	return "No description"
 }
 
 func (l *lItem) Description() string {

@@ -11,5 +11,6 @@ func New(L *lua.LState) *lua.LTable {
 		"open":      openDefault,
 		"open_data": openData,
 		"download":  download,
+		"save":      save,
 	})
 }
