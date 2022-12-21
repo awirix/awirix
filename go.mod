@@ -16,6 +16,7 @@ require (
 	github.com/ka-weihe/fast-levenshtein v0.0.0-20201227151214-4c99ee36a1ba
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/lithammer/fuzzysearch v1.1.5
+	github.com/lrstanley/bubblezone v0.0.0-20221217035003-70987ad7d934
 	github.com/mvdan/xurls v1.1.0
 	github.com/pdfcpu/pdfcpu v0.3.13
 	github.com/pelletier/go-toml/v2 v2.0.6
@@ -36,6 +37,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20221026131551-cf6655e29de4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/andybalholm/cascadia v1.3.1 // indirect
+	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
 	github.com/cloudflare/circl v1.3.1 // indirect
 	github.com/containerd/console v1.0.3 // indirect
@@ -69,6 +71,7 @@ require (
 	github.com/pjbgf/sha1cd v0.2.3 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
+	github.com/sahilm/fuzzy v0.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/skeema/knownhosts v1.1.0 // indirect
 	github.com/spf13/cast v1.5.0 // indirect

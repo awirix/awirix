@@ -12,4 +12,5 @@ const (
 	stateStreamOrDownloadSelection
 	stateStream
 	stateDownload
+	stateFinal
 )
