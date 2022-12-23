@@ -6,23 +6,26 @@ import (
 	"fmt"
 )
 
-const _PresetName = "LuaFennelTypescript"
+const _PresetName = "LuaFennelTypescriptTealYue"
 
-var _PresetIndex = [...]uint8{0, 3, 9, 19}
+var _PresetIndex = [...]uint8{0, 3, 9, 19, 23, 26}
 
 func (i Preset) String() string {
+	i -= 1
 	if i < 0 || i >= Preset(len(_PresetIndex)-1) {
-		return fmt.Sprintf("Preset(%d)", i)
+		return fmt.Sprintf("Preset(%d)", i+1)
 	}
 	return _PresetName[_PresetIndex[i]:_PresetIndex[i+1]]
 }
 
-var _PresetValues = []Preset{0, 1, 2}
+var _PresetValues = []Preset{1, 2, 3, 4, 5}
 
 var _PresetNameToValueMap = map[string]Preset{
-	_PresetName[0:3]:  0,
-	_PresetName[3:9]:  1,
-	_PresetName[9:19]: 2,
+	_PresetName[0:3]:   1,
+	_PresetName[3:9]:   2,
+	_PresetName[9:19]:  3,
+	_PresetName[19:23]: 4,
+	_PresetName[23:26]: 5,
 }
 
 // PresetString retrieves an enum value from the enum constants string name.

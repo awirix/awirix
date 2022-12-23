@@ -1,6 +1,9 @@
-local M = {}
+local record Tester
+	test: function()
+end
 
---- Tests this extension.
+local M: Tester = {}
+
 function M.test()
 	assert(2 + 2 == 4, 'Math is broken')
 end

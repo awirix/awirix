@@ -1,3 +1,6 @@
+;; Learn Fennel: fennel-lang.org/tutorial
+;; Style Guide: fennel-lang.org/style
+
 (local module {:layers {}})
 
 (fn module.search [query progress]

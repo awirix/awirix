@@ -4,19 +4,25 @@ import "embed"
 
 var (
 	//go:embed .gitignore
-	GitIgnore []byte
+	gitIgnore []byte
 
 	//go:embed .editorconfig
-	EditorConfig []byte
+	editorConfig []byte
 )
 
 var (
 	//go:embed lua
-	FSLua embed.FS
+	fsLua embed.FS
 
 	//go:embed fennel
-	FSFennel embed.FS
+	fsFennel embed.FS
 
 	//go:embed typescript
-	FSTypescript embed.FS
+	fsTypescript embed.FS
+
+	//go:embed teal
+	fsTeal embed.FS
+
+	//go:embed yue
+	fsYue embed.FS
 )

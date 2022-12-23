@@ -253,6 +253,7 @@ var xAddCmd = &cobra.Command{
 
 func init() {
 	xCmd.AddCommand(xUpCmd)
+	xCmd.Flags().BoolP("verbose", "v", false, "print skipped extensions")
 }
 
 var xUpCmd = &cobra.Command{
@@ -265,7 +266,9 @@ var xUpCmd = &cobra.Command{
 
 		for _, ext := range extensions {
 			if ext.Passport().Repository == nil {
-				printWarning(fmt.Sprintf("skipping %s, no repository specified", style.Fg(color.Purple)(ext.String())))
+				if lo.Must(cmd.Flags().GetBool("verbose")) {
+					printWarning(fmt.Sprintf("skipping %s, no repository specified", style.Fg(color.Purple)(ext.String())))
+				}
 				continue
 			}
 
@@ -285,5 +288,18 @@ var xUpCmd = &cobra.Command{
 
 			printSuccess(fmt.Sprintf("%s %s", style.Fg(color.Purple)(ext.String()), outcome))
 		}
+	},
+}
+
+func init() {
+	xCmd.AddCommand(xHealthCmd)
+}
+
+var xHealthCmd = &cobra.Command{
+	Use:   "health",
+	Short: "Check the health of the extensions",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		manager.CheckHealth(cmd.OutOrStdout())
 	},
 }

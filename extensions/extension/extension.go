@@ -24,7 +24,18 @@ type Extension struct {
 }
 
 func (e *Extension) loadPassport() error {
-	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Passport))
+	path := filepath.Join(e.Path(), filename.Passport)
+
+	exists, err := filesystem.Api().Exists(path)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		return fmt.Errorf("%s is missing", filename.Passport)
+	}
+
+	file, err := filesystem.Api().Open(path)
 	if err != nil {
 		return err
 	}

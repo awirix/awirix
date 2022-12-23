@@ -1,0 +1,24 @@
+# {{ .Name }} {{ if .NSFW }}🔞{{ end }}
+
+{{ .About }}
+
+> Yue scraper for [vivi](https://github.com/vivi-app/vivi)
+
+## Compile
+
+1. Install [yue](https://yuescript.org/doc/#installation) compiler 📦
+2. In the extension directory run 🤖
+
+```bash
+yue --target=5.1  .
+```
+
+3. This will output something like this 📄
+
+```
+Built ./tester.yue
+Built ./scraper.yue
+```
+
+4. It will create compiled `scraper.lua` and `tester.lua` that vivi can use
+5. Done! You are awesome! 🎉

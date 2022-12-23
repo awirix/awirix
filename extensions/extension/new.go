@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/lithammer/fuzzysearch/fuzzy"
+	"github.com/samber/lo"
 	"github.com/vivi-app/templates"
 	"github.com/vivi-app/vivi/context"
 	"github.com/vivi-app/vivi/extensions/passport"
@@ -145,7 +146,9 @@ func GenerateInteractive() (*Extension, error) {
 			Name: "Preset",
 			Prompt: &survey.Select{
 				Message: "Programming language preset",
-				Options: []string{templates.PresetLua.String(), templates.PresetFennel.String(), templates.PresetTypescript.String()},
+				Options: lo.Map(templates.PresetValues(), func(p templates.Preset, _ int) string {
+					return p.String()
+				}),
 				Default: 0,
 				VimMode: true,
 			},

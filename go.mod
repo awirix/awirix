@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/PuerkitoBio/goquery v1.8.0
-	github.com/briandowns/spinner v1.19.0
+	github.com/briandowns/spinner v1.20.0
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
@@ -16,7 +16,7 @@ require (
 	github.com/ka-weihe/fast-levenshtein v0.0.0-20201227151214-4c99ee36a1ba
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/lithammer/fuzzysearch v1.1.5
-	github.com/lrstanley/bubblezone v0.0.0-20221217035003-70987ad7d934
+	github.com/lrstanley/bubblezone v0.0.0-20221222153816-e95291e2243e
 	github.com/mvdan/xurls v1.1.0
 	github.com/pdfcpu/pdfcpu v0.3.13
 	github.com/pelletier/go-toml/v2 v2.0.6
@@ -29,7 +29,7 @@ require (
 	github.com/spf13/viper v1.14.0
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
-	github.com/vivi-app/templates v0.1.0
+	github.com/vivi-app/templates v0.3.1
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 	golang.org/x/term v0.3.0
 )

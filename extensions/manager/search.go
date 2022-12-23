@@ -5,11 +5,18 @@ import (
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/log"
+	"github.com/vivi-app/vivi/option"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
 )
 
+var installedExtensions option.Option[[]*extension.Extension]
+
 func InstalledExtensions() ([]*extension.Extension, error) {
+	if exts, ok := installedExtensions.Get(); ok {
+		return exts, nil
+	}
+
 	path := where.Extensions()
 
 	dir, err := filesystem.Api().ReadDir(path)
@@ -46,6 +53,7 @@ func InstalledExtensions() ([]*extension.Extension, error) {
 		}
 	}
 
+	installedExtensions = option.Some(extensions)
 	return extensions, nil
 }
 

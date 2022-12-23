@@ -43,7 +43,7 @@ github.com/atotto/clipboard
 # github.com/aymanbagabas/go-osc52 v1.2.1
 ## explicit; go 1.16
 github.com/aymanbagabas/go-osc52
-# github.com/briandowns/spinner v1.19.0
+# github.com/briandowns/spinner v1.20.0
 ## explicit; go 1.14
 github.com/briandowns/spinner
 # github.com/charmbracelet/bubbles v0.14.0
@@ -205,7 +205,7 @@ github.com/kevinburke/ssh_config
 # github.com/lithammer/fuzzysearch v1.1.5
 ## explicit; go 1.15
 github.com/lithammer/fuzzysearch/fuzzy
-# github.com/lrstanley/bubblezone v0.0.0-20221217035003-70987ad7d934
+# github.com/lrstanley/bubblezone v0.0.0-20221222153816-e95291e2243e
 ## explicit; go 1.19
 github.com/lrstanley/bubblezone
 # github.com/lucasb-eyer/go-colorful v1.2.0
@@ -348,7 +348,7 @@ github.com/vivi-app/lua
 github.com/vivi-app/lua/ast
 github.com/vivi-app/lua/parse
 github.com/vivi-app/lua/pm
-# github.com/vivi-app/templates v0.1.0
+# github.com/vivi-app/templates v0.3.1
 ## explicit; go 1.19
 github.com/vivi-app/templates
 # github.com/xanzy/ssh-agent v0.3.3

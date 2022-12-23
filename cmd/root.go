@@ -1,15 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/spf13/cobra"
 	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/tui"
 	"github.com/vivi-app/vivi/where"
 	"os"
@@ -51,13 +47,13 @@ func Execute() {
 
 func handleErr(err error) {
 	if err != nil {
-		log.Error(err)
-		_, _ = fmt.Fprintf(
-			os.Stderr,
-			"%s %s\n",
-			style.New().Foreground(color.Red).Bold(true).Render(icon.Cross),
-			style.Fg(color.Red)(strings.Trim(err.Error(), " \n")),
-		)
+		msg := strings.TrimSpace(err.Error())
+		msg = strings.Trim(msg, "\n")
+
+		log.Error(msg)
+		_, _ = log.WriteErrorf(os.Stderr, msg)
+		_, _ = os.Stderr.Write([]byte("\n"))
+
 		os.Exit(1)
 	}
 }
