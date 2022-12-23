@@ -30,6 +30,7 @@ help:
 	@echo "  install      Install the ${app} binary"
 	@echo "  uninstall    Uninstall the ${app} binary"
 	@echo "  rename       Rename go.mod name"
+	@echo "  generate     Generate code"
 	@echo "  test         Run the tests"
 	@echo "  help         Show this help message"
 	@echo ""
@@ -64,8 +65,11 @@ rename:
 	
 	$(call print_green,Renamed)
 
+generate:
+	@go generate ./...
+
 uninstall:
 	@rm -f $(shell which ${app})
 	$(call print_yellow,Uninstalled)
 
-.PHONY: all help install build test uninstall rename
+.PHONY: all help install build test uninstall rename generate

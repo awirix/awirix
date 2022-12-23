@@ -20,7 +20,7 @@ type Extension struct {
 	tester   *tester.Tester
 	state    *lua.LState
 
-	ctx *context.Context
+	context *context.Context
 }
 
 func (e *Extension) loadPassport() error {

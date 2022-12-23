@@ -13,8 +13,8 @@ type Repository struct {
 	Name   string `json:"name" jsonschema:"required,description=The name of the repository"`
 	Branch string `json:"branch,omitempty" jsonschema:"description=The branch of the repository,default=main"`
 
-	repo  option.Option[*github.Repository]
-	files option.Option[[]*File]
+	repo  *option.Option[*github.Repository]
+	files *option.Option[[]*File]
 }
 
 func (r *Repository) URL() string {

@@ -1,6 +1,8 @@
 package bind
 
-import "github.com/charmbracelet/bubbles/key"
+import (
+	"github.com/charmbracelet/bubbles/key"
+)
 
 func bind(help string, keys ...string) key.Binding {
 	return key.NewBinding(
@@ -9,9 +11,17 @@ func bind(help string, keys ...string) key.Binding {
 	)
 }
 
-var (
-	Confirm   = bind("Confirm", "enter")
-	Cancel    = bind("Cancel", "esc")
-	Quit      = bind("Quit", "q")
-	ForceQuit = bind("Force Quit", "ctrl+c", "ctrl+d")
-)
+type KeyMap struct {
+	Quit, ForceQuit,
+
+	Confirm, GoBack key.Binding
+}
+
+func NewKeyMap() *KeyMap {
+	return &KeyMap{
+		Quit:      bind("Quit", "q"),
+		ForceQuit: bind("Force Quit", "ctrl+c", "ctrl+d"),
+		Confirm:   bind("Confirm", "enter"),
+		GoBack:    bind("Go Back", "esc"),
+	}
+}

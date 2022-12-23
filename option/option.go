@@ -17,8 +17,8 @@ func empty[T any]() (t T) {
 
 // Some builds an Option when value is present.
 // Stream: https://go.dev/play/p/iqz2n9n0tDM
-func Some[T any](value T) Option[T] {
-	return Option[T]{
+func Some[T any](value T) *Option[T] {
+	return &Option[T]{
 		isPresent: true,
 		value:     value,
 	}
@@ -26,15 +26,15 @@ func Some[T any](value T) Option[T] {
 
 // None builds an Option when value is absent.
 // Stream: https://go.dev/play/p/yYQPsYCSYlD
-func None[T any]() Option[T] {
-	return Option[T]{
+func None[T any]() *Option[T] {
+	return &Option[T]{
 		isPresent: false,
 	}
 }
 
 // TupleToOption builds a Some Option when second argument is true, or None.
 // Stream: https://go.dev/play/p/gkrg2pZwOty
-func TupleToOption[T any](value T, ok bool) Option[T] {
+func TupleToOption[T any](value T, ok bool) *Option[T] {
 	if ok {
 		return Some(value)
 	}
@@ -116,7 +116,7 @@ func (o *Option[T]) ForEach(onValue func(value T)) {
 // Match executes the first function if value is present and second function if absent.
 // It returns a new Option.
 // Stream: https://go.dev/play/p/1V6st3LDJsM
-func (o *Option[T]) Match(onValue func(value T) (T, bool), onNone func() (T, bool)) Option[T] {
+func (o *Option[T]) Match(onValue func(value T) (T, bool), onNone func() (T, bool)) *Option[T] {
 	if o.isPresent {
 		return TupleToOption(onValue(o.value))
 	}
@@ -125,7 +125,7 @@ func (o *Option[T]) Match(onValue func(value T) (T, bool), onNone func() (T, boo
 
 // Map executes the mapper function if value is present or returns None if absent.
 // Stream: https://go.dev/play/p/mvfP3pcP_eJ
-func (o *Option[T]) Map(mapper func(value T) (T, bool)) Option[T] {
+func (o *Option[T]) Map(mapper func(value T) (T, bool)) *Option[T] {
 	if o.isPresent {
 		return TupleToOption(mapper(o.value))
 	}
@@ -135,7 +135,7 @@ func (o *Option[T]) Map(mapper func(value T) (T, bool)) Option[T] {
 
 // MapNone executes the mapper function if value is absent or returns Option.
 // Stream: https://go.dev/play/p/_KaHWZ6Q17b
-func (o *Option[T]) MapNone(mapper func() (T, bool)) Option[T] {
+func (o *Option[T]) MapNone(mapper func() (T, bool)) *Option[T] {
 	if o.isPresent {
 		return Some(o.value)
 	}
@@ -145,7 +145,7 @@ func (o *Option[T]) MapNone(mapper func() (T, bool)) Option[T] {
 
 // FlatMap executes the mapper function if value is present or returns None if absent.
 // Stream: https://go.dev/play/p/OXO-zJx6n5r
-func (o *Option[T]) FlatMap(mapper func(value T) Option[T]) Option[T] {
+func (o *Option[T]) FlatMap(mapper func(value T) *Option[T]) *Option[T] {
 	if o.isPresent {
 		return mapper(o.value)
 	}

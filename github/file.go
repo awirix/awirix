@@ -11,7 +11,7 @@ type File struct {
 	Repository *Repository
 	Path       string
 	SHA        string
-	contents   option.Option[[]byte]
+	contents   *option.Option[[]byte]
 }
 
 func (f *File) URL() string {

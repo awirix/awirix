@@ -31,8 +31,8 @@ func New(path string) (*Extension, error) {
 	}
 
 	ext := &Extension{
-		path: path,
-		ctx:  context.New(),
+		path:    path,
+		context: context.New(),
 	}
 
 	// extensions must have valid passports
@@ -42,6 +42,10 @@ func New(path string) (*Extension, error) {
 	}
 
 	return ext, nil
+}
+
+func (e *Extension) SetContext(ctx *context.Context) {
+	e.context = ctx
 }
 
 func GenerateInteractive() (*Extension, error) {

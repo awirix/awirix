@@ -1,5 +1,7 @@
 package stack
 
+import "github.com/vivi-app/vivi/option"
+
 type (
 	Stack[T any] struct {
 		top    *node[T]
@@ -20,26 +22,24 @@ func (s *Stack[T]) Len() int {
 	return s.length
 }
 
-// Peek vieww the top item on the stack
-func (s *Stack[T]) Peek() T {
+// Peek view the top item on the stack
+func (s *Stack[T]) Peek() *option.Option[T] {
 	if s.length == 0 {
-		var t T
-		return t
+		return option.None[T]()
 	}
-	return s.top.value
+	return option.Some(s.top.value)
 }
 
 // Pop the top item of the stack and return it
-func (s *Stack[T]) Pop() T {
+func (s *Stack[T]) Pop() *option.Option[T] {
 	if s.length == 0 {
-		var t T
-		return t
+		return option.None[T]()
 	}
 
 	n := s.top
 	s.top = n.prev
 	s.length--
-	return n.value
+	return option.Some(n.value)
 }
 
 // Push a value onto the top of the stack

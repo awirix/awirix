@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 )
 
-var installedExtensions option.Option[[]*extension.Extension]
+var installedExtensions = option.None[[]*extension.Extension]()
 
 func InstalledExtensions() ([]*extension.Extension, error) {
 	if exts, ok := installedExtensions.Get(); ok {

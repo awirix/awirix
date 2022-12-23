@@ -2,6 +2,7 @@ package tui
 
 import (
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/vivi-app/vivi/extensions/manager"
 )
@@ -20,5 +21,9 @@ func (m *model) Init() tea.Cmd {
 		items = append(items, newItem(ext))
 	}
 
-	return m.component.extensionSelect.SetItems(items)
+	return tea.Batch(
+		m.component.extensionSelect.SetItems(items),
+		m.component.textInput.Focus(),
+		textinput.Blink,
+	)
 }

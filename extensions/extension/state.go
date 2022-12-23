@@ -51,8 +51,8 @@ func (e *Extension) initState(debug bool) {
 	lualib.Preload(L)
 
 	// this is hideous, but works
-	e.ctx.Set("extension", e)
-	L.SetContext(e.ctx)
+	e.context.Set("extension", e)
+	L.SetContext(e.context)
 
 	// add local files to the path
 	pkg := L.GetGlobal("package").(*lua.LTable)
