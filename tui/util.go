@@ -5,7 +5,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"
+	"github.com/samber/lo"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/option"
+	"strings"
 )
 
 func newList(title, singular, plural string) list.Model {
@@ -29,6 +32,16 @@ func newList(title, singular, plural string) list.Model {
 	l.Title = title
 	l.SetStatusBarItemName(singular, plural)
 	return l
+}
+
+func listReverseItems(lst *list.Model) tea.Cmd {
+	var b strings.Builder
+	_, _ = log.WriteSuccessf(&b, "Reversed")
+	items := lst.Items()
+	return tea.Batch(
+		lst.SetItems(lo.Reverse(items)),
+		lst.NewStatusMessage(b.String()),
+	)
 }
 
 func listHandleMouseMsg(msg tea.MouseMsg, lst *list.Model) {

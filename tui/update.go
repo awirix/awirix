@@ -90,6 +90,8 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, m.keyMap.Reverse):
+			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
 			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
 			if !ok {
@@ -135,6 +137,8 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, m.keyMap.Reverse):
+			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
 			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
 			if !ok {
@@ -162,6 +166,8 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
 		switch {
+		case key.Matches(msg, m.keyMap.Reverse):
+			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
 		}
 	}
