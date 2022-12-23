@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/vivi-app/vivi/context"
@@ -27,12 +26,6 @@ func newModel(options *Options) *model {
 	model.error = make(chan error)
 	model.style.global = lipgloss.NewStyle()
 
-	newList := func(singular, plural string) list.Model {
-		l := list.New(nil, list.NewDefaultDelegate(), 0, 0)
-		l.SetStatusBarItemName(singular, plural)
-		return l
-	}
-
 	newTextInput := func(placeholder string) textinput.Model {
 		t := textinput.New()
 		t.CharLimit = 80
@@ -40,9 +33,8 @@ func newModel(options *Options) *model {
 		return t
 	}
 
-	model.component.extensionSelect = newList("extension", "extensions")
-	model.component.layerResults = newList("media", "medias")
-	model.component.searchResults = newList("media", "medias")
+	model.component.extensionSelect = newList("Extensions", "extension", "extensions")
+	model.component.searchResults = newList("Search Results", "media", "media")
 	model.component.textInput = newTextInput("Search...")
 
 	width, height, err := term.GetSize(int(os.Stdout.Fd()))

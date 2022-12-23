@@ -8,4 +8,5 @@ import (
 type (
 	msgExtensionLoaded *extension.Extension
 	msgSearchDone      []*scraper.Media
+	msgLayerDone       []*scraper.Media
 )

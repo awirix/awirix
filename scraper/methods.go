@@ -76,7 +76,7 @@ func (s *Scraper) Search(query string) ([]*Media, error) {
 	return s.checkMediaSlice()
 }
 
-func (s *Scraper) Layers() (layers []*Layer, err error) {
+func (s *Scraper) Layers() []*Layer {
 	if !s.HasLayers() {
 		panic("scraper does not have any layers")
 	}
@@ -96,8 +96,7 @@ func (s *Scraper) Layers() (layers []*Layer, err error) {
 		}
 	}
 
-	layers = s.layers
-	return
+	return s.layers
 }
 
 func (s *Scraper) Prepare(media *Media) (*Media, error) {

@@ -124,10 +124,7 @@ func stateSearchMedia(s *state) error {
 }
 
 func stateLayers(s *state) error {
-	layers, err := s.Extension.Scraper().Layers()
-	if err != nil {
-		return err
-	}
+	layers := s.Extension.Scraper().Layers()
 
 	for _, layer := range layers {
 		medias, err := layer.Function(s.LastSelectedMedia)
@@ -215,7 +212,7 @@ func stateDoNext(s *state) error {
 	var optionLayer string
 
 	if s.Extension.Scraper().HasLayers() {
-		layers, _ := s.Extension.Scraper().Layers()
+		layers := s.Extension.Scraper().Layers()
 		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].Name)
 		options = append(options, optionLayer)
 	}

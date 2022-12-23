@@ -20,19 +20,18 @@ type model struct {
 	extensions []*extension.Extension
 
 	current struct {
-		state     state
-		extension *extension.Extension
-		media     *scraper.Media
-		layer     *scraper.Layer
-		query     string
-		error     error
+		width, height int
+		state         state
+		extension     *extension.Extension
+		layer         *scraper.Layer
+		error         error
 	}
 
 	component struct {
 		extensionSelect list.Model
 		textInput       textinput.Model
 		searchResults   list.Model
-		layerResults    list.Model
+		layers          map[string]*list.Model
 	}
 
 	status string
@@ -44,12 +43,20 @@ type model struct {
 }
 
 func (m *model) resize(width, height int) {
+	m.current.width, m.current.height = width, height
+
 	frameX, frameY := m.style.global.GetFrameSize()
 
-	for _, lst := range []*list.Model{
+	lists := []*list.Model{
 		&m.component.extensionSelect,
 		&m.component.searchResults,
-	} {
+	}
+
+	for _, lst := range m.component.layers {
+		lists = append(lists, lst)
+	}
+
+	for _, lst := range lists {
 		lst.SetSize(width-frameX, height-frameY)
 	}
 }

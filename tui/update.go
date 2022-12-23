@@ -1,12 +1,11 @@
 package tui
 
 import (
-	"fmt"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	zone "github.com/lrstanley/bubblezone"
 	"github.com/vivi-app/vivi/extensions/extension"
+	"github.com/vivi-app/vivi/scraper"
 )
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -17,10 +16,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.context.Reset()
 		return m, m.pushState(stateError)
 	default:
-		goto main
 	}
 
-main:
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.resize(msg.Width, msg.Height)
@@ -33,20 +30,7 @@ main:
 		}
 	}
 
-	switch m.current.state {
-	case stateLoading:
-		return m.updateLoading(msg)
-	case stateError:
-		return m.updateError(msg)
-	case stateExtensionSelect:
-		return m.updateExtensionSelect(msg)
-	case stateSearch:
-		return m.updateSearch(msg)
-	case stateSearchResults:
-		return m.updateSearchResults(msg)
-	default:
-		panic(fmt.Sprintf(`Unknown state "%s"`, m.current.state.String()))
-	}
+	return m.getCurrentStateHandler().Update(msg)
 }
 
 func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -68,6 +52,17 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Batch(
 			m.component.searchResults.SetItems(items),
 			m.pushState(stateSearchResults),
+		)
+	case msgLayerDone:
+		var items = make([]list.Item, len(msg))
+
+		for i, m := range msg {
+			items[i] = newItem(m)
+		}
+
+		return m, tea.Batch(
+			m.component.layers[m.current.layer.Name].SetItems(items),
+			m.pushState(stateLayer),
 		)
 	default:
 		// trigger update
@@ -92,29 +87,11 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.MouseMsg:
-		switch msg.Type {
-		case tea.MouseWheelUp:
-			thisList.CursorUp()
-		case tea.MouseWheelDown:
-			thisList.CursorDown()
-		case tea.MouseLeft:
-			for i, listItem := range thisList.VisibleItems() {
-				item, _ := listItem.(*lItem)
-				if zone.Get(item.id).InBounds(msg) {
-					thisList.Select(i)
-					goto end
-				}
-			}
-		}
+		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keyMap.Confirm):
-			item, ok := thisList.SelectedItem().(*lItem)
-			if !ok {
-				goto end
-			}
-
-			ext, ok := item.Internal().(*extension.Extension)
+			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
 			if !ok {
 				goto end
 			}
@@ -151,17 +128,45 @@ func (m *model) updateSearch(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
+	thisList := &m.component.searchResults
+
 	switch msg := msg.(type) {
+	case tea.MouseMsg:
+		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keyMap.Confirm):
-			// TODO
-			goto end
+			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			return m, tea.Batch(
+				m.handleLayer(media),
+				m.pushState(stateLoading),
+			)
 		}
 	}
 
 end:
 	model, cmd := m.component.searchResults.Update(msg)
 	m.component.searchResults = model
+	return m, cmd
+}
+
+func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
+	thisList := m.component.layers[m.current.layer.Name]
+
+	switch msg := msg.(type) {
+	case tea.MouseMsg:
+		listHandleMouseMsg(msg, thisList)
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keyMap.Confirm):
+		}
+	}
+
+	model, cmd := thisList.Update(msg)
+	m.component.layers[m.current.layer.Name] = &model
 	return m, cmd
 }
