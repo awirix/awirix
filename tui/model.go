@@ -45,5 +45,11 @@ type model struct {
 
 func (m *model) resize(width, height int) {
 	frameX, frameY := m.style.global.GetFrameSize()
-	m.component.extensionSelect.SetSize(width-frameX, height-frameY)
+
+	for _, lst := range []*list.Model{
+		&m.component.extensionSelect,
+		&m.component.searchResults,
+	} {
+		lst.SetSize(width-frameX, height-frameY)
+	}
 }

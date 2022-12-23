@@ -17,6 +17,8 @@ func (m *model) View() string {
 		return zone.Scan(m.style.global.Render(m.component.extensionSelect.View()))
 	case stateSearch:
 		return m.component.textInput.View()
+	case stateSearchResults:
+		return zone.Scan(m.style.global.Render(m.component.searchResults.View()))
 	default:
 		panic(fmt.Sprintf(`Unknown state "%s"`, m.current.state.String()))
 	}

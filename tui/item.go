@@ -45,6 +45,7 @@ func (l *lItem) Title() string {
 }
 
 func (l *lItem) description() string {
+	const noDescription = "No description"
 	switch item := l.internal.(type) {
 	case *extension.Extension:
 		var b strings.Builder
@@ -55,15 +56,20 @@ func (l *lItem) description() string {
 
 		about := item.Passport().About
 		if about == "" {
-			about = "No description"
+			about = noDescription
 		}
 
 		b.WriteString(about)
 		return b.String()
 	case *scraper.Media:
-		return item.About()
+		about := item.About()
+		if about == "" {
+			about = noDescription
+		}
+
+		return about
 	default:
-		return "No description"
+		return noDescription
 	}
 }
 

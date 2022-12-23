@@ -42,6 +42,7 @@ func newModel(options *Options) *model {
 
 	model.component.extensionSelect = newList("extension", "extensions")
 	model.component.layerResults = newList("media", "medias")
+	model.component.searchResults = newList("media", "medias")
 	model.component.textInput = newTextInput("Search...")
 
 	width, height, err := term.GetSize(int(os.Stdout.Fd()))

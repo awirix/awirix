@@ -3,6 +3,7 @@ package tui
 import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/vivi-app/vivi/extensions/extension"
@@ -41,6 +42,8 @@ main:
 		return m.updateExtensionSelect(msg)
 	case stateSearch:
 		return m.updateSearch(msg)
+	case stateSearchResults:
+		return m.updateSearchResults(msg)
 	default:
 		panic(fmt.Sprintf(`Unknown state "%s"`, m.current.state.String()))
 	}
@@ -55,6 +58,17 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			return m, m.pushState(stateLayer)
 		}
+	case msgSearchDone:
+		var items = make([]list.Item, len(msg))
+
+		for i, m := range msg {
+			items[i] = newItem(m)
+		}
+
+		return m, tea.Batch(
+			m.component.searchResults.SetItems(items),
+			m.pushState(stateSearchResults),
+		)
 	default:
 		// trigger update
 		return m, func() tea.Msg { return msg }
@@ -123,13 +137,31 @@ func (m *model) updateSearch(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keyMap.Confirm):
+			query := m.component.textInput.Value()
+			return m, tea.Batch(
+				m.handleSearch(query),
+				m.pushState(stateLoading),
+			)
+		}
+	}
+
+	model, cmd := m.component.textInput.Update(msg)
+	m.component.textInput = model
+	return m, cmd
+}
+
+func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keyMap.Confirm):
 			// TODO
 			goto end
 		}
 	}
 
 end:
-	model, cmd := m.component.textInput.Update(msg)
-	m.component.textInput = model
+	model, cmd := m.component.searchResults.Update(msg)
+	m.component.searchResults = model
 	return m, cmd
 }
