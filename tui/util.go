@@ -3,12 +3,29 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/vivi-app/vivi/option"
 )
 
 func newList(title, singular, plural string) list.Model {
-	l := list.New(nil, list.NewDefaultDelegate(), 0, 0)
+	delegate := list.NewDefaultDelegate()
+	border := lipgloss.Border{
+		Left: "█",
+	}
+
+	delegate.Styles.SelectedTitle = delegate.
+		Styles.
+		SelectedTitle.
+		Bold(true).
+		Border(border, false, false, false, true)
+
+	delegate.Styles.SelectedDesc = delegate.
+		Styles.
+		SelectedDesc.
+		Border(border, false, false, false, true)
+
+	l := list.New(nil, delegate, 0, 0)
 	l.Title = title
 	l.SetStatusBarItemName(singular, plural)
 	return l
