@@ -8,6 +8,10 @@ import (
 func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 	return func() tea.Msg {
 		m.status = "Loading extension"
+		if ext.IsScraperLoaded() {
+			return msgExtensionLoaded(ext)
+		}
+
 		ext.SetContext(m.context)
 		err := ext.LoadScraper(false)
 		if err != nil {

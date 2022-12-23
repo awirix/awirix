@@ -57,7 +57,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	default:
 		// trigger update
-		return m, func() tea.Msg { return nil }
+		return m, func() tea.Msg { return msg }
 	}
 }
 

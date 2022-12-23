@@ -87,6 +87,10 @@ func (e *Extension) LoadTester(debug bool) error {
 	return nil
 }
 
+func (e *Extension) IsScraperLoaded() bool {
+	return e.scraper != nil
+}
+
 func (e *Extension) String() string {
 	var name string
 	if e.Passport() != nil {
