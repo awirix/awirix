@@ -58,22 +58,12 @@ func (s *Scraper) checkMediaSlice() ([]*Media, error) {
 	return medias, nil
 }
 
-func (s *Scraper) Search(query string) ([]*Media, error) {
+func (s *Scraper) Search() *Search {
 	if !s.HasSearch() {
-		panic("scraper does not have a search function")
+		panic("scraper does not have a search handler")
 	}
 
-	err := s.state.CallByParam(lua.P{
-		Fn:      s.functionSearch,
-		NRet:    1,
-		Protect: true,
-	}, lua.LString(query), s.progress)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return s.checkMediaSlice()
+	return s.search
 }
 
 func (s *Scraper) Layers() []*Layer {

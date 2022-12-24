@@ -11,18 +11,18 @@ var (
 )
 
 var (
-	//go:embed lua
+	//go:embed languages/lua
 	fsLua embed.FS
 
-	//go:embed fennel
+	//go:embed languages/fennel
 	fsFennel embed.FS
 
-	//go:embed typescript
+	//go:embed languages/typescript
 	fsTypescript embed.FS
 
-	//go:embed teal
+	//go:embed languages/teal
 	fsTeal embed.FS
 
-	//go:embed yue
+	//go:embed languages/yue
 	fsYue embed.FS
 )

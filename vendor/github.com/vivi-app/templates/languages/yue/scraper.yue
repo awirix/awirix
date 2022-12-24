@@ -1,0 +1,20 @@
+-- Learn Yuescript: https://yuescript.org/doc/#introduction
+
+export search =
+    title: 'Search'
+    handler: (query, progress) ->
+        {}
+
+export layers =
+    * title: 'Layer 1'
+      handler: (media, progress) ->
+        {}
+
+export prepare = (media, progress) ->
+    media
+
+export stream = (media, progress) ->
+    error 'Not implemented'
+
+export download = (media, progress) ->
+    error 'Not implemented'

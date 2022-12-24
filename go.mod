@@ -29,7 +29,7 @@ require (
 	github.com/spf13/viper v1.14.0
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
-	github.com/vivi-app/templates v0.3.1
+	github.com/vivi-app/templates v0.4.0
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 	golang.org/x/term v0.3.0
 )

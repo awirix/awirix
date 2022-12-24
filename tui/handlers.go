@@ -3,8 +3,10 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/scraper"
+	"github.com/vivi-app/vivi/style"
 )
 
 func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
@@ -28,8 +30,8 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			layers := ext.Scraper().Layers()
 			m.component.layers = make(map[string]*list.Model, len(layers))
 			for _, layer := range layers {
-				lst := newList(layer.Name, "media", "media")
-				m.component.layers[layer.Name] = &lst
+				lst := newList(layer.String(), layer.Noun().Singular(), layer.Noun().Plural())
+				m.component.layers[layer.String()] = &lst
 			}
 
 			// to update layers lists
@@ -42,7 +44,13 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 
 func (m *model) handleSearch(query string) tea.Cmd {
 	return func() tea.Msg {
-		media, err := m.current.extension.Scraper().Search(query)
+		m.status = "Searching for " + style.Fg(color.Yellow)(query)
+
+		search := m.current.extension.Scraper().Search()
+		m.component.searchResults.Title = search.String()
+		m.component.searchResults.SetStatusBarItemName(search.Noun().Singular(), search.Noun().Plural())
+
+		media, err := search.Call(query)
 
 		if err != nil {
 			m.error <- err
@@ -55,6 +63,12 @@ func (m *model) handleSearch(query string) tea.Cmd {
 
 func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd {
 	return func() tea.Msg {
+		if media != nil {
+			m.status = "Loading " + style.Fg(color.Yellow)(media.String())
+		} else {
+			m.status = "Loading " + style.Fg(color.Yellow)(layer.Noun().Plural())
+		}
+
 		layerMedia, err := layer.Call(media)
 
 		if err != nil {

@@ -365,6 +365,8 @@ github.com/vivi-app/templates v0.3.0 h1:cyhNRDP5UHXGK3+8ha4mKvmRN72Qgse0NerJOVdH
 github.com/vivi-app/templates v0.3.0/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/vivi-app/templates v0.3.1 h1:kL2ToySrHFist94JxoohAzdytpWNqNXRvAJpqHOm7fw=
 github.com/vivi-app/templates v0.3.1/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
+github.com/vivi-app/templates v0.4.0 h1:t5LOkBgoyeBuMKIqf/tPPs/XeQc0xHh+sQzHJL7FBoE=
+github.com/vivi-app/templates v0.4.0/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
 github.com/xanzy/ssh-agent v0.3.3/go.mod h1:6dzNDKs0J9rVPHPhaGCukekBHKqfl+L3KghI1Bc68Uw=
 github.com/yuin/goldmark v1.1.25/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=

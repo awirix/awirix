@@ -70,7 +70,7 @@ func (m *model) nextLayer() *scraper.Layer {
 	}
 
 	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
-		return l.Name == m.current.layer.Name
+		return l.String() == m.current.layer.String()
 	})
 
 	if index == -1 {
@@ -92,7 +92,7 @@ func (m *model) previousLayer() *scraper.Layer {
 	}
 
 	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
-		return l.Name == m.current.layer.Name
+		return l.String() == m.current.layer.String()
 	})
 
 	if index == -1 {

@@ -1,6 +1,7 @@
 # Templates
 
-This repository contains extension templates for the [vivi](https://github.com/vivi-app/viv)
+This repository contains extension templates
+for the [vivi](https://github.com/vivi-app/viv)
 
 ## Supported Languages
 
@@ -19,7 +20,7 @@ and reach of Lua with the flexibility of a lisp syntax and macro system.
 
 [Website](https://fennel-lang.org)
 
-### TypescriptToLua
+### Typescript
 
 Write Lua with TypeScript*
 > \*With some limitations, see [caveats](https://typescripttolua.github.io/docs/caveats)
@@ -31,4 +32,19 @@ Write Lua with TypeScript*
 
 A typed dialect of Lua.
 
-[Github Repository](https://github.com/teal-language/tl)
+[GitHub Repository](https://github.com/teal-language/tl)
+
+### Yue
+
+Yuescript is a dynamic language that compiles to Lua.
+And it's a Moonscript dialect.
+
+[Website](https://yuescript.org)
+
+
+## Contributing
+
+Contributions are welcome!
+
+Please read the [contribution guidelines](CONTRIBUTING.md)
+before opening a pull request.

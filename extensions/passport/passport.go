@@ -17,7 +17,7 @@ import (
 
 type Passport struct {
 	MetaSchema   string                    `json:"$schema,omitempty"`
-	Name         string                    `json:"name" jsonschema:"description=Name of the extension"`
+	Name         string                    `json:"name" jsonschema:"description=title of the extension"`
 	ID           string                    `json:"id" jsonschema:"description=ID of the extension"`
 	About        string                    `json:"about" jsonschema:"description=Brief description"`
 	VersionRaw   string                    `json:"version" jsonschema:"required,description=Semantic version of the extension,example=1.0.0"`
@@ -46,10 +46,10 @@ var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
 	"bold":   style.Bold,
 	"cyan":   style.Fg(color.Cyan),
 	"url":    style.New().Foreground(color.Cyan).Underline(true).Render,
-}).Parse(`{{ bold (purple .Name) }} {{ bold .Version.String }} {{ if .NSFW }}{{ nsfw "NSFW" }}{{ end }} 
+}).Parse(`{{ bold (purple .title) }} {{ bold .Version.String }} {{ if .NSFW }}{{ nsfw "NSFW" }}{{ end }} 
 {{ if not .About }}{{ faint "No description" }}{{ else }}{{ faint .About }}{{ end }}
 
-{{ yellow .Language.Name }} {{ if not (eq .Language.Name .Language.NativeName) }}{{ faint .Language.NativeName }}{{ end }}
+{{ yellow .Language.title }} {{ if not (eq .Language.title .Language.NativeName) }}{{ faint .Language.NativeName }}{{ end }}
 {{ if .Tags }}{{ tags .Tags }}{{ end }}
 {{ if .Requirements }}{{ .Requirements.Info }}{{ end }}
 {{ if .Repository }}{{ url .Repository.URL }}{{ end }}`))

@@ -2,7 +2,6 @@ package tui
 
 import (
 	"fmt"
-	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	zone "github.com/lrstanley/bubblezone"
@@ -76,7 +75,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateLayer: {
 			Update: m.updateLayer,
 			View: func() string {
-				current := m.component.layers[m.current.layer.Name]
+				current := m.component.layers[m.current.layer.String()]
 				return zone.Scan(m.style.global.Render(current.View()))
 			},
 		},
@@ -122,22 +121,10 @@ func (m *model) pushState(s state) tea.Cmd {
 func (m *model) popState() tea.Cmd {
 	return func() tea.Msg {
 		if m.current.state == stateLayer {
-			previous := m.previousLayer()
-
-			m.component.layers[m.current.layer.Name].ResetSelected()
-
-			// if we're going back from the first layer
-			if previous == nil {
-				// reset layers lists
-				m.component.layers = make(map[string]*list.Model)
-				m.current.layer = nil
-				goto regular
-			}
-
-			m.current.layer = previous
+			m.component.layers[m.current.layer.String()].ResetSelected()
+			m.current.layer = m.previousLayer()
 		}
 
-	regular:
 		var cmds = make([]tea.Cmd, 0)
 
 		popped, ok := m.history.Pop().Get()

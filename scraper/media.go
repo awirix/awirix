@@ -24,16 +24,16 @@ func (i *Media) About() string {
 }
 
 func newMedia(table *lua.LTable) (*Media, error) {
-	value := table.RawGetString(FieldDisplay)
+	value := table.RawGetString(FieldTitle)
 	display, ok := value.(lua.LString)
 	if !ok {
-		return nil, fmt.Errorf("invalid media `%s` field: expected 'string' got '%s'", FieldDisplay, value.Type().String())
+		return nil, fmt.Errorf("invalid media `%s` field: expected 'string' got '%s'", FieldTitle, value.Type().String())
 	}
 
-	value = table.RawGetString(FieldAbout)
+	value = table.RawGetString(FieldDescription)
 	about, ok := value.(lua.LString)
 	if !ok && value.Type() != lua.LTNil {
-		return nil, fmt.Errorf("invalid media `%s` field: expected 'string|nil' got '%s'", FieldAbout, value.Type().String())
+		return nil, fmt.Errorf("invalid media `%s` field: expected 'string|nil' got '%s'", FieldDescription, value.Type().String())
 	}
 
 	return &Media{
