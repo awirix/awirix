@@ -127,7 +127,7 @@ func stateLayers(s *state) error {
 	layers := s.Extension.Scraper().Layers()
 
 	for _, layer := range layers {
-		medias, err := layer.Function(s.LastSelectedMedia)
+		medias, err := layer.Call(s.LastSelectedMedia)
 		if err != nil {
 			return err
 		}

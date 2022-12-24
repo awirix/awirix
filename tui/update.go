@@ -40,7 +40,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.current.extension.Scraper().HasSearch() {
 			return m, m.pushState(stateSearch)
 		} else {
-			return m, m.pushState(stateLayer)
+			return m, m.handleLayer(nil, m.nextLayer())
 		}
 	case msgSearchDone:
 		var items = make([]list.Item, len(msg))
@@ -54,16 +54,18 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.pushState(stateSearchResults),
 		)
 	case msgLayerDone:
-		var items = make([]list.Item, len(msg))
-
-		for i, m := range msg {
-			items[i] = newItem(m)
-		}
-
-		return m, tea.Batch(
-			m.component.layers[m.current.layer.Name].SetItems(items),
-			m.pushState(stateLayer),
+		// tea.Sequence is broken, so use deprecated tea.Sequentially
+		return m, tea.Sequentially(
+			listSetItems[*scraper.Media](
+				msg,
+				m.component.layers[m.nextLayer().Name],
+			),
+			func() tea.Msg {
+				return msgLayerItemsSet{}
+			},
 		)
+	case msgLayerItemsSet:
+		return m, m.pushState(stateLayer)
 	default:
 		// trigger update
 		return m, func() tea.Msg { return msg }
@@ -146,7 +148,7 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			return m, tea.Batch(
-				m.handleLayer(media),
+				m.handleLayer(media, m.nextLayer()),
 				m.pushState(stateLoading),
 			)
 		}
@@ -169,9 +171,23 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
+			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			if m.nextLayer() == nil {
+				goto end
+			}
+
+			return m, tea.Batch(
+				m.handleLayer(media, m.nextLayer()),
+				m.pushState(stateLoading),
+			)
 		}
 	}
 
+end:
 	model, cmd := thisList.Update(msg)
 	m.component.layers[m.current.layer.Name] = &model
 	return m, cmd

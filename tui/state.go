@@ -8,9 +8,7 @@ import (
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
-	"golang.org/x/exp/slices"
 )
 
 type state int
@@ -93,37 +91,23 @@ func (m *model) getCurrentStateHandler() *handler {
 
 func (m *model) pushState(s state) tea.Cmd {
 	return func() tea.Msg {
-		// Layers are special case
-		// Basically, when we receive `pushState(stateLayer)`
-		// we just set current layer to the next in a sequence.
-		if m.current.state == stateLayer && s == stateLayer {
-			layers := m.current.extension.Scraper().Layers()
-			index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
-				return l.Name == m.current.layer.Name
-			})
-
-			if index == -1 {
-				panic("current layer is not listed in the scraper")
-			}
-
-			// do nothing if this is the last layer already
-			if index == len(layers) {
-				return nil
-			}
-
-			newLayer := layers[index+1]
-			m.current.layer = newLayer
-			return nil
-		}
-
-		if m.current.state == s {
-			return nil
-		}
-
 		blacklist := []state{
 			stateLoading,
 			statePrepare,
 			stateError,
+		}
+
+		// Layers are special case
+		// Basically, when we receive `pushState(stateLayer)`
+		// we just set current layer to the next in a sequence.
+		if s == stateLayer {
+			if nextLayer := m.nextLayer(); nextLayer != nil {
+				m.current.layer = m.nextLayer()
+			}
+		}
+
+		if m.current.state == s {
+			return nil
 		}
 
 		if !lo.Contains[state](blacklist, m.current.state) {
@@ -138,26 +122,19 @@ func (m *model) pushState(s state) tea.Cmd {
 func (m *model) popState() tea.Cmd {
 	return func() tea.Msg {
 		if m.current.state == stateLayer {
-			layers := m.current.extension.Scraper().Layers()
-			index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
-				return l.Name == m.current.layer.Name
-			})
-
-			if index == -1 {
-				panic("current layer is not listed in the scraper")
-			}
+			previous := m.previousLayer()
 
 			m.component.layers[m.current.layer.Name].ResetSelected()
 
 			// if we're going back from the first layer
-			if index == 0 {
+			if previous == nil {
 				// reset layers lists
+				m.component.layers = make(map[string]*list.Model)
+				m.current.layer = nil
 				goto regular
 			}
 
-			newLayer := layers[index-1]
-			m.current.layer = newLayer
-			return nil
+			m.current.layer = previous
 		}
 
 	regular:
@@ -173,8 +150,6 @@ func (m *model) popState() tea.Cmd {
 			if m.component.textInput.Reset() {
 				cmds = append(cmds, textinput.Blink)
 			}
-
-			m.component.layers = make(map[string]*list.Model)
 		case stateSearchResults:
 			m.component.searchResults.ResetSelected()
 		}

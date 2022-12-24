@@ -44,6 +44,16 @@ func listReverseItems(lst *list.Model) tea.Cmd {
 	)
 }
 
+func listSetItems[T any](items []T, lst *list.Model) tea.Cmd {
+	var listItems = make([]list.Item, len(items))
+
+	for i, m := range items {
+		listItems[i] = newItem(m)
+	}
+
+	return lst.SetItems(listItems)
+}
+
 func listHandleMouseMsg(msg tea.MouseMsg, lst *list.Model) {
 	switch msg.Type {
 	case tea.MouseWheelUp:

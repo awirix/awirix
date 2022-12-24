@@ -9,6 +9,7 @@ import (
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/stack"
 	"github.com/vivi-app/vivi/tui/bind"
+	"golang.org/x/exp/slices"
 )
 
 type model struct {
@@ -59,4 +60,48 @@ func (m *model) resize(width, height int) {
 	for _, lst := range lists {
 		lst.SetSize(width-frameX, height-frameY)
 	}
+}
+
+func (m *model) nextLayer() *scraper.Layer {
+	layers := m.current.extension.Scraper().Layers()
+
+	if m.current.layer == nil {
+		return layers[0]
+	}
+
+	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
+		return l.Name == m.current.layer.Name
+	})
+
+	if index == -1 {
+		panic("current layer is not listed in the scraper")
+	}
+
+	if index == len(layers)-1 {
+		return nil
+	}
+
+	return layers[index+1]
+}
+
+func (m *model) previousLayer() *scraper.Layer {
+	layers := m.current.extension.Scraper().Layers()
+
+	if m.current.layer == nil {
+		return layers[0]
+	}
+
+	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
+		return l.Name == m.current.layer.Name
+	})
+
+	if index == -1 {
+		panic("current layer is not listed in the scraper")
+	}
+
+	if index == 0 {
+		return nil
+	}
+
+	return layers[index-1]
 }

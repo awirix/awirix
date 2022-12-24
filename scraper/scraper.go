@@ -65,7 +65,7 @@ func getFunctionFromTable(table *lua.LTable, name string, required bool) (*lua.L
 	return nil, errNotAFunction(name, function)
 }
 
-func getLayers(table *lua.LTable) (layers []*Layer, err error) {
+func (s *Scraper) getLayers(table *lua.LTable) (layers []*Layer, err error) {
 	field := table.RawGetString(FieldLayers)
 
 	if field.Type() == lua.LTNil {
@@ -76,6 +76,7 @@ func getLayers(table *lua.LTable) (layers []*Layer, err error) {
 
 	table = field.(*lua.LTable)
 
+	// FIXME: order is not preserved. Use an array-like table instead?
 	table.ForEach(func(key lua.LValue, value lua.LValue) {
 		if err != nil {
 			return
@@ -92,8 +93,9 @@ func getLayers(table *lua.LTable) (layers []*Layer, err error) {
 		}
 
 		layers = append(layers, &Layer{
-			Name:        string(key.(lua.LString)),
-			luaFunction: value.(*lua.LFunction),
+			Name:     string(key.(lua.LString)),
+			function: value.(*lua.LFunction),
+			scraper:  s,
 		})
 	})
 
@@ -130,7 +132,7 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, err
 	}
 
-	theScraper.layers, err = getLayers(table)
+	theScraper.layers, err = theScraper.getLayers(table)
 	if err != nil {
 		return nil, err
 	}

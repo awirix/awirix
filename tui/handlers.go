@@ -27,7 +27,6 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 		if ext.Scraper().HasLayers() {
 			layers := ext.Scraper().Layers()
 			m.component.layers = make(map[string]*list.Model, len(layers))
-			m.current.layer = layers[0]
 			for _, layer := range layers {
 				lst := newList(layer.Name, "media", "media")
 				m.component.layers[layer.Name] = &lst
@@ -54,9 +53,9 @@ func (m *model) handleSearch(query string) tea.Cmd {
 	}
 }
 
-func (m *model) handleLayer(media *scraper.Media) tea.Cmd {
+func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd {
 	return func() tea.Msg {
-		layerMedia, err := m.current.layer.Function(media)
+		layerMedia, err := layer.Call(media)
 
 		if err != nil {
 			m.error <- err

@@ -77,25 +77,6 @@ func (s *Scraper) Search(query string) ([]*Media, error) {
 }
 
 func (s *Scraper) Layers() []*Layer {
-	if !s.HasLayers() {
-		panic("scraper does not have any layers")
-	}
-
-	for _, layer := range s.layers {
-		layer.Function = func(media *Media) (subMedias []*Media, err error) {
-			err = s.state.CallByParam(lua.P{
-				Fn:      layer.luaFunction,
-				NRet:    1,
-				Protect: true,
-			}, media.Value(), s.progress)
-			if err != nil {
-				return nil, err
-			}
-
-			return s.checkMediaSlice()
-		}
-	}
-
 	return s.layers
 }
 
