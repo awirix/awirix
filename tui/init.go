@@ -24,7 +24,6 @@ func (m *model) Init() tea.Cmd {
 	return tea.Batch(
 		m.component.extensionSelect.SetItems(items),
 		m.component.textInput.Focus(),
-		listSetItems[variant](variantValues(), &m.component.streamOrDownload),
 		textinput.Blink,
 	)
 }

@@ -28,9 +28,9 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 
 		if ext.Scraper().HasSearch() {
 			search := ext.Scraper().Search()
-			m.component.searchResults.Title = search.Subtitle()
-			m.component.textInput.Placeholder = search.Placeholder()
-			m.component.searchResults.SetStatusBarItemName(search.Noun().Singular(), search.Noun().Plural())
+			m.component.searchResults.Title = search.SubtitleAuto()
+			m.component.textInput.Placeholder = search.PlaceholderAuto()
+			m.component.searchResults.SetStatusBarItemName(search.Noun.Singular(), search.Noun.Plural())
 		}
 
 		if ext.Scraper().HasLayers() {
@@ -38,16 +38,20 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			m.component.layers = make(map[string]*list.Model, len(layers))
 			for i, layer := range layers {
 				lst := newList(
-					fmt.Sprintf("%s - %d/%d", layer.Title(), i+1, len(layers)),
-					layer.Noun().Singular(),
-					layer.Noun().Plural(),
+					fmt.Sprintf("%s - %d/%d", layer.String(), i+1, len(layers)),
+					layer.Noun.Singular(),
+					layer.Noun.Plural(),
 				)
-				m.component.layers[layer.Title()] = &lst
+				m.component.layers[layer.String()] = &lst
 			}
 
 			// to update layers lists
 			m.resize(m.current.width, m.current.height)
 		}
+
+		// it returns tea cmd it's just nil if we don't have any filter applied,
+		// so we can safely ignore it here
+		listSetItems[*scraper.Action](ext.Scraper().Actions(), &m.component.actionSelect)
 
 		ext.SetContext(m.current.context)
 		return msgExtensionLoaded(ext)
@@ -75,7 +79,7 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		if media != nil {
 			m.status = "Loading " + style.Fg(color.Yellow)(media.String())
 		} else {
-			m.status = "Loading " + style.Fg(color.Yellow)(layer.Noun().Plural())
+			m.status = "Loading " + style.Fg(color.Yellow)(layer.Noun.Plural())
 		}
 
 		layerMedia, err := layer.Call(media)
@@ -86,12 +90,5 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		}
 
 		return msgLayerDone(layerMedia)
-	}
-}
-
-func (m *model) handlePrepare(media *scraper.Media) tea.Cmd {
-	return func() tea.Msg {
-		m.status = "Preparing " + style.Fg(color.Yellow)(media.String())
-		return msgPrepareDone(media)
 	}
 }

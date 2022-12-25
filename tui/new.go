@@ -42,7 +42,7 @@ func newModel(options *Options) *model {
 	model.component.extensionSelect = newList("Extensions", "extension", "extensions")
 	model.component.searchResults = newList("Search Results", "media", "media")
 	model.component.textInput = newTextInput("Search...")
-	model.component.streamOrDownload = newList("Stream or Download", "option", "options")
+	model.component.actionSelect = newList("Actions", "action", "actions")
 
 	width, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {

@@ -69,44 +69,6 @@ func (s *Scraper) Layers() []*Layer {
 	return s.layers
 }
 
-func (s *Scraper) Prepare(media *Media) (*Media, error) {
-	err := s.state.CallByParam(lua.P{
-		Fn:      s.functionPrepare,
-		NRet:    1,
-		Protect: true,
-	}, media.Value(), s.progress)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return s.checkMedia()
-}
-
-func (s *Scraper) Stream(media *Media) error {
-	err := s.state.CallByParam(lua.P{
-		Fn:      s.functionStream,
-		NRet:    1,
-		Protect: true,
-	}, media.Value(), s.progress)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (s *Scraper) Download(media *Media) error {
-	err := s.state.CallByParam(lua.P{
-		Fn:      s.functionDownload,
-		NRet:    1,
-		Protect: true,
-	}, media.Value(), s.progress)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (s *Scraper) Actions() []*Action {
+	return s.actions
 }

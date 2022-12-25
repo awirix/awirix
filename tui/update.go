@@ -58,7 +58,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Sequentially(
 			listSetItems[*scraper.Media](
 				msg,
-				m.component.layers[m.nextLayer().Title()],
+				m.component.layers[m.nextLayer().String()],
 			),
 			func() tea.Msg {
 				return msgLayerItemsSet{}
@@ -66,9 +66,6 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		)
 	case msgLayerItemsSet:
 		return m, m.pushState(stateLayer)
-	case msgPrepareDone:
-		m.current.media = msg
-		return m, m.pushState(stateStreamOrDownloadSelection)
 	default:
 		// trigger update
 		return m, func() tea.Msg { return msg }
@@ -161,10 +158,11 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 				)
 			}
 
-			return m, tea.Batch(
-				m.handlePrepare(media),
-				m.pushState(stateLoading),
-			)
+			if m.current.extension.Scraper().HasActions() {
+				m.pushState(stateActionSelect)
+			}
+
+			return m, nil
 		}
 	}
 
@@ -175,7 +173,7 @@ end:
 }
 
 func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
-	thisList := m.component.layers[m.current.layer.Title()]
+	thisList := m.component.layers[m.current.layer.String()]
 
 	switch msg := msg.(type) {
 	case tea.MouseMsg:
@@ -190,11 +188,14 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 				goto end
 			}
 
+			m.current.media = media
+
 			if m.nextLayer() == nil {
-				return m, tea.Batch(
-					m.handlePrepare(media),
-					m.pushState(stateLoading),
-				)
+				if !m.current.extension.Scraper().HasActions() {
+					goto end
+				}
+
+				return m, m.pushState(stateActionSelect)
 			}
 
 			return m, tea.Batch(
@@ -206,12 +207,12 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 end:
 	model, cmd := thisList.Update(msg)
-	m.component.layers[m.current.layer.Title()] = &model
+	m.component.layers[m.current.layer.String()] = &model
 	return m, cmd
 }
 
-func (m *model) updateStreamOrDownload(msg tea.Msg) (tea.Model, tea.Cmd) {
-	thisList := &m.component.streamOrDownload
+func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
+	thisList := &m.component.actionSelect
 
 	switch msg := msg.(type) {
 	case tea.MouseMsg:
@@ -221,33 +222,22 @@ func (m *model) updateStreamOrDownload(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
-			item, ok := listGetSelectedItem[variant](thisList).Get()
+			_, ok := listGetSelectedItem[*scraper.Action](thisList).Get()
 			if !ok {
 				goto end
 			}
 
-			switch item {
-			case variantStream:
-				// TODO
-			case variantDownload:
-				// TODO
-			}
+			// TODO
 		}
 	}
 
 end:
 	model, cmd := thisList.Update(msg)
-	m.component.streamOrDownload = model
+	m.component.actionSelect = model
 	return m, cmd
 }
 
 func (m *model) updateStream(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// TODO
-
-	return m, nil
-}
-
-func (m *model) updateDownload(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// TODO
 
 	return m, nil

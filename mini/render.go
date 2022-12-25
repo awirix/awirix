@@ -9,8 +9,8 @@ import (
 func renderMedia(media *scraper.Media) (rendered string) {
 	rendered += media.String()
 
-	if about := media.Description(); about != "" {
-		rendered += " " + style.Faint(about)
+	if description := media.Description; description != "" {
+		rendered += " " + style.Faint(description)
 	}
 
 	return

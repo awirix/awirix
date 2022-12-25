@@ -339,6 +339,9 @@ github.com/spf13/viper/internal/encoding/yaml
 # github.com/subosito/gotenv v1.4.1
 ## explicit; go 1.18
 github.com/subosito/gotenv
+# github.com/vivi-app/gluamapper v1.0.0
+## explicit; go 1.19
+github.com/vivi-app/gluamapper
 # github.com/vivi-app/libopen v1.0.0
 ## explicit
 github.com/vivi-app/libopen/open

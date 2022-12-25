@@ -10,12 +10,10 @@ import (
 type Scraper struct {
 	state *lua.LState
 
-	functionPrepare  *lua.LFunction
-	functionStream   *lua.LFunction
-	functionDownload *lua.LFunction
+	search  *Search
+	layers  []*Layer
+	actions []*Action
 
-	layers   []*Layer
-	search   *Search
 	progress *lua.LFunction
 }
 
@@ -27,12 +25,8 @@ func (s *Scraper) HasLayers() bool {
 	return s.layers != nil || len(s.layers) > 0
 }
 
-func (s *Scraper) HasStream() bool {
-	return s.functionStream != nil
-}
-
-func (s *Scraper) HasDownload() bool {
-	return s.functionDownload != nil
+func (s *Scraper) HasActions() bool {
+	return s.actions != nil || len(s.actions) > 0
 }
 
 func (s *Scraper) SetProgress(progress func(string)) {
@@ -50,12 +44,11 @@ func (s *Scraper) getLayers(table *lua.LTable) (layers []*Layer, err error) {
 	if field.Type() == lua.LTNil {
 		return nil, nil
 	} else if field.Type() != lua.LTTable {
-		return nil, fmt.Errorf("layers field must be a table, got %s", field.Type().String())
+		return nil, fmt.Errorf("layers must be a table, got %s", field.Type().String())
 	}
 
 	table = field.(*lua.LTable)
 
-	// FIXME: order is not preserved. Use an array-like table instead?
 	table.ForEach(func(_, value lua.LValue) {
 		if err != nil {
 			return
@@ -75,6 +68,41 @@ func (s *Scraper) getLayers(table *lua.LTable) (layers []*Layer, err error) {
 		}
 
 		layers = append(layers, layer)
+	})
+
+	return
+}
+
+func (s *Scraper) getActions(table *lua.LTable) (actions []*Action, err error) {
+	field := table.RawGetString(FieldActions)
+
+	if field.Type() == lua.LTNil {
+		return nil, nil
+	} else if field.Type() != lua.LTTable {
+		return nil, fmt.Errorf("actions must be a table, got %s", field.Type().String())
+	}
+
+	table = field.(*lua.LTable)
+
+	table.ForEach(func(_, value lua.LValue) {
+		if err != nil {
+			return
+		}
+
+		if value.Type() != lua.LTTable {
+			err = fmt.Errorf("each action must be a table, got %s", value.Type().String())
+			return
+		}
+
+		actionTable := value.(*lua.LTable)
+
+		var action *Action
+		action, err = s.newAction(actionTable)
+		if err != nil {
+			return
+		}
+
+		actions = append(actions, action)
 	})
 
 	return
@@ -105,9 +133,12 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, fmt.Errorf("scraper module must return a table, got %s", module.Type().String())
 	}
 
-	theScraper.search, err = theScraper.getSearch(table)
-	if err != nil {
-		return nil, err
+	searchTable := table.RawGetString(FieldSearch)
+	if searchTable.Type() != lua.LTNil {
+		theScraper.search, err = theScraper.newSearch(searchTable.(*lua.LTable))
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	theScraper.layers, err = theScraper.getLayers(table)
@@ -115,27 +146,13 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, err
 	}
 
+	theScraper.actions, err = theScraper.getActions(table)
+	if err != nil {
+		return nil, err
+	}
+
 	if !theScraper.HasLayers() && !theScraper.HasSearch() {
 		return nil, fmt.Errorf("scraper must implement `search` handler or have more than 0 layers")
-	}
-
-	theScraper.functionPrepare, err = getFunctionFromTable(table, FunctionPrepare, true)
-	if err != nil {
-		return nil, err
-	}
-
-	theScraper.functionStream, err = getFunctionFromTable(table, FunctionStream, false)
-	if err != nil {
-		return nil, err
-	}
-
-	theScraper.functionDownload, err = getFunctionFromTable(table, FunctionDownload, false)
-	if err != nil {
-		return nil, err
-	}
-
-	if !theScraper.HasDownload() && !theScraper.HasStream() {
-		return nil, errOneOfRequired(theScraper.functionDownload, theScraper.functionStream)
 	}
 
 	theScraper.state = L

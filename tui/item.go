@@ -62,7 +62,7 @@ func (l *lItem) description() string {
 		b.WriteString(about)
 		return b.String()
 	case *scraper.Media:
-		description := item.Description()
+		description := item.Description
 		if description == "" {
 			return noDescription
 		}

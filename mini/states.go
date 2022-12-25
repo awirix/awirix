@@ -111,7 +111,7 @@ func stateSearchMedia(s *state) error {
 		return stateInputQuery(s)
 	}
 
-	s.LastSelectedMedia, err = selectOne[*scraper.Media](search.Title(), medias, renderMedia)
+	s.LastSelectedMedia, err = selectOne[*scraper.Media](search.String(), medias, renderMedia)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func stateLayers(s *state) error {
 			return fmt.Errorf("nothing was found")
 		}
 
-		s.LastSelectedMedia, err = selectOne[*scraper.Media](layer.Title(), medias, renderMedia)
+		s.LastSelectedMedia, err = selectOne[*scraper.Media](layer.String(), medias, renderMedia)
 		if err != nil {
 			return err
 		}
@@ -152,45 +152,20 @@ func stateLayers(s *state) error {
 }
 
 func stateDoAction(s *state) error {
-	const (
-		actionStream   = "Stream"
-		actionDownload = "Download"
-	)
-
-	prepared, err := s.Extension.Scraper().Prepare(s.LastSelectedMedia)
-	if err != nil {
-		return err
-	}
-	s.LastSelectedMedia = prepared
-
 	var actions = make([]string, 0)
 
-	if s.Extension.Scraper().HasStream() {
-		actions = append(actions, actionStream)
+	for _, action := range s.Extension.Scraper().Actions() {
+		actions = append(actions, action.String())
 	}
 
-	if s.Extension.Scraper().HasDownload() {
-		actions = append(actions, actionDownload)
-	}
-
-	action, err := selectOne[string]("What do you want to do?", actions, func(s string) string { return s })
+	action, err := selectOne[*scraper.Action]("What do you want to do?", s.Extension.Scraper().Actions(), func(s *scraper.Action) string { return s.String() })
 	if err != nil {
 		return err
 	}
 
-	switch action {
-	case actionStream:
-		err = s.Extension.Scraper().Stream(s.LastSelectedMedia)
-		if err != nil {
-			return err
-		}
-	case actionDownload:
-		err = s.Extension.Scraper().Download(s.LastSelectedMedia)
-		if err != nil {
-			return err
-		}
-	default:
-		return fmt.Errorf("unknown action %s", action)
+	err = action.Call(s.LastSelectedMedia)
+	if err != nil {
+		return err
 	}
 
 	return stateDoNext(s)
@@ -201,8 +176,6 @@ func stateDoNext(s *state) error {
 		optionQuit            = "Quit"
 		optionSelectExtension = "Select Extension"
 		optionSearch          = "Search"
-		optionStream          = "Stream"
-		optionDownload        = "Download"
 	)
 
 	options := []string{optionSelectExtension}
@@ -214,11 +187,11 @@ func stateDoNext(s *state) error {
 
 	if s.Extension.Scraper().HasLayers() {
 		layers := s.Extension.Scraper().Layers()
-		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].Title())
+		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].String())
 		options = append(options, optionLayer)
 	}
 
-	options = append(options, optionQuit, optionStream, optionDownload)
+	options = append(options, optionQuit)
 
 	clearScreen()
 	option, err := selectOne[string]("Done! What to do next?", options, func(s string) string { return s })
@@ -236,20 +209,6 @@ func stateDoNext(s *state) error {
 	case optionLayer:
 		s.LastSelectedMedia = s.LastSelectedSearchMedia
 		return stateLayers(s)
-	case optionStream:
-		err = s.Extension.Scraper().Stream(s.LastSelectedMedia)
-		if err != nil {
-			return err
-		}
-
-		return stateDoNext(s)
-	case optionDownload:
-		err = s.Extension.Scraper().Download(s.LastSelectedMedia)
-		if err != nil {
-			return err
-		}
-
-		return stateDoNext(s)
 	default:
 		return fmt.Errorf("unknown option %s", option)
 	}

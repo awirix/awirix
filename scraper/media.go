@@ -1,52 +1,31 @@
 package scraper
 
 import (
-	"fmt"
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/log"
+	"github.com/vivi-app/gluamapper"
+	"github.com/vivi-app/lua"
 )
 
 type Media struct {
 	internal    lua.LValue
-	title       string
-	description string
+	Title       string
+	Description string
 }
 
 func (i *Media) String() string {
-	return i.title
+	return i.Title
 }
 
 func (i *Media) Value() lua.LValue {
 	return i.internal
 }
 
-func (i *Media) Description() string {
-	return i.description
-}
-
 func newMedia(table *lua.LTable) (*Media, error) {
-	var media = &Media{internal: table}
-
-	value := table.RawGetString(FieldTitle)
-
-	if value.Type() != lua.LTNil {
-		if value.Type() != lua.LTString {
-			return nil, fmt.Errorf("title: must be a string, got %s", value.Type().String())
-		}
-
-		media.title = string(value.(lua.LString))
+	media := &Media{}
+	err := gluamapper.Map(table, media)
+	if err != nil {
+		return nil, err
 	}
 
-	value = table.RawGetString(FieldDescription)
-
-	if value.Type() != lua.LTNil {
-		if value.Type() != lua.LTString {
-			return nil, fmt.Errorf("description: must be a string, got %s", value.Type().String())
-		}
-
-		log.Info(value.String())
-		media.description = string(value.(lua.LString))
-	}
-
+	media.internal = table
 	return media, nil
 }

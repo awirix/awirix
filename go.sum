@@ -347,12 +347,12 @@ github.com/stretchr/testify v1.8.1 h1:w7B6lhMri9wdJUVmEZPGGhZzrYTPvgJArz7wNPgYKs
 github.com/stretchr/testify v1.8.1/go.mod h1:w2LPCIKwWwSfY2zedu0+kehJoqGctiVI29o6fzry7u4=
 github.com/subosito/gotenv v1.4.1 h1:jyEFiXpy21Wm81FBN71l9VoMMV8H8jG+qIK3GCpY6Qs=
 github.com/subosito/gotenv v1.4.1/go.mod h1:ayKnFf/c6rvx/2iiLrJUk1e6plDbT3edrFNGqEflhK0=
+github.com/vivi-app/gluamapper v1.0.0 h1:jtgKzXIaHA1wAyDs/EUFhmBkUXXtg4XGFHT8AyLUNu0=
+github.com/vivi-app/gluamapper v1.0.0/go.mod h1:Yxvh9GcT4+4SAUzl1C8M5s06QaY91em4u/0+j3os534=
 github.com/vivi-app/libopen v1.0.0 h1:QOPxhlaUVs19WynaLFXPDddO0zQpMm0rZnVcSmylR70=
 github.com/vivi-app/libopen v1.0.0/go.mod h1:nfTJ+t23vbyebw9xJYj1vQv8O+1P1Nit2m2Rg90LUK0=
 github.com/vivi-app/lua v1.5.0 h1:4nB/G2JImMDQvE9ucyOjsxnPdO9U+o5ukkq4DBpy/SE=
 github.com/vivi-app/lua v1.5.0/go.mod h1:dyreQL+dKurMwBe4Dos+tSd33znmw7poABLAuaWPHjM=
-github.com/vivi-app/templates v0.4.0 h1:t5LOkBgoyeBuMKIqf/tPPs/XeQc0xHh+sQzHJL7FBoE=
-github.com/vivi-app/templates v0.4.0/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/vivi-app/templates v0.4.1 h1:aHrsQEH1aqWSrgR4Roq6THLtiRqrjESD+TiS4ikQN9c=
 github.com/vivi-app/templates v0.4.1/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=

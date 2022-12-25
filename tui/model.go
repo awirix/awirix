@@ -31,11 +31,11 @@ type model struct {
 	}
 
 	component struct {
-		extensionSelect  list.Model
-		textInput        textinput.Model
-		searchResults    list.Model
-		layers           map[string]*list.Model
-		streamOrDownload list.Model
+		extensionSelect list.Model
+		textInput       textinput.Model
+		searchResults   list.Model
+		layers          map[string]*list.Model
+		actionSelect    list.Model
 	}
 
 	status string
@@ -54,7 +54,7 @@ func (m *model) resize(width, height int) {
 	lists := []*list.Model{
 		&m.component.extensionSelect,
 		&m.component.searchResults,
-		&m.component.streamOrDownload,
+		&m.component.actionSelect,
 	}
 
 	for _, lst := range m.component.layers {
@@ -74,7 +74,7 @@ func (m *model) nextLayer() *scraper.Layer {
 	}
 
 	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
-		return l.Title() == m.current.layer.Title()
+		return l.String() == m.current.layer.String()
 	})
 
 	if index == -1 {
@@ -96,7 +96,7 @@ func (m *model) previousLayer() *scraper.Layer {
 	}
 
 	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
-		return l.Title() == m.current.layer.Title()
+		return l.String() == m.current.layer.String()
 	})
 
 	if index == -1 {
