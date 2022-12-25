@@ -1,7 +1,6 @@
 package scraper
 
 import (
-	"context"
 	"fmt"
 	"github.com/vivi-app/lua"
 )
@@ -110,8 +109,4 @@ func (s *Scraper) Download(media *Media) error {
 	}
 
 	return nil
-}
-
-func (s *Scraper) Ctx() context.Context {
-	return s.state.Context().(context.Context)
 }
