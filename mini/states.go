@@ -111,7 +111,7 @@ func stateSearchMedia(s *state) error {
 		return stateInputQuery(s)
 	}
 
-	s.LastSelectedMedia, err = selectOne[*scraper.Media]("Select a media", medias, renderMedia)
+	s.LastSelectedMedia, err = selectOne[*scraper.Media](search.Title(), medias, renderMedia)
 	if err != nil {
 		return err
 	}
@@ -142,7 +142,7 @@ func stateLayers(s *state) error {
 			return fmt.Errorf("nothing was found")
 		}
 
-		s.LastSelectedMedia, err = selectOne[*scraper.Media](layer.String(), medias, renderMedia)
+		s.LastSelectedMedia, err = selectOne[*scraper.Media](layer.Title(), medias, renderMedia)
 		if err != nil {
 			return err
 		}
@@ -214,7 +214,7 @@ func stateDoNext(s *state) error {
 
 	if s.Extension.Scraper().HasLayers() {
 		layers := s.Extension.Scraper().Layers()
-		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].String())
+		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].Title())
 		options = append(options, optionLayer)
 	}
 

@@ -75,7 +75,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateLayer: {
 			Update: m.updateLayer,
 			View: func() string {
-				current := m.component.layers[m.current.layer.String()]
+				current := m.component.layers[m.current.layer.Title()]
 				return zone.Scan(m.style.global.Render(current.View()))
 			},
 		},
@@ -121,7 +121,7 @@ func (m *model) pushState(s state) tea.Cmd {
 func (m *model) popState() tea.Cmd {
 	return func() tea.Msg {
 		if m.current.state == stateLayer {
-			m.component.layers[m.current.layer.String()].ResetSelected()
+			m.component.layers[m.current.layer.Title()].ResetSelected()
 			m.current.layer = m.previousLayer()
 		}
 

@@ -26,12 +26,19 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			m.status = message
 		})
 
+		if ext.Scraper().HasSearch() {
+			search := ext.Scraper().Search()
+			m.component.searchResults.Title = search.Subtitle()
+			m.component.textInput.Placeholder = search.Placeholder()
+			m.component.searchResults.SetStatusBarItemName(search.Noun().Singular(), search.Noun().Plural())
+		}
+
 		if ext.Scraper().HasLayers() {
 			layers := ext.Scraper().Layers()
 			m.component.layers = make(map[string]*list.Model, len(layers))
 			for _, layer := range layers {
-				lst := newList(layer.String(), layer.Noun().Singular(), layer.Noun().Plural())
-				m.component.layers[layer.String()] = &lst
+				lst := newList(layer.Title(), layer.Noun().Singular(), layer.Noun().Plural())
+				m.component.layers[layer.Title()] = &lst
 			}
 
 			// to update layers lists
@@ -47,9 +54,6 @@ func (m *model) handleSearch(query string) tea.Cmd {
 		m.status = "Searching for " + style.Fg(color.Yellow)(query)
 
 		search := m.current.extension.Scraper().Search()
-		m.component.searchResults.Title = search.String()
-		m.component.searchResults.SetStatusBarItemName(search.Noun().Singular(), search.Noun().Plural())
-
 		media, err := search.Call(query)
 
 		if err != nil {

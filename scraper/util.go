@@ -125,10 +125,32 @@ func (s *Scraper) getSearch(table *lua.LTable) (*Search, error) {
 		return nil, err
 	}
 
+	var subtitle string
+	value = table.RawGetString(FieldSubtitle)
+	if value.Type() != lua.LTNil {
+		if value.Type() != lua.LTString {
+			return nil, fmt.Errorf("search: subtitle must be a string, got %s", value.Type().String())
+		}
+
+		subtitle = string(value.(lua.LString))
+	}
+
+	var placeholder string
+	value = table.RawGetString(FieldPlaceholder)
+	if value.Type() != lua.LTNil {
+		if value.Type() != lua.LTString {
+			return nil, fmt.Errorf("search: placeholder must be a string, got %s", value.Type().String())
+		}
+
+		placeholder = string(value.(lua.LString))
+	}
+
 	return &Search{
-		title:   title,
-		handler: handler,
-		scraper: s,
-		noun:    noun,
+		title:       title,
+		handler:     handler,
+		scraper:     s,
+		noun:        noun,
+		subtitle:    subtitle,
+		placeholder: placeholder,
 	}, nil
 }

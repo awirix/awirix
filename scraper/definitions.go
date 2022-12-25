@@ -15,6 +15,8 @@ const (
 	FieldLayers = "layers"
 
 	FieldTitle       = "title"
+	FieldSubtitle    = "subtitle"
+	FieldPlaceholder = "placeholder"
 	FieldDescription = "description"
 	FieldHandler     = "handler"
 
@@ -57,8 +59,12 @@ func (l *Layer) Noun() *Noun {
 	return l.noun
 }
 
-func (l *Layer) String() string {
-	return l.title
+func (l *Layer) Title() string {
+	if title := l.title; title != "" {
+		return title
+	}
+
+	return "Select a " + l.Noun().Singular()
 }
 
 func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
@@ -82,14 +88,36 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 }
 
 type Search struct {
-	scraper *Scraper
-	title   string
-	handler *lua.LFunction
-	noun    *Noun
+	scraper     *Scraper
+	title       string
+	subtitle    string
+	placeholder string
+	handler     *lua.LFunction
+	noun        *Noun
 }
 
-func (s *Search) String() string {
-	return s.title
+func (s *Search) Title() string {
+	if title := s.title; title != "" {
+		return title
+	}
+
+	return "Search"
+}
+
+func (s *Search) Subtitle() string {
+	if subtitle := s.subtitle; subtitle != "" {
+		return subtitle
+	}
+
+	return "Select a " + s.Noun().Singular()
+}
+
+func (s *Search) Placeholder() string {
+	if placeholder := s.placeholder; placeholder != "" {
+		return placeholder
+	}
+
+	return "Search " + s.Noun().Plural()
 }
 
 func (s *Search) Call(query string) (subMedia []*Media, err error) {

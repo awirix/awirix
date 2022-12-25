@@ -58,7 +58,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Sequentially(
 			listSetItems[*scraper.Media](
 				msg,
-				m.component.layers[m.nextLayer().String()],
+				m.component.layers[m.nextLayer().Title()],
 			),
 			func() tea.Msg {
 				return msgLayerItemsSet{}
@@ -119,6 +119,10 @@ func (m *model) updateSearch(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.Confirm):
 			query := m.component.textInput.Value()
+			if query == "" {
+				return m, nil
+			}
+
 			return m, tea.Batch(
 				m.handleSearch(query),
 				m.pushState(stateLoading),
@@ -161,7 +165,7 @@ end:
 }
 
 func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
-	thisList := m.component.layers[m.current.layer.String()]
+	thisList := m.component.layers[m.current.layer.Title()]
 
 	switch msg := msg.(type) {
 	case tea.MouseMsg:
@@ -189,6 +193,6 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 end:
 	model, cmd := thisList.Update(msg)
-	m.component.layers[m.current.layer.String()] = &model
+	m.component.layers[m.current.layer.Title()] = &model
 	return m, cmd
 }
