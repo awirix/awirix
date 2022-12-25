@@ -10,10 +10,9 @@ import (
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	select {
-	case err := <-m.error:
-		m.current.error = err
-		m.context.Cancel()
-		m.context.Reset()
+	case err := <-m.error[&m.current.context]:
+		m.current.error[&m.current.context] = err
+		m.cancel()
 		return m, m.pushState(stateError)
 	default:
 	}
@@ -26,6 +25,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.ForceQuit):
 			return m, tea.Quit
 		case key.Matches(msg, m.keyMap.GoBack):
+			m.cancel()
 			return m, m.popState()
 		}
 	}
@@ -66,6 +66,9 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		)
 	case msgLayerItemsSet:
 		return m, m.pushState(stateLayer)
+	case msgPrepareDone:
+		m.current.media = msg
+		return m, m.pushState(stateStreamOrDownloadSelection)
 	default:
 		// trigger update
 		return m, func() tea.Msg { return msg }
@@ -151,8 +154,15 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 				goto end
 			}
 
+			if m.current.extension.Scraper().HasLayers() {
+				return m, tea.Batch(
+					m.handleLayer(media, m.nextLayer()),
+					m.pushState(stateLoading),
+				)
+			}
+
 			return m, tea.Batch(
-				m.handleLayer(media, m.nextLayer()),
+				m.handlePrepare(media),
 				m.pushState(stateLoading),
 			)
 		}
@@ -181,7 +191,10 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.nextLayer() == nil {
-				goto end
+				return m, tea.Batch(
+					m.handlePrepare(media),
+					m.pushState(stateLoading),
+				)
 			}
 
 			return m, tea.Batch(
@@ -195,4 +208,47 @@ end:
 	model, cmd := thisList.Update(msg)
 	m.component.layers[m.current.layer.Title()] = &model
 	return m, cmd
+}
+
+func (m *model) updateStreamOrDownload(msg tea.Msg) (tea.Model, tea.Cmd) {
+	thisList := &m.component.streamOrDownload
+
+	switch msg := msg.(type) {
+	case tea.MouseMsg:
+		listHandleMouseMsg(msg, thisList)
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keyMap.Reverse):
+			return m, listReverseItems(thisList)
+		case key.Matches(msg, m.keyMap.Confirm):
+			item, ok := listGetSelectedItem[variant](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			switch item {
+			case variantStream:
+				// TODO
+			case variantDownload:
+				// TODO
+			}
+		}
+	}
+
+end:
+	model, cmd := thisList.Update(msg)
+	m.component.streamOrDownload = model
+	return m, cmd
+}
+
+func (m *model) updateStream(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// TODO
+
+	return m, nil
+}
+
+func (m *model) updateDownload(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// TODO
+
+	return m, nil
 }

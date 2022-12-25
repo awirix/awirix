@@ -46,10 +46,10 @@ var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
 	"bold":   style.Bold,
 	"cyan":   style.Fg(color.Cyan),
 	"url":    style.New().Foreground(color.Cyan).Underline(true).Render,
-}).Parse(`{{ bold (purple .title) }} {{ bold .Version.String }} {{ if .NSFW }}{{ nsfw "NSFW" }}{{ end }} 
+}).Parse(`{{ bold (purple .Name) }} {{ bold .Version.String }} {{ if .NSFW }}{{ nsfw "NSFW" }}{{ end }} 
 {{ if not .About }}{{ faint "No description" }}{{ else }}{{ faint .About }}{{ end }}
 
-{{ yellow .Language.title }} {{ if not (eq .Language.title .Language.NativeName) }}{{ faint .Language.NativeName }}{{ end }}
+{{ yellow (.Language).Name }} {{ if not (eq (.Language).Name (.Language).NativeName) }}{{ faint (.Language).NativeName }}{{ end }}
 {{ if .Tags }}{{ tags .Tags }}{{ end }}
 {{ if .Requirements }}{{ .Requirements.Info }}{{ end }}
 {{ if .Repository }}{{ url .Repository.URL }}{{ end }}`))

@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-const _stateName = "ExtensionSelectExtensionConfigSearchSearchResultsLayerPrepareStreamOrDownloadSelectionStreamDownloadFinalLoadingError"
+const _stateName = "ExtensionSelectExtensionConfigSearchSearchResultsLayerStreamOrDownloadSelectionStreamDownloadFinalLoadingError"
 
-var _stateIndex = [...]uint8{0, 15, 30, 36, 49, 54, 61, 86, 92, 100, 105, 112, 117}
+var _stateIndex = [...]uint8{0, 15, 30, 36, 49, 54, 79, 85, 93, 98, 105, 110}
 
 func (i state) String() string {
 	i -= 1
@@ -18,7 +18,7 @@ func (i state) String() string {
 	return _stateName[_stateIndex[i]:_stateIndex[i+1]]
 }
 
-var _stateValues = []state{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
+var _stateValues = []state{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
 
 var _stateNameToValueMap = map[string]state{
 	_stateName[0:15]:    1,
@@ -26,13 +26,12 @@ var _stateNameToValueMap = map[string]state{
 	_stateName[30:36]:   3,
 	_stateName[36:49]:   4,
 	_stateName[49:54]:   5,
-	_stateName[54:61]:   6,
-	_stateName[61:86]:   7,
-	_stateName[86:92]:   8,
-	_stateName[92:100]:  9,
-	_stateName[100:105]: 10,
-	_stateName[105:112]: 11,
-	_stateName[112:117]: 12,
+	_stateName[54:79]:   6,
+	_stateName[79:85]:   7,
+	_stateName[85:93]:   8,
+	_stateName[93:98]:   9,
+	_stateName[98:105]:  10,
+	_stateName[105:110]: 11,
 }
 
 // stateString retrieves an enum value from the enum constants string name.

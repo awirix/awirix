@@ -2,6 +2,7 @@ package extension
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,7 +10,6 @@ import (
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/samber/lo"
 	"github.com/vivi-app/templates"
-	"github.com/vivi-app/vivi/context"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
@@ -31,8 +31,7 @@ func New(path string) (*Extension, error) {
 	}
 
 	ext := &Extension{
-		path:    path,
-		context: context.New(),
+		path: path,
 	}
 
 	// extensions must have valid passports
@@ -44,8 +43,8 @@ func New(path string) (*Extension, error) {
 	return ext, nil
 }
 
-func (e *Extension) SetContext(ctx *context.Context) {
-	e.context = ctx
+func (e *Extension) SetContext(ctx context.Context) {
+	e.state.SetContext(ctx)
 }
 
 func GenerateInteractive() (*Extension, error) {

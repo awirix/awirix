@@ -5,7 +5,6 @@ import (
 	app2 "github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/lualib/api"
 	"github.com/vivi-app/vivi/lualib/app"
-	ext "github.com/vivi-app/vivi/lualib/ext"
 	"github.com/vivi-app/vivi/lualib/sdk"
 )
 
@@ -20,7 +19,6 @@ func Loader(L *lua.LState) int {
 		"app": app.New,
 		"api": api.New,
 		"sdk": sdk.New,
-		"ext": ext.New,
 	} {
 		L.SetField(libs, name, create(L))
 	}

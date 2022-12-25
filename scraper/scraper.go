@@ -2,7 +2,7 @@ package scraper
 
 import (
 	"fmt"
-	lua "github.com/vivi-app/lua"
+	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/log"
 	"io"
 )

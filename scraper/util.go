@@ -31,9 +31,8 @@ func getNoun(table *lua.LTable) (*Noun, error) {
 
 	value := table.RawGetString(FieldNoun)
 	if value.Type() == lua.LTNil {
-		return &Noun{
-			singular: "media",
-		}, nil
+		noun.singular = "media"
+		return noun, nil
 	}
 
 	if value.Type() != lua.LTTable {

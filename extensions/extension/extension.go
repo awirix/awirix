@@ -3,7 +3,6 @@ package extension
 import (
 	"fmt"
 	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/context"
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
@@ -19,8 +18,6 @@ type Extension struct {
 	scraper  *scraper.Scraper
 	tester   *tester.Tester
 	state    *lua.LState
-
-	context *context.Context
 }
 
 func (e *Extension) loadPassport() error {

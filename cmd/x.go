@@ -205,10 +205,12 @@ var xSelCmd = &cobra.Command{
 
 		switch {
 		case lo.Must(cmd.Flags().GetBool("run")):
-			handleErr(ext.LoadScraper(false))
+			handleErr(ext.LoadScraper(true))
+
 		case lo.Must(cmd.Flags().GetBool("test")):
-			handleErr(ext.LoadTester(false))
+			handleErr(ext.LoadTester(true))
 			handleErr(ext.Tester().Test())
+
 		case lo.Must(cmd.Flags().GetBool("info")):
 			fmt.Println(ext.Passport().Info())
 		}

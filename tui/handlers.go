@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"fmt"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/vivi-app/vivi/color"
@@ -12,12 +13,11 @@ import (
 func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 	return func() tea.Msg {
 		m.status = "Loading extension"
-		ext.SetContext(m.context)
 
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)
 			if err != nil {
-				m.error <- err
+				m.error[&m.current.context] <- err
 				return nil
 			}
 		}
@@ -36,8 +36,12 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 		if ext.Scraper().HasLayers() {
 			layers := ext.Scraper().Layers()
 			m.component.layers = make(map[string]*list.Model, len(layers))
-			for _, layer := range layers {
-				lst := newList(layer.Title(), layer.Noun().Singular(), layer.Noun().Plural())
+			for i, layer := range layers {
+				lst := newList(
+					fmt.Sprintf("%s - %d/%d", layer.Title(), i+1, len(layers)),
+					layer.Noun().Singular(),
+					layer.Noun().Plural(),
+				)
 				m.component.layers[layer.Title()] = &lst
 			}
 
@@ -45,6 +49,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			m.resize(m.current.width, m.current.height)
 		}
 
+		ext.SetContext(m.current.context)
 		return msgExtensionLoaded(ext)
 	}
 }
@@ -57,7 +62,7 @@ func (m *model) handleSearch(query string) tea.Cmd {
 		media, err := search.Call(query)
 
 		if err != nil {
-			m.error <- err
+			m.error[&m.current.context] <- err
 			return nil
 		}
 
@@ -76,10 +81,17 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		layerMedia, err := layer.Call(media)
 
 		if err != nil {
-			m.error <- err
+			m.error[&m.current.context] <- err
 			return nil
 		}
 
 		return msgLayerDone(layerMedia)
+	}
+}
+
+func (m *model) handlePrepare(media *scraper.Media) tea.Cmd {
+	return func() tea.Msg {
+		m.status = "Preparing " + style.Fg(color.Yellow)(media.String())
+		return msgPrepareDone(media)
 	}
 }

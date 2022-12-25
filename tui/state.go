@@ -22,7 +22,6 @@ const (
 
 	stateLayer
 
-	statePrepare
 	stateStreamOrDownloadSelection
 	stateStream
 	stateDownload
@@ -49,7 +48,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateError: {
 			Update: m.updateError,
 			View: func() string {
-				return style.Fg(color.Red)(m.current.error.Error())
+				return style.Fg(color.Red)(m.current.error[&m.current.context].Error())
 			},
 		},
 
@@ -79,6 +78,13 @@ func (m *model) getCurrentStateHandler() *handler {
 				return zone.Scan(m.style.global.Render(current.View()))
 			},
 		},
+
+		stateStreamOrDownloadSelection: {
+			Update: m.updateStreamOrDownload,
+			View: func() string {
+				return zone.Scan(m.style.global.Render(m.component.streamOrDownload.View()))
+			},
+		},
 	}[m.current.state]
 
 	if !ok {
@@ -92,7 +98,6 @@ func (m *model) pushState(s state) tea.Cmd {
 	return func() tea.Msg {
 		blacklist := []state{
 			stateLoading,
-			statePrepare,
 			stateError,
 		}
 
