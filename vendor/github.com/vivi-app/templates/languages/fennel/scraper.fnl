@@ -3,12 +3,10 @@
 
 (local module {})
 
-(local search {:title :Search
-               :handler (fn [query progress]
+(local search {:handler (fn [query progress]
                           [])})
 
-(local layers [{:title "First Layer"
-                :handler (fn [media progress]
+(local layers [{:handler (fn [media progress]
                            [])}])
 
 (tset module :search search)

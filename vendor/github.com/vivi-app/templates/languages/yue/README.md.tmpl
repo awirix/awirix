@@ -6,12 +6,19 @@
 
 ## Compile
 
-1. [Install Yue compiler 📦](https://yuescript.org/doc/#installation) 
+😇 Script
+
+1. Run `./compile.sh` in the extension directory.
+2. Yeah, that's it.
+
+😈 Manual
+
+1. [Install Yue compiler 📦](https://yuescript.org/doc/#installation)
 2. In the extension directory run 🤖
 
 ```bash
 # Since vivi uses Lua5.1 VM
-yue --target=5.1  .
+yue --target=5.1 .
 ```
 
 3. This will output something like this 📄
@@ -22,4 +29,5 @@ Built ./scraper.yue
 ```
 
 4. It will create compiled `scraper.lua` and `tester.lua` that vivi can use
-5. Done! You are awesome! 🎉
+5. Done!
+6. Btw, you can also use `yue --target=5.1 --watch .` to watch for changes and recompile on the fly

@@ -37,11 +37,11 @@ func (l *lItem) title() string {
 		return stringer.String()
 	}
 
-	return "Unnamed"
+	return fmt.Sprintf("%v", l.internal)
 }
 
 func (l *lItem) Title() string {
-	return l.FilterValue()
+	return zone.Mark(l.id, l.title())
 }
 
 func (l *lItem) description() string {
@@ -62,12 +62,12 @@ func (l *lItem) description() string {
 		b.WriteString(about)
 		return b.String()
 	case *scraper.Media:
-		about := item.About()
-		if about == "" {
-			about = noDescription
+		description := item.Description()
+		if description == "" {
+			return noDescription
 		}
 
-		return about
+		return description
 	default:
 		return noDescription
 	}

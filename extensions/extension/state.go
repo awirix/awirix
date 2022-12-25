@@ -8,6 +8,7 @@ import (
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/lualib"
 	"github.com/vivi-app/vivi/luautil"
+	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
 	"strings"
@@ -97,7 +98,7 @@ func inject(ext *Extension, L *lua.LState) {
 				},
 			}),
 		}, nil),
-	}, map[string]lua.LGFunction{})
+	}, nil)
 
-	L.SetGlobal("_EXTENSION", table)
+	L.SetGlobal(scraper.GlobalExtension, table)
 }

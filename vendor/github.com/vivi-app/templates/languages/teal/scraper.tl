@@ -11,14 +11,16 @@ local record Media
 end
 
 local record Search
-   title: string
    handler: function(query: string, progress: Progress): {Media}
+   title: string|nil
+   subtitle: string|nil
+   placeholder: string|nil
    noun: Noun|nil
 end
 
 local record Layer
-   title: string
    handler: function(media: Media, progress: Progress): {Media}
+   title: string|nil
    noun: Noun|nil
 end
 
@@ -34,7 +36,6 @@ end
 local M: Module = {}
 
 M.search = {
-   title = "Search",
    handler = function(query: string, progress: Progress): {Media}
       return {}
    end,
@@ -42,7 +43,6 @@ M.search = {
 
 M.layers = {
 	{
-      title = "First Layer",
       handler = function(media: Media, progress: Progress): {Media}
          return {}
       end,

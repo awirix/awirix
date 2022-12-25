@@ -4,13 +4,11 @@ root = true
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
-
-[*.{json,lua,tl,fnl,ts}]
 indent_style = space
+indent_size = 4
 
 [*.{lua,tl}]
 indent_size = 3
-quote_type = single
 
-[*.{fnl,json,ts}]
-indent_size = 4
+[*.fnl]
+indent_size = 2

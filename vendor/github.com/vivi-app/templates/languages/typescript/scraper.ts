@@ -41,14 +41,24 @@ interface Media {
 
 interface Search {
     /**
-     * Title to set in the search field.
-     */
-    title: string;
-
-    /**
      * Function that will be called to search for the media.
      */
     handler: (query: string, progress: Progress) => Media[];
+
+    /**
+     * Title to show when typing query.
+     */
+    title?: string;
+
+    /**
+     * Title in the list of search results.
+     */
+    subtitle?: string;
+
+    /**
+     * Placeholder to show in the search input.
+     */
+    placeholder?: string;
 
     /**
      * Optional field that, if present, will be used
@@ -59,16 +69,16 @@ interface Search {
 
 interface Layer {
     /**
+     * Function that will be called to get the list of sub-media for the given one.
+     */
+    handler: (media: Media, progress: Progress) => Media[];
+
+    /**
      * Name of the layer
      * Will be used as a title of the layer in the vivi's interface.
      * E.g. "Seasons", "Episodes", "Books", etc.
      */
-    title: string;
-
-    /**
-     * Function that will be called to get the list of sub-media for the given one.
-     */
-    handler: (media: Media, progress: Progress) => Media[];
+    title?: string;
 
     /**
      * Optional field that, if present, will be used
@@ -84,7 +94,6 @@ interface Layer {
 type Progress = (message: string) => void;
 
 export const search = {
-    title: "Search",
     handler: (query: string, progress: Progress) => [],
 } as Search;
 
@@ -97,7 +106,6 @@ export const search = {
  */
 export const layers = [
     {
-        title: "First Layer",
         handler: (media: Media, progress: Progress) => [],
     },
 ] as Layer[];

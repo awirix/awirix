@@ -34,9 +34,10 @@ Example:
 
 Available variables for all `*.tmpl` files:
 
-- `Name`: The name of the extension
-- `About`: The description of the extension
-- `NSFW`: Whether the extension is NSFW or not
+-   `Name`: The name of the extension ~ string
+-   `About`: The description of the extension ~ string
+-   `NSFW`: Whether the extension is NSFW or not ~ bool
+-   `Libs`: Paths to the libraries used by the lua scraper ~ []string
 
 > [Learn golang templates syntax](https://golang.org/pkg/text/template/)
 
@@ -59,10 +60,10 @@ Take a look at the [lua](./languages/lua/tester.lua) and [fennel](./languages/fe
 ### `scraper.lua` & `tester.lua`
 
 1. If compiler for your language is written in Lua 5.1 without any runtime dependencies, you should call it from these files.
-    Take a look at the [fennel](./languages/fennel/scraper.lua) and [teal](./languages/teal/scraper.lua) for examples.
+   Take a look at the [fennel](./languages/fennel/scraper.lua) and [teal](./languages/teal/scraper.lua) for examples.
 2. Otherwise (non-lua compiler, different version, etc...) you should include an error message in these files
-    and point to the compilation instructions in the [README.md.tmpl](#readmemdtmpl) file.
-    See the [yue](./languages/yue/scraper.lua) and [typescript](./languages/typescript/scraper.ts) for examples.
+   and point to the compilation instructions in the [README.md.tmpl](#readmemdtmpl) file.
+   See the [yue](./languages/yue/scraper.lua) and [typescript](./languages/typescript/scraper.ts) for examples.
 
 ### Optional files
 
