@@ -22,14 +22,19 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			}
 		}
 
-		ext.Scraper().SetProgress(func(message string) {
-			m.status = message
+		ext.Scraper().SetExtensionContext(&scraper.Context{
+			Progress: func(message string) {
+				m.status = message
+			},
+			Error: func(err error) {
+				m.error[&m.current.context] <- err
+			},
 		})
 
 		if ext.Scraper().HasSearch() {
 			search := ext.Scraper().Search()
-			m.component.searchResults.Title = search.SubtitleAuto()
-			m.component.textInput.Placeholder = search.PlaceholderAuto()
+			m.component.searchResults.Title = search.Subtitle
+			m.component.textInput.Placeholder = search.Placeholder
 			m.component.searchResults.SetStatusBarItemName(search.Noun.Singular(), search.Noun.Plural())
 		}
 
@@ -90,5 +95,24 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		}
 
 		return msgLayerDone(layerMedia)
+	}
+}
+
+func (m *model) handleAction(action *scraper.Action) tea.Cmd {
+	return func() tea.Msg {
+		m.status = "Performing " + style.Fg(color.Yellow)(action.String()) + " action"
+
+		var media = make([]*scraper.Media, 0)
+		for item := range m.selectedMedia {
+			media = append(media, item.Internal().(*scraper.Media))
+		}
+
+		err := action.Call(media)
+		if err != nil {
+			m.error[&m.current.context] <- err
+			return nil
+		}
+
+		return msgActionDone(action)
 	}
 }

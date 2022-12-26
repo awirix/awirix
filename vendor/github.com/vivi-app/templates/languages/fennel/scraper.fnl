@@ -1,25 +1,22 @@
-;; Learn Fennel: fennel-lang.org/tutorial
-;; Style Guide: fennel-lang.org/style
-
 (local module {})
 
 (local search {:handler (fn [query progress]
                           [])})
 
-(local layers [{:handler (fn [media progress]
+(local layers [{:title :Layer
+                :handler (fn [media progress]
                            [])}])
+
+(local actions [{:title :Stream
+                 :handler (fn [media progress]
+                            (error "Not implemented"))}
+                {:title :Download
+                 :handler (fn [media progress]
+                            (error "Not implemented"))}])
 
 (tset module :search search)
 (tset module :layers layers)
-
-(fn module.prepare [media progress]
-  media)
-
-(fn module.stream [media progress]
-  (error "Not implemented"))
-
-(fn module.download [media progress]
-  (error "Not implemented"))
+(tset module :actions actions)
 
 module
 

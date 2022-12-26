@@ -94,6 +94,8 @@ func (m *model) getCurrentStateHandler() *handler {
 
 func (m *model) pushState(s state) tea.Cmd {
 	return func() tea.Msg {
+		// states that should not be pushed to the history
+		// since it makes no sense to return to them
 		blacklist := []state{
 			stateLoading,
 			stateError,
@@ -112,7 +114,7 @@ func (m *model) pushState(s state) tea.Cmd {
 			return nil
 		}
 
-		if !lo.Contains[state](blacklist, m.current.state) {
+		if !lo.Contains[state](blacklist, m.current.state) && m.history.Peek().OrElse(s+s) != s {
 			m.history.Push(m.current.state)
 		}
 
@@ -142,6 +144,9 @@ func (m *model) popState() tea.Cmd {
 			}
 		case stateSearchResults:
 			m.component.searchResults.ResetSelected()
+			m.selectedMedia = make(map[*lItem]struct{})
+		case stateLayer:
+			m.selectedMedia = make(map[*lItem]struct{})
 		}
 
 		m.current.state = popped

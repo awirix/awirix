@@ -18,14 +18,16 @@ func newModel(options *Options) *model {
 	currentContext, currentContextCancelFunc := context.WithCancel(context.Background())
 
 	model := &model{
-		keyMap:  bind.NewKeyMap(),
-		history: stack.New[state](),
-		options: options,
-		error:   make(map[*context.Context]chan error),
+		keyMap:        bind.NewKeyMap(),
+		history:       stack.New[state](),
+		selectedMedia: make(map[*lItem]struct{}),
+		options:       options,
+		error:         make(map[*context.Context]chan error),
 	}
 
 	model.current.context = currentContext
 	model.current.contextCancelFunc = currentContextCancelFunc
+
 	model.error[&model.current.context] = make(chan error)
 	model.current.error = make(map[*context.Context]error)
 

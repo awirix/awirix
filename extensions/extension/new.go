@@ -74,14 +74,6 @@ func GenerateInteractive() (*Extension, error) {
 			Prompt: &survey.Input{
 				Message: "Extension name",
 			},
-			Validate: survey.ComposeValidators(survey.Required, func(val any) error {
-				name := strings.TrimSpace(val.(string))
-				if strings.Contains(name, " ") {
-					return errors.New("extension name cannot contain spaces")
-				}
-
-				return nil
-			}),
 		},
 		{
 			Name: "about",
@@ -170,13 +162,6 @@ func GenerateInteractive() (*Extension, error) {
 		Tags:        answers.Tags,
 		LanguageRaw: answers.Language,
 		NSFW:        answers.Nsfw,
-		Config: map[string]*passport.ConfigSection{
-			"test": {
-				Display: "this is a test",
-				About:   "about the test",
-				Default: false,
-			},
-		},
 	}
 
 	path := filepath.Join(where.Extensions(), username, filename.Sanitize(p.ID))

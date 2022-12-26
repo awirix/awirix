@@ -19,13 +19,15 @@ type model struct {
 
 	extensions []*extension.Extension
 
+	// algebraic set
+	selectedMedia map[*lItem]struct{}
+
 	current struct {
 		width, height     int
 		state             state
 		extension         *extension.Extension
 		layer             *scraper.Layer
 		error             map[*context.Context]error
-		media             *scraper.Media
 		context           context.Context
 		contextCancelFunc context.CancelFunc
 	}
@@ -119,4 +121,14 @@ func (m *model) cancel() {
 	}
 
 	m.error[&m.current.context] = make(chan error)
+}
+
+func (m *model) toggleSelect(item *lItem) {
+	if _, ok := m.selectedMedia[item]; ok {
+		delete(m.selectedMedia, item)
+		item.SetSelected(false)
+	} else {
+		m.selectedMedia[item] = struct{}{}
+		item.SetSelected(true)
+	}
 }

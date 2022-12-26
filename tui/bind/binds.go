@@ -14,7 +14,7 @@ func bind(help string, keys ...string) key.Binding {
 type KeyMap struct {
 	Quit, ForceQuit,
 
-	Confirm, GoBack,
+	Select, Confirm, GoBack,
 
 	Reverse key.Binding
 }
@@ -23,6 +23,7 @@ func NewKeyMap() *KeyMap {
 	return &KeyMap{
 		Quit:      bind("Quit", "q"),
 		ForceQuit: bind("Force Quit", "ctrl+c", "ctrl+d"),
+		Select:    bind("Select", " "),
 		Confirm:   bind("Confirm", "enter"),
 		GoBack:    bind("Go Back", "esc"),
 		Reverse:   bind("Reverse", "r"),

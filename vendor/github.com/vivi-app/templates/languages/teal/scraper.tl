@@ -20,17 +20,20 @@ end
 
 local record Layer
    handler: function(media: Media, progress: Progress): {Media}
-   title: string|nil
+   title: string
    noun: Noun|nil
 end
 
-local record Module
-   search: Search
-	layers: {Layer}
+local record Action
+   handler: function(media: Media, progress: Progress)
+   title: string
+   description: string|nil
+end
 
-	prepare: function(media: Media, progress: Progress): Media
-	stream: function(media: Media, progress: Progress)
-	download: function(media: Media, progress: Progress)
+local record Module
+   search: Search|nil
+	layers: {Layer}|nil
+   actions: {Action}|nil
 end
 
 local M: Module = {}
@@ -43,20 +46,26 @@ M.search = {
 
 M.layers = {
 	{
+      title = 'Layer',
       handler = function(media: Media, progress: Progress): {Media}
          return {}
       end,
    }
 }
 
-function M.prepare(media: Media, progress: Progress): Media
-	return media
-end
-
-function M.stream(media: Media, progress: Progress)
-end
-
-function M.download(media: Media, progress: Progress)
-end
+M.actions = {
+   {
+      title = 'Stream',
+      handler = function(media: Media, progress: Progress)
+         error('Not implemented')
+      end,
+   },
+   {
+      title = 'Download',
+      handler = function(media: Media, progress: Progress)
+         error('Not implemented')
+      end,
+   },
+}
 
 return M

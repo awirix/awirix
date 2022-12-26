@@ -6,7 +6,9 @@ import (
 	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/filename"
 	"github.com/vivi-app/vivi/filesystem"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
+	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/tester"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
@@ -61,7 +63,14 @@ func (e *Extension) LoadScraper(debug bool) error {
 		return err
 	}
 
-	theScraper.SetProgress(func(string) {})
+	theScraper.SetExtensionContext(&scraper.Context{
+		Progress: func(message string) {
+			log.Tracef("%s: progress: %s", e, message)
+		},
+		Error: func(err error) {
+			log.Tracef("%s: error: %s", e, err)
+		},
+	})
 	e.scraper = theScraper
 	return nil
 }
@@ -96,7 +105,7 @@ func (e *Extension) String() string {
 		name = filepath.Base(e.Path())
 	}
 
-	return fmt.Sprintf("%s/%s", e.Author(), name)
+	return fmt.Sprintf("%s %s", name, style.Faint("by "+e.Author()))
 }
 
 func (e *Extension) Author() string {

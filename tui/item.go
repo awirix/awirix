@@ -5,6 +5,7 @@ import (
 	"github.com/lrstanley/bubblezone"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
+	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
 	"strings"
@@ -41,7 +42,13 @@ func (l *lItem) title() string {
 }
 
 func (l *lItem) Title() string {
-	return zone.Mark(l.id, l.title())
+	title := l.title()
+
+	if l.Selected() {
+		title += " " + style.Fg(color.Green)(icon.CDot)
+	}
+
+	return zone.Mark(l.id, title)
 }
 
 func (l *lItem) description() string {
@@ -62,6 +69,13 @@ func (l *lItem) description() string {
 		b.WriteString(about)
 		return b.String()
 	case *scraper.Media:
+		description := item.Description
+		if description == "" {
+			return noDescription
+		}
+
+		return description
+	case *scraper.Action:
 		description := item.Description
 		if description == "" {
 			return noDescription

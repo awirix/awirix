@@ -5,7 +5,9 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/vivi-app/vivi/extensions/extension"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
+	"strings"
 )
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -66,6 +68,9 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		)
 	case msgLayerItemsSet:
 		return m, m.pushState(stateLayer)
+	case msgActionDone:
+		// TODO: push final state
+		return m, m.pushState(stateActionSelect)
 	default:
 		// trigger update
 		return m, func() tea.Msg { return msg }
@@ -145,6 +150,17 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
+		case key.Matches(msg, m.keyMap.Select):
+			if m.current.extension.Scraper().HasLayers() {
+				goto end
+			}
+
+			item, ok := thisList.SelectedItem().(*lItem)
+			if !ok {
+				goto end
+			}
+
+			m.toggleSelect(item)
 		case key.Matches(msg, m.keyMap.Confirm):
 			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
 			if !ok {
@@ -182,20 +198,35 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
-		case key.Matches(msg, m.keyMap.Confirm):
-			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+		case key.Matches(msg, m.keyMap.Select):
+			if m.nextLayer() != nil {
+				goto end
+			}
+
+			item, ok := thisList.SelectedItem().(*lItem)
 			if !ok {
 				goto end
 			}
 
-			m.current.media = media
-
+			m.toggleSelect(item)
+		case key.Matches(msg, m.keyMap.Confirm):
 			if m.nextLayer() == nil {
 				if !m.current.extension.Scraper().HasActions() {
 					goto end
 				}
 
+				if len(m.selectedMedia) == 0 {
+					var b strings.Builder
+					_, _ = log.WriteErrorf(&b, "no media selected")
+					return m, thisList.NewStatusMessage(b.String())
+				}
+
 				return m, m.pushState(stateActionSelect)
+			}
+
+			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			if !ok {
+				goto end
 			}
 
 			return m, tea.Batch(
@@ -222,12 +253,15 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
-			_, ok := listGetSelectedItem[*scraper.Action](thisList).Get()
+			action, ok := listGetSelectedItem[*scraper.Action](thisList).Get()
 			if !ok {
 				goto end
 			}
 
-			// TODO
+			return m, tea.Batch(
+				m.pushState(stateLoading),
+				m.handleAction(action),
+			)
 		}
 	}
 
@@ -235,10 +269,4 @@ end:
 	model, cmd := thisList.Update(msg)
 	m.component.actionSelect = model
 	return m, cmd
-}
-
-func (m *model) updateStream(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// TODO
-
-	return m, nil
 }

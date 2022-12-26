@@ -23,10 +23,6 @@ func (p *Passport) UnmarshalJSON(data []byte) error {
 
 	aux.Name = strings.TrimSpace(aux.Name)
 
-	if strings.Contains(aux.Name, " ") {
-		return fmt.Errorf("passport: name cannot contain spaces")
-	}
-
 	if strings.Contains(aux.ID, " ") {
 		return fmt.Errorf("passport: id cannot contain spaces")
 	}

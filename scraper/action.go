@@ -17,12 +17,17 @@ func (a *Action) String() string {
 	return a.Title
 }
 
-func (a *Action) Call(media *Media) error {
+func (a *Action) Call(media []*Media) error {
+	table := a.scraper.state.NewTable()
+	for _, m := range media {
+		table.Append(m.Value())
+	}
+
 	return a.scraper.state.CallByParam(lua.P{
 		Fn:      a.Handler,
-		NRet:    1,
+		NRet:    0,
 		Protect: true,
-	}, media.Value(), a.scraper.progress)
+	}, table, a.scraper.context)
 }
 
 func (s *Scraper) newAction(table *lua.LTable) (*Action, error) {

@@ -1,9 +1,4 @@
 /**
- * Learn More: https://typescripttolua.github.io
- * Caveats:    https://typescripttolua.github.io/docs/caveats
- */
-
-/**
  * Noun is used to describe the media.
  */
 interface Noun {
@@ -78,13 +73,31 @@ interface Layer {
      * Will be used as a title of the layer in the vivi's interface.
      * E.g. "Seasons", "Episodes", "Books", etc.
      */
-    title?: string;
+    title: string;
 
     /**
      * Optional field that, if present, will be used
      * as a name of the noun that represents the sub-media.
      */
     noun?: Noun;
+}
+
+interface Action {
+    /**
+     * Function that will be called to perform the action.
+     */
+    handler: (media: Media, progress: Progress) => void;
+
+    /**
+     * Title to show in the list of actions.
+     * E.g. "Download", "Stream", etc.
+     */
+    title: string;
+
+    /**
+     * Description to show in the list of actions.
+     */
+    description?: string;
 }
 
 /**
@@ -106,35 +119,18 @@ export const search = {
  */
 export const layers = [
     {
+        title: "Layer",
         handler: (media: Media, progress: Progress) => [],
     },
 ] as Layer[];
 
-/**
- * Prepares a media for streaming/downloading.
- * When you need to do some heavy operations before passing it further.
- * E.g. decode a video stream url, calculate a hash of the file, etc.
- */
-export function prepare(media: Media, progress: Progress): Media {
-    return media;
-}
-
-/**
- * Streams a media
- * May be omitted if the extension does not provide streaming functionality.
- * However, at least one of the `stream` or `download` functions must be present.
- */
-export function stream(media: Media, progress: Progress) {
-    // @ts-ignore
-    error("Not implemented");
-}
-
-/**
- * Downloads a media.
- * May be omitted if this extension does not provide downloading functionality.
- * However, at least one of the `stream` or `download` functions must be present.
- */
-export function download(media: Media, progress: Progress) {
-    // @ts-ignore
-    error("Not implemented");
-}
+export const actions = [
+    {
+        title: "Stream",
+        handler: (media: Media, progress: Progress) => {},
+    },
+    {
+        title: "Download",
+        handler: (media: Media, progress: Progress) => {},
+    },
+] as Action[];

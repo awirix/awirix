@@ -1,9 +1,11 @@
 package scraper
 
 import (
+	"errors"
 	"fmt"
 	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/log"
+	"github.com/vivi-app/vivi/luautil"
 	"io"
 )
 
@@ -13,8 +15,7 @@ type Scraper struct {
 	search  *Search
 	layers  []*Layer
 	actions []*Action
-
-	progress *lua.LFunction
+	context *lua.LTable
 }
 
 func (s *Scraper) HasSearch() bool {
@@ -29,12 +30,20 @@ func (s *Scraper) HasActions() bool {
 	return s.actions != nil || len(s.actions) > 0
 }
 
-func (s *Scraper) SetProgress(progress func(string)) {
-	s.progress = s.state.NewFunction(func(L *lua.LState) int {
-		msg := L.ToString(1)
-		progress(msg)
-		log.Tracef("progress: %s", msg)
-		return 0
+func (s *Scraper) SetExtensionContext(context *Context) {
+	s.context = luautil.NewTable(s.state, nil, map[string]lua.LGFunction{
+		"progress": func(L *lua.LState) int {
+			message := L.ToString(1)
+			context.Progress(message)
+			log.Tracef("progress: %s", message)
+			return 0
+		},
+		"error": func(L *lua.LState) int {
+			err := errors.New(L.ToString(1))
+			context.Error(err)
+			log.Tracef("error: %s", err)
+			return 0
+		},
 	})
 }
 

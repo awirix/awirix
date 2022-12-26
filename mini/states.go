@@ -49,7 +49,13 @@ func stateSelectExtension(s *state) (err error) {
 		return err
 	}
 
-	s.Extension.Scraper().SetProgress(progress)
+	s.Extension.Scraper().SetExtensionContext(&scraper.Context{
+		Progress: progress,
+		Error: func(err error) {
+			// TODO: handle it better
+			progress(err.Error())
+		},
+	})
 
 	if s.Options.EditConfig {
 		return stateExtensionConfig(s)
@@ -163,7 +169,7 @@ func stateDoAction(s *state) error {
 		return err
 	}
 
-	err = action.Call(s.LastSelectedMedia)
+	err = action.Call([]*scraper.Media{s.LastSelectedMedia})
 	if err != nil {
 		return err
 	}

@@ -11,31 +11,11 @@ type Search struct {
 	Subtitle    string
 	Placeholder string
 	Handler     *lua.LFunction
-	Noun        Noun
+	Noun        *Noun
 }
 
 func (s *Search) String() string {
-	if title := s.Title; title != "" {
-		return title
-	}
-
-	return "Search"
-}
-
-func (s *Search) SubtitleAuto() string {
-	if subtitle := s.Subtitle; subtitle != "" {
-		return subtitle
-	}
-
-	return "Select a " + s.Noun.Singular()
-}
-
-func (s *Search) PlaceholderAuto() string {
-	if placeholder := s.Placeholder; placeholder != "" {
-		return placeholder
-	}
-
-	return "Search " + s.Noun.Plural()
+	return s.Title
 }
 
 func (s *Search) Call(query string) (subMedia []*Media, err error) {
@@ -43,7 +23,7 @@ func (s *Search) Call(query string) (subMedia []*Media, err error) {
 		Fn:      s.Handler,
 		NRet:    1,
 		Protect: true,
-	}, lua.LString(query), s.scraper.progress)
+	}, lua.LString(query), s.scraper.context)
 	if err != nil {
 		return nil, err
 	}
@@ -56,6 +36,22 @@ func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
 	err := gluamapper.Map(table, search)
 	if err != nil {
 		return nil, err
+	}
+
+	if search.Noun == nil {
+		search.Noun = &Noun{singular: "media"}
+	}
+
+	if search.Title == "" {
+		search.Title = "Search"
+	}
+
+	if search.Subtitle == "" {
+		search.Subtitle = "Select a " + search.Noun.Singular()
+	}
+
+	if search.Placeholder == "" {
+		search.Placeholder = "Search for " + search.Noun.Plural()
 	}
 
 	return search, nil

@@ -10,4 +10,5 @@ type (
 	msgSearchDone      []*scraper.Media
 	msgLayerDone       []*scraper.Media
 	msgLayerItemsSet   struct{}
+	msgActionDone      *scraper.Action
 )

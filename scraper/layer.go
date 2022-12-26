@@ -9,15 +9,11 @@ type Layer struct {
 	scraper *Scraper
 	Title   string
 	Handler *lua.LFunction
-	Noun    Noun
+	Noun    *Noun
 }
 
 func (l *Layer) String() string {
-	if title := l.Title; title != "" {
-		return title
-	}
-
-	return "Select a " + l.Noun.Singular()
+	return l.Title
 }
 
 func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
@@ -32,7 +28,7 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 		Fn:      l.Handler,
 		NRet:    1,
 		Protect: true,
-	}, value, l.scraper.progress)
+	}, value, l.scraper.context)
 	if err != nil {
 		return nil, err
 	}
@@ -46,6 +42,14 @@ func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
 	err := gluamapper.Map(table, layer)
 	if err != nil {
 		return nil, err
+	}
+
+	if layer.Noun == nil {
+		layer.Noun = &Noun{singular: "media"}
+	}
+
+	if layer.Title == "" {
+		layer.Title = "Select a " + layer.Noun.Singular()
 	}
 
 	return layer, nil
