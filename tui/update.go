@@ -11,6 +11,7 @@ import (
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	select {
 	case err := <-m.errorChan:
+		m.current.cancelContext()
 		return m, func() tea.Msg {
 			return msgError(err)
 		}
