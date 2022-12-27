@@ -144,12 +144,19 @@ func (m *model) popState() tea.Cmd {
 			}
 		case stateSearchResults:
 			m.component.searchResults.ResetSelected()
-			m.selectedMedia = make(map[*lItem]struct{})
+			m.resetSelected()
 		case stateLayer:
-			m.selectedMedia = make(map[*lItem]struct{})
+			m.resetSelected()
 		}
 
 		m.current.state = popped
 		return tea.Batch(cmds...)
 	}
+}
+
+func (m *model) resetSelected() {
+	for i := range m.selectedMedia {
+		i.SetSelected(false)
+	}
+	m.selectedMedia = make(map[*lItem]struct{})
 }

@@ -7,6 +7,7 @@ import (
 
 type Search struct {
 	scraper *Scraper
+	cache   map[string][]*Media
 	*search
 }
 
@@ -43,16 +44,27 @@ func (s *Search) Subtitle() string {
 }
 
 func (s *Search) Call(query string) (subMedia []*Media, err error) {
+	if cached, ok := s.cache[query]; ok {
+		return cached, nil
+	}
+
 	err = s.scraper.state.CallByParam(lua.P{
 		Fn:      s.Handler,
 		NRet:    1,
 		Protect: true,
 	}, lua.LString(query), s.scraper.context)
+
 	if err != nil {
 		return nil, errors.Wrap(err, "search")
 	}
 
-	return s.scraper.checkMediaSlice()
+	media, err := s.scraper.checkMediaSlice()
+	if err != nil {
+		return nil, err
+	}
+
+	s.cache[query] = media
+	return media, nil
 }
 
 func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
@@ -66,5 +78,5 @@ func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
 		return nil, errors.Wrap(ErrMissingHandler, "search")
 	}
 
-	return &Search{scraper: s, search: aux}, nil
+	return &Search{scraper: s, search: aux, cache: make(map[string][]*Media)}, nil
 }

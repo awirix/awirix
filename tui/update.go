@@ -5,9 +5,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
-	"strings"
 )
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -179,6 +177,15 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			if m.current.extension.Scraper().HasActions() {
+				if len(m.selectedMedia) == 0 {
+					item, ok := thisList.SelectedItem().(*lItem)
+					if !ok {
+						goto end
+					}
+
+					m.toggleSelect(item)
+				}
+
 				m.pushState(stateActionSelect)
 			}
 
@@ -220,9 +227,12 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 
 				if len(m.selectedMedia) == 0 {
-					var b strings.Builder
-					_, _ = log.WriteErrorf(&b, "no media selected")
-					return m, thisList.NewStatusMessage(b.String())
+					item, ok := thisList.SelectedItem().(*lItem)
+					if !ok {
+						goto end
+					}
+
+					m.toggleSelect(item)
 				}
 
 				return m, m.pushState(stateActionSelect)

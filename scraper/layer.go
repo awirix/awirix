@@ -7,6 +7,7 @@ import (
 
 type Layer struct {
 	scraper *Scraper
+	cache   map[*Media][]*Media
 	*layer
 }
 
@@ -25,6 +26,10 @@ func (l *Layer) String() string {
 }
 
 func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
+	if cached, ok := l.cache[media]; ok {
+		return cached, nil
+	}
+
 	var value lua.LValue
 	if media != nil {
 		value = media.Value()
@@ -41,7 +46,13 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 		return nil, err
 	}
 
-	return l.scraper.checkMediaSlice()
+	medias, err := l.scraper.checkMediaSlice()
+	if err != nil {
+		return nil, err
+	}
+
+	l.cache[media] = medias
+	return medias, nil
 }
 
 func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
@@ -59,5 +70,5 @@ func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
 		return nil, errors.Wrap(ErrMissingHandler, "layer")
 	}
 
-	return &Layer{scraper: s, layer: aux}, nil
+	return &Layer{scraper: s, layer: aux, cache: make(map[*Media][]*Media)}, nil
 }
