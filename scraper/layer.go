@@ -1,19 +1,27 @@
 package scraper
 
 import (
-	"github.com/vivi-app/gluamapper"
+	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
 )
 
 type Layer struct {
 	scraper *Scraper
+	*layer
+}
+
+type layer struct {
 	Title   string
 	Handler *lua.LFunction
-	Noun    *Noun
+	Noun    Noun `lua:"noun"`
 }
 
 func (l *Layer) String() string {
-	return l.Title
+	if l.Title != "" {
+		return l.Title
+	}
+
+	return "Select a " + l.Noun.Singular()
 }
 
 func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
@@ -37,20 +45,19 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 }
 
 func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
-	layer := &Layer{scraper: s}
-
-	err := gluamapper.Map(table, layer)
+	aux := &layer{}
+	err := tableMapper.Map(table, aux)
 	if err != nil {
 		return nil, err
 	}
 
-	if layer.Noun == nil {
-		layer.Noun = &Noun{singular: "media"}
+	if aux.Title == "" {
+		return nil, ErrMissingTitle
 	}
 
-	if layer.Title == "" {
-		layer.Title = "Select a " + layer.Noun.Singular()
+	if aux.Handler == nil {
+		return nil, errors.Wrap(ErrMissingHandler, "layer")
 	}
 
-	return layer, nil
+	return &Layer{scraper: s, layer: aux}, nil
 }

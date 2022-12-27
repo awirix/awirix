@@ -1,24 +1,26 @@
 package scraper
 
 type Noun struct {
-	singular,
-	plural string
+	noun `lua:",squash"`
+}
+
+type noun struct {
+	Singular,
+	Plural string
 }
 
 func (n *Noun) Singular() string {
-	singular := n.singular
-	if singular == "" {
-		singular = "media"
+	if n.noun.Singular != "" {
+		return n.noun.Singular
 	}
 
-	return singular
+	return "media"
 }
 
 func (n *Noun) Plural() string {
-	plural := n.plural
-	if plural == "" {
-		plural = n.Singular() + "s"
+	if n.noun.Plural != "" {
+		return n.noun.Plural
 	}
 
-	return plural
+	return n.Singular() + "s"
 }

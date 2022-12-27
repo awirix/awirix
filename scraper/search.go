@@ -1,21 +1,45 @@
 package scraper
 
 import (
-	"github.com/vivi-app/gluamapper"
+	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
 )
 
 type Search struct {
-	scraper     *Scraper
+	scraper *Scraper
+	*search
+}
+
+type search struct {
 	Title       string
 	Subtitle    string
 	Placeholder string
 	Handler     *lua.LFunction
-	Noun        *Noun
+	Noun        Noun `lua:"noun"`
 }
 
 func (s *Search) String() string {
-	return s.Title
+	if s.Title != "" {
+		return s.Title
+	}
+
+	return "Search"
+}
+
+func (s *Search) Placeholder() string {
+	if s.search.Placeholder != "" {
+		return s.search.Placeholder
+	}
+
+	return "Search for " + s.search.Noun.Plural()
+}
+
+func (s *Search) Subtitle() string {
+	if s.search.Subtitle != "" {
+		return s.search.Subtitle
+	}
+
+	return "Select a " + s.search.Noun.Singular()
 }
 
 func (s *Search) Call(query string) (subMedia []*Media, err error) {
@@ -25,34 +49,22 @@ func (s *Search) Call(query string) (subMedia []*Media, err error) {
 		Protect: true,
 	}, lua.LString(query), s.scraper.context)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "search")
 	}
 
 	return s.scraper.checkMediaSlice()
 }
 
 func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
-	search := &Search{scraper: s}
-	err := gluamapper.Map(table, search)
+	aux := &search{}
+	err := tableMapper.Map(table, aux)
 	if err != nil {
 		return nil, err
 	}
 
-	if search.Noun == nil {
-		search.Noun = &Noun{singular: "media"}
+	if aux.Handler == nil {
+		return nil, errors.Wrap(ErrMissingHandler, "search")
 	}
 
-	if search.Title == "" {
-		search.Title = "Search"
-	}
-
-	if search.Subtitle == "" {
-		search.Subtitle = "Select a " + search.Noun.Singular()
-	}
-
-	if search.Placeholder == "" {
-		search.Placeholder = "Search for " + search.Noun.Plural()
-	}
-
-	return search, nil
+	return &Search{scraper: s, search: aux}, nil
 }

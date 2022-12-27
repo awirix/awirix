@@ -74,7 +74,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.pushState(stateLayer)
 	case msgActionDone:
 		// TODO: push final state
-		return m, m.pushState(stateActionSelect)
+		return m, m.popState()
 	default:
 		// trigger update
 		return m, func() tea.Msg { return nil }

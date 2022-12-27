@@ -351,7 +351,7 @@ github.com/vivi-app/lua
 github.com/vivi-app/lua/ast
 github.com/vivi-app/lua/parse
 github.com/vivi-app/lua/pm
-# github.com/vivi-app/templates v0.5.0
+# github.com/vivi-app/templates v0.7.0
 ## explicit; go 1.19
 github.com/vivi-app/templates
 # github.com/xanzy/ssh-agent v0.3.3

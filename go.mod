@@ -20,6 +20,7 @@ require (
 	github.com/mvdan/xurls v1.1.0
 	github.com/pdfcpu/pdfcpu v0.3.13
 	github.com/pelletier/go-toml/v2 v2.0.6
+	github.com/pkg/errors v0.9.1
 	github.com/robertkrimen/otto v0.2.1
 	github.com/samber/lo v1.37.0
 	github.com/sirupsen/logrus v1.9.0
@@ -30,7 +31,7 @@ require (
 	github.com/vivi-app/gluamapper v1.0.0
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
-	github.com/vivi-app/templates v0.5.0
+	github.com/vivi-app/templates v0.7.0
 	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
 	golang.org/x/term v0.3.0
 )
@@ -72,7 +73,6 @@ require (
 	github.com/muesli/termenv v0.13.0 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pjbgf/sha1cd v0.2.3 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/sahilm/fuzzy v0.1.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect

@@ -8,11 +8,11 @@
                            [])}])
 
 (local actions [{:title :Stream
-                 :handler (fn [media progress]
-                            (error "Not implemented"))}
+                 :handler (fn [medias ctx]
+                            (ctx.error "Not implemented"))}
                 {:title :Download
-                 :handler (fn [media progress]
-                            (error "Not implemented"))}])
+                 :handler (fn [medias ctx]
+                            (ctx.error "Not implemented"))}])
 
 (tset module :search search)
 (tset module :layers layers)

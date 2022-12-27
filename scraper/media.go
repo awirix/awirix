@@ -1,7 +1,7 @@
 package scraper
 
 import (
-	"github.com/vivi-app/gluamapper"
+	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
 )
 
@@ -20,12 +20,16 @@ func (i *Media) Value() lua.LValue {
 }
 
 func newMedia(table *lua.LTable) (*Media, error) {
-	media := &Media{}
-	err := gluamapper.Map(table, media)
+	media := &Media{internal: table}
+	err := tableMapper.Map(table, media)
+
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "media")
 	}
 
-	media.internal = table
+	if media.Title == "" {
+		return nil, errors.Wrap(ErrMissingTitle, "media")
+	}
+
 	return media, nil
 }

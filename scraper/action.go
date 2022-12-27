@@ -1,16 +1,19 @@
 package scraper
 
 import (
-	"github.com/vivi-app/gluamapper"
+	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
 )
 
 type Action struct {
-	scraper     *Scraper
+	scraper *Scraper
+	*action
+}
+
+type action struct {
 	Title       string
 	Description string
 	Handler     *lua.LFunction
-	Multiple    bool
 }
 
 func (a *Action) String() string {
@@ -31,11 +34,11 @@ func (a *Action) Call(media []*Media) error {
 }
 
 func (s *Scraper) newAction(table *lua.LTable) (*Action, error) {
-	action := &Action{scraper: s}
-	err := gluamapper.Map(table, action)
+	aux := &action{}
+	err := tableMapper.Map(table, aux)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "action")
 	}
 
-	return action, nil
+	return &Action{scraper: s, action: aux}, nil
 }

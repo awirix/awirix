@@ -86,7 +86,7 @@ interface Action {
     /**
      * Function that will be called to perform the action.
      */
-    handler: (media: Media, progress: Progress) => void;
+    handler: (media: Media[], progress: Progress) => void;
 
     /**
      * Title to show in the list of actions.
@@ -101,13 +101,24 @@ interface Action {
 }
 
 /**
- * Function that will pass message to the vivi's interface
- * during loading.
+ * Context is passed to each function to provide a way to communicate with the user.
  */
-type Progress = (message: string) => void;
+interface Context {
+    /**
+     * Function that will be called to show a progress message.
+     * E.g. "Searching...", "Loading...", etc.
+     */
+    Progress: (message: string) => void;
+
+    /**
+     * Function that will be called to abort the current operation
+     * and show an error message.
+     */
+    Error: (message: string) => void;
+}
 
 export const search = {
-    handler: (query: string, progress: Progress) => [],
+    handler: (query: string, ctx: Context): Media[] => [],
 } as Search;
 
 /**
@@ -120,17 +131,17 @@ export const search = {
 export const layers = [
     {
         title: "Layer",
-        handler: (media: Media, progress: Progress) => [],
+        handler: (media: Media, ctx: Context): Media[] => [],
     },
 ] as Layer[];
 
 export const actions = [
     {
         title: "Stream",
-        handler: (media: Media, progress: Progress) => {},
+        handler: (medias: Media[], ctx: Context): void => {},
     },
     {
         title: "Download",
-        handler: (media: Media, progress: Progress) => {},
+        handler: (medias: Media[], ctx: Context): void => {},
     },
 ] as Action[];

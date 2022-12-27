@@ -1,19 +1,19 @@
 export search =
     title: 'Search'
     subtitle: 'Search results'
-    handler: (query, progress) ->
+    handler: (query, ctx) ->
         {}
 
 export layers =
     * title: 'Layer'
-      handler: (media, progress) ->
+      handler: (media, ctx) ->
         {}
 
 export actions =
     * title: 'Stream'
       description: 'Stream description'
-      handler: (media, progress) ->
+      handler: (medias, ctx) ->
 
     * title: 'Download'
       description: 'Download description'
-      handler: (media, progress) ->
+      handler: (medias, ctx) ->

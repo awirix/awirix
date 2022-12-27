@@ -1,4 +1,7 @@
-local type Progress = function(message: string)
+local record Context
+   progress: function(message: string)
+   error: function(message: string)
+end
 
 local record Noun
    singular: string
@@ -11,7 +14,7 @@ local record Media
 end
 
 local record Search
-   handler: function(query: string, progress: Progress): {Media}
+   handler: function(query: string, ctx: Context): {Media}
    title: string|nil
    subtitle: string|nil
    placeholder: string|nil
@@ -19,13 +22,13 @@ local record Search
 end
 
 local record Layer
-   handler: function(media: Media, progress: Progress): {Media}
+   handler: function(media: Media, ctx: Context): {Media}
    title: string
    noun: Noun|nil
 end
 
 local record Action
-   handler: function(media: Media, progress: Progress)
+   handler: function(media: {Media}, ctx: Context)
    title: string
    description: string|nil
 end
@@ -39,7 +42,7 @@ end
 local M: Module = {}
 
 M.search = {
-   handler = function(query: string, progress: Progress): {Media}
+   handler = function(query: string, ctx: Context): {Media}
       return {}
    end,
 }
@@ -47,7 +50,7 @@ M.search = {
 M.layers = {
 	{
       title = 'Layer',
-      handler = function(media: Media, progress: Progress): {Media}
+      handler = function(media: Media, ctx: Context): {Media}
          return {}
       end,
    }
@@ -56,14 +59,15 @@ M.layers = {
 M.actions = {
    {
       title = 'Stream',
-      handler = function(media: Media, progress: Progress)
-         error('Not implemented')
+      handler = function(media: {Media}, ctx: Context)
+         ctx.error('Not implemented')
       end,
    },
    {
       title = 'Download',
-      handler = function(media: Media, progress: Progress)
-         error('Not implemented')
+      multiple = true,
+      handler = function(media: {Media}, ctx: Context)
+         ctx.error('Not implemented')
       end,
    },
 }

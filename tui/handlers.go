@@ -1,7 +1,6 @@
 package tui
 
 import (
-	"context"
 	"fmt"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -30,13 +29,10 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			}
 		}
 
-		m.current.context, m.current.cancelContext = context.WithCancel(context.Background())
-		m.injectContext(ext)
-
 		if ext.Scraper().HasSearch() {
 			search := ext.Scraper().Search()
-			m.component.searchResults.Title = search.Subtitle
-			m.component.textInput.Placeholder = search.Placeholder
+			m.component.searchResults.Title = search.Subtitle()
+			m.component.textInput.Placeholder = search.Placeholder()
 			m.component.searchResults.SetStatusBarItemName(search.Noun.Singular(), search.Noun.Plural())
 		}
 
