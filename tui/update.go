@@ -152,6 +152,17 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
+		case key.Matches(msg, m.keyMap.Reset):
+			m.resetSelected()
+		case key.Matches(msg, m.keyMap.SelectAll):
+			if m.current.extension.Scraper().HasLayers() {
+				goto end
+			}
+
+			m.resetSelected()
+			for _, item := range thisList.Items() {
+				m.toggleSelect(item.(*lItem))
+			}
 		case key.Matches(msg, m.keyMap.Select):
 			if m.current.extension.Scraper().HasLayers() {
 				goto end
@@ -209,6 +220,17 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
+		case key.Matches(msg, m.keyMap.Reset):
+			m.resetSelected()
+		case key.Matches(msg, m.keyMap.SelectAll):
+			if m.nextLayer() != nil {
+				goto end
+			}
+
+			m.resetSelected()
+			for _, item := range thisList.Items() {
+				m.toggleSelect(item.(*lItem))
+			}
 		case key.Matches(msg, m.keyMap.Select):
 			if m.nextLayer() != nil {
 				goto end
