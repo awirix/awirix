@@ -1,6 +1,7 @@
 package tui
 
 import (
+	"context"
 	"fmt"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -10,26 +11,27 @@ import (
 	"github.com/vivi-app/vivi/style"
 )
 
-func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
+func (m *model) handleWrapper(cmd tea.Cmd) tea.Cmd {
 	return func() tea.Msg {
+		m.resetContext()
+		return cmd()
+	}
+}
+
+func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
+	return m.handleWrapper(func() tea.Msg {
 		m.status = "Loading extension"
 
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)
 			if err != nil {
-				m.error[&m.current.context] <- err
-				return nil
+				//m.error <- err
+				return msgError(err)
 			}
 		}
 
-		ext.Scraper().SetExtensionContext(&scraper.Context{
-			Progress: func(message string) {
-				m.status = message
-			},
-			Error: func(err error) {
-				m.error[&m.current.context] <- err
-			},
-		})
+		m.current.context, m.current.cancelContext = context.WithCancel(context.Background())
+		m.injectContext(ext)
 
 		if ext.Scraper().HasSearch() {
 			search := ext.Scraper().Search()
@@ -58,29 +60,28 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 		// so we can safely ignore it here
 		listSetItems[*scraper.Action](ext.Scraper().Actions(), &m.component.actionSelect)
 
-		ext.SetContext(m.current.context)
 		return msgExtensionLoaded(ext)
-	}
+	})
 }
 
 func (m *model) handleSearch(query string) tea.Cmd {
-	return func() tea.Msg {
+	return m.handleWrapper(func() tea.Msg {
 		m.status = "Searching for " + style.Fg(color.Yellow)(query)
 
 		search := m.current.extension.Scraper().Search()
 		media, err := search.Call(query)
 
 		if err != nil {
-			m.error[&m.current.context] <- err
-			return nil
+			//m.error <- err
+			return msgError(err)
 		}
 
 		return msgSearchDone(media)
-	}
+	})
 }
 
 func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd {
-	return func() tea.Msg {
+	return m.handleWrapper(func() tea.Msg {
 		if media != nil {
 			m.status = "Loading " + style.Fg(color.Yellow)(media.String())
 		} else {
@@ -90,16 +91,16 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		layerMedia, err := layer.Call(media)
 
 		if err != nil {
-			m.error[&m.current.context] <- err
-			return nil
+			//m.error <- err
+			return msgError(err)
 		}
 
 		return msgLayerDone(layerMedia)
-	}
+	})
 }
 
 func (m *model) handleAction(action *scraper.Action) tea.Cmd {
-	return func() tea.Msg {
+	return m.handleWrapper(func() tea.Msg {
 		m.status = "Performing " + style.Fg(color.Yellow)(action.String()) + " action"
 
 		var media = make([]*scraper.Media, 0)
@@ -109,10 +110,10 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 
 		err := action.Call(media)
 		if err != nil {
-			m.error[&m.current.context] <- err
-			return nil
+			//m.error <- err
+			return msgError(err)
 		}
 
 		return msgActionDone(action)
-	}
+	})
 }

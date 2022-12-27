@@ -46,7 +46,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateError: {
 			Update: m.updateError,
 			View: func() string {
-				return style.Fg(color.Red)(m.current.error[&m.current.context].Error())
+				return style.Fg(color.Red)(m.current.error.Error())
 			},
 		},
 
@@ -114,7 +114,8 @@ func (m *model) pushState(s state) tea.Cmd {
 			return nil
 		}
 
-		if !lo.Contains[state](blacklist, m.current.state) && m.history.Peek().OrElse(s+s) != s {
+		// TODO: handle the case when returning from successful action would cause duplicated stateAction
+		if !lo.Contains[state](blacklist, m.current.state) {
 			m.history.Push(m.current.state)
 		}
 

@@ -10,7 +10,7 @@ import (
 func (m *model) Init() tea.Cmd {
 	extensions, err := manager.InstalledExtensions()
 	if err != nil {
-		m.error[&m.current.context] <- err
+		m.errorChan <- err
 		return nil
 	}
 

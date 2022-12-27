@@ -135,7 +135,7 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 	}
 
 	module := L.Get(-1)
-	theScraper := &Scraper{}
+	theScraper := &Scraper{state: L}
 
 	table, ok := module.(*lua.LTable)
 	if !ok {
@@ -164,6 +164,5 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		return nil, fmt.Errorf("scraper must implement `search` handler or have more than 0 layers")
 	}
 
-	theScraper.state = L
 	return theScraper, nil
 }

@@ -13,9 +13,9 @@ import (
 )
 
 type model struct {
-	options *Options
-	error   map[*context.Context]chan error
-	history *stack.Stack[state]
+	options   *Options
+	errorChan chan error
+	history   *stack.Stack[state]
 
 	extensions []*extension.Extension
 
@@ -23,13 +23,13 @@ type model struct {
 	selectedMedia map[*lItem]struct{}
 
 	current struct {
-		width, height     int
-		state             state
-		extension         *extension.Extension
-		layer             *scraper.Layer
-		error             map[*context.Context]error
-		context           context.Context
-		contextCancelFunc context.CancelFunc
+		width, height int
+		state         state
+		extension     *extension.Extension
+		layer         *scraper.Layer
+		error         error
+		context       context.Context
+		cancelContext context.CancelFunc
 	}
 
 	component struct {
@@ -112,15 +112,11 @@ func (m *model) previousLayer() *scraper.Layer {
 	return layers[index-1]
 }
 
-func (m *model) cancel() {
-	m.current.contextCancelFunc()
-	m.current.context, m.current.contextCancelFunc = context.WithCancel(context.Background())
-
+func (m *model) resetContext() {
+	m.current.context, m.current.cancelContext = context.WithCancel(context.Background())
 	if m.current.extension != nil {
-		m.current.extension.SetContext(m.current.context)
+		m.injectContext(m.current.extension)
 	}
-
-	m.error[&m.current.context] = make(chan error)
 }
 
 func (m *model) toggleSelect(item *lItem) {
@@ -131,4 +127,16 @@ func (m *model) toggleSelect(item *lItem) {
 		m.selectedMedia[item] = struct{}{}
 		item.SetSelected(true)
 	}
+}
+
+func (m *model) injectContext(ext *extension.Extension) {
+	ext.SetContext(m.current.context)
+	ext.Scraper().SetExtensionContext(&scraper.Context{
+		Progress: func(message string) {
+			m.status = message
+		},
+		Error: func(err error) {
+			m.errorChan <- err
+		},
+	})
 }

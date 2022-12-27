@@ -12,10 +12,10 @@ import (
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	select {
-	case err := <-m.error[&m.current.context]:
-		m.current.error[&m.current.context] = err
-		m.cancel()
-		return m, m.pushState(stateError)
+	case err := <-m.errorChan:
+		return m, func() tea.Msg {
+			return msgError(err)
+		}
 	default:
 	}
 
@@ -27,7 +27,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.ForceQuit):
 			return m, tea.Quit
 		case key.Matches(msg, m.keyMap.GoBack):
-			m.cancel()
+			m.current.cancelContext()
 			return m, m.popState()
 		}
 	}
@@ -37,6 +37,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case msgError:
+		m.current.error = msg
+		m.current.cancelContext()
+		return m, m.pushState(stateError)
 	case msgExtensionLoaded:
 		m.current.extension = msg
 		if m.current.extension.Scraper().HasSearch() {
@@ -73,7 +77,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.pushState(stateActionSelect)
 	default:
 		// trigger update
-		return m, func() tea.Msg { return msg }
+		return m, func() tea.Msg { return nil }
 	}
 }
 

@@ -58,10 +58,6 @@ func (s *Scraper) checkMediaSlice() ([]*Media, error) {
 }
 
 func (s *Scraper) Search() *Search {
-	if !s.HasSearch() {
-		panic("scraper does not have a search handler")
-	}
-
 	return s.search
 }
 

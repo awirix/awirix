@@ -11,4 +11,5 @@ type (
 	msgLayerDone       []*scraper.Media
 	msgLayerItemsSet   struct{}
 	msgActionDone      *scraper.Action
+	msgError           error
 )
