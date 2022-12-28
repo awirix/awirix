@@ -3,9 +3,13 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/vivi-app/vivi/extensions/extension"
+	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
+	"github.com/vivi-app/vivi/text"
+	"strings"
 )
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -26,8 +30,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.ForceQuit):
 			return m, tea.Quit
 		case key.Matches(msg, m.keyMap.GoBack):
-			m.current.cancelContext()
-			return m, m.popState()
+			return m, m.getCurrentStateHandler().Back()
+			//m.current.cancelContext()
+			//return m, m.popState()
 		}
 	}
 
@@ -74,9 +79,14 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case msgActionDone:
 		// TODO: push final state
 		return m, m.popState()
+	case spinner.TickMsg:
+		var cmd tea.Cmd
+		m.component.spinner, cmd = m.component.spinner.Update(msg)
+		return m, cmd
 	default:
-		// trigger update
-		return m, func() tea.Msg { return nil }
+		return m, func() tea.Msg {
+			return msg
+		}
 	}
 }
 
@@ -99,6 +109,10 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
+		if thisList.FilterState() == list.Filtering {
+			goto end
+		}
+
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
@@ -127,7 +141,7 @@ func (m *model) updateSearch(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.Confirm):
 			query := m.component.textInput.Value()
-			if query == "" {
+			if strings.TrimSpace(query) == "" {
 				return m, nil
 			}
 
@@ -150,6 +164,10 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
+		if thisList.FilterState() == list.Filtering {
+			goto end
+		}
+
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
@@ -218,6 +236,10 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
+		if thisList.FilterState() == list.Filtering {
+			goto end
+		}
+
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
@@ -286,6 +308,10 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.MouseMsg:
 		listHandleMouseMsg(msg, thisList)
 	case tea.KeyMsg:
+		if thisList.FilterState() == list.Filtering {
+			goto end
+		}
+
 		switch {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
@@ -295,9 +321,29 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 				goto end
 			}
 
+			if action.Max != 0 && len(m.selectedMedia) > action.Max {
+				var noun scraper.Noun
+				if m.previousLayer() != nil {
+					noun = m.previousLayer().Noun
+				} else {
+					noun = m.current.extension.Scraper().Search().Noun
+				}
+
+				var s strings.Builder
+				_, _ = log.WriteErrorf(
+					&s,
+					"%q only supports %s max, but %d were selected",
+					action.String(),
+					text.Quantify(action.Max, noun.Singular(), noun.Plural()),
+					len(m.selectedMedia),
+				)
+
+				return m, thisList.NewStatusMessage(s.String())
+			}
+
 			return m, tea.Batch(
-				m.pushState(stateLoading),
 				m.handleAction(action),
+				m.pushState(stateLoading),
 			)
 		}
 	}

@@ -73,6 +73,14 @@ and the extension will be unable to access the filesystem.`,
 		"Try to perform git pull instead of cloning the repo when updating.",
 	},
 	// EXTENSIONS
+
+	// TUI
+	{
+		key.TUIClickable,
+		false,
+		"Enable support for mouse clicks in TUI",
+	},
+	// END TUI
 }
 
 func setDefaults() {

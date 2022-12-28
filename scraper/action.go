@@ -14,6 +14,7 @@ type action struct {
 	Title       string
 	Description string
 	Handler     *lua.LFunction
+	Max         int
 }
 
 func (a *Action) String() string {

@@ -3,6 +3,7 @@ package tui
 import (
 	"context"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/vivi-app/vivi/extensions/extension"
@@ -38,21 +39,19 @@ type model struct {
 		searchResults   list.Model
 		layers          map[string]*list.Model
 		actionSelect    list.Model
+		spinner         spinner.Model
 	}
 
 	status string
 	keyMap *bind.KeyMap
 
 	style struct {
-		global lipgloss.Style
+		global,
+		title, titleError, titleBar lipgloss.Style
 	}
 }
 
-func (m *model) resize(width, height int) {
-	m.current.width, m.current.height = width, height
-
-	frameX, frameY := m.style.global.GetFrameSize()
-
+func (m *model) lists() []*list.Model {
 	lists := []*list.Model{
 		&m.component.extensionSelect,
 		&m.component.searchResults,
@@ -63,7 +62,14 @@ func (m *model) resize(width, height int) {
 		lists = append(lists, lst)
 	}
 
-	for _, lst := range lists {
+	return lists
+}
+
+func (m *model) resize(width, height int) {
+	m.current.width, m.current.height = width, height
+	frameX, frameY := m.style.global.GetFrameSize()
+
+	for _, lst := range m.lists() {
 		lst.SetSize(width-frameX, height-frameY)
 	}
 }
@@ -139,4 +145,9 @@ func (m *model) injectContext(ext *extension.Extension) {
 			m.errorChan <- err
 		},
 	})
+}
+
+func (m *model) resetSpinner() {
+	m.component.spinner = spinner.New()
+	m.component.spinner.Spinner = spinner.Dot
 }

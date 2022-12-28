@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	zone "github.com/lrstanley/bubblezone"
@@ -32,22 +33,48 @@ const (
 type handler struct {
 	Update func(msg tea.Msg) (tea.Model, tea.Cmd)
 	View   func() string
+	Back   func() tea.Cmd
 }
 
 func (m *model) getCurrentStateHandler() *handler {
 	// TODO: optimize (create this map only once and reuse it)
 
+	defaultBack := func() tea.Cmd {
+		m.current.cancelContext()
+		return m.popState()
+	}
+
+	listBack := func(l *list.Model) tea.Cmd {
+
+		if l.FilterState() != list.Unfiltered {
+			l.ResetFilter()
+			return nil
+		}
+
+		return defaultBack()
+	}
+
 	h, ok := map[state]*handler{
 		stateLoading: {
 			Update: m.updateLoading,
-			View:   func() string { return m.status },
+			View: func() string {
+				return m.renderLines(
+					m.style.title.Render("Loading"),
+					m.component.spinner.View()+m.status,
+				)
+			},
+			Back: defaultBack,
 		},
 
 		stateError: {
 			Update: m.updateError,
 			View: func() string {
-				return style.Fg(color.Red)(m.current.error.Error())
+				return m.renderLines(
+					m.style.titleError.Render("Error"),
+					style.Fg(color.Red)(m.current.error.Error()),
+				)
 			},
+			Back: defaultBack,
 		},
 
 		stateExtensionSelect: {
@@ -55,17 +82,30 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return zone.Scan(m.style.global.Render(m.component.extensionSelect.View()))
 			},
+			Back: func() tea.Cmd {
+				return listBack(&m.component.extensionSelect)
+			},
 		},
 
 		stateSearch: {
 			Update: m.updateSearch,
-			View:   m.component.textInput.View,
+			View: func() string {
+				return m.renderLines(
+					// TODO: use title from extension
+					m.style.title.Render("Search"),
+					m.component.textInput.View(),
+				)
+			},
+			Back: defaultBack,
 		},
 
 		stateSearchResults: {
 			Update: m.updateSearchResults,
 			View: func() string {
 				return zone.Scan(m.style.global.Render(m.component.searchResults.View()))
+			},
+			Back: func() tea.Cmd {
+				return listBack(&m.component.searchResults)
 			},
 		},
 
@@ -75,12 +115,18 @@ func (m *model) getCurrentStateHandler() *handler {
 				current := m.component.layers[m.current.layer.String()]
 				return zone.Scan(m.style.global.Render(current.View()))
 			},
+			Back: func() tea.Cmd {
+				return listBack(m.component.layers[m.current.layer.String()])
+			},
 		},
 
 		stateActionSelect: {
 			Update: m.updateActionSelect,
 			View: func() string {
 				return zone.Scan(m.style.global.Render(m.component.actionSelect.View()))
+			},
+			Back: func() tea.Cmd {
+				return listBack(&m.component.actionSelect)
 			},
 		},
 	}[m.current.state]
@@ -119,6 +165,16 @@ func (m *model) pushState(s state) tea.Cmd {
 		}
 
 		m.current.state = s
+
+		if s == stateLoading {
+			m.resetSpinner()
+			return m.component.spinner.Tick()
+		}
+
+		if s == stateSearch {
+			return textinput.Blink
+		}
+
 		return nil
 	}
 }
@@ -139,9 +195,7 @@ func (m *model) popState() tea.Cmd {
 
 		switch m.current.state {
 		case stateSearch:
-			if m.component.textInput.Reset() {
-				cmds = append(cmds, textinput.Blink)
-			}
+			m.component.textInput.Reset()
 		case stateSearchResults:
 			m.component.searchResults.ResetSelected()
 			m.resetSelected()
@@ -149,9 +203,19 @@ func (m *model) popState() tea.Cmd {
 			m.resetSelected()
 		}
 
+		cmds = append(cmds, m.resetListStatusMessages())
 		m.current.state = popped
 		return tea.Batch(cmds...)
 	}
+}
+
+func (m *model) resetListStatusMessages() tea.Cmd {
+	var cmds []tea.Cmd
+	for _, l := range m.lists() {
+		cmds = append(cmds, l.NewStatusMessage(""))
+	}
+
+	return tea.Batch(cmds...)
 }
 
 func (m *model) resetSelected() {

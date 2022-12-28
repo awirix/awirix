@@ -3,6 +3,7 @@ package scraper
 import (
 	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
+	"strings"
 )
 
 type Search struct {
@@ -44,6 +45,8 @@ func (s *Search) Subtitle() string {
 }
 
 func (s *Search) Call(query string) (subMedia []*Media, err error) {
+	query = strings.TrimSpace(query)
+
 	if cached, ok := s.cache[query]; ok {
 		return cached, nil
 	}

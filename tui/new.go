@@ -1,9 +1,11 @@
 package tui
 
 import (
+	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/stack"
+	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/tui/bind"
 	"golang.org/x/term"
 	"os"
@@ -22,13 +24,18 @@ func newModel(options *Options) *model {
 		errorChan:     make(chan error),
 	}
 
+	listStyles := list.DefaultStyles()
 	model.current.state = stateExtensionSelect
-	model.style.global = lipgloss.NewStyle()
+	model.style.global = style.New()
+	model.style.title = listStyles.Title
+	model.style.titleError = model.style.title.Copy().Background(color.Red)
+	model.style.titleBar = listStyles.TitleBar
 
 	newTextInput := func(placeholder string) textinput.Model {
 		t := textinput.New()
 		t.CharLimit = 80
 		t.Placeholder = placeholder
+		t.SetCursorMode(textinput.CursorStatic)
 		return t
 	}
 

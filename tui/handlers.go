@@ -24,7 +24,6 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)
 			if err != nil {
-				//m.error <- err
 				return msgError(err)
 			}
 		}

@@ -2,10 +2,12 @@ package tui
 
 import (
 	"fmt"
-	"github.com/lrstanley/bubblezone"
+	zone "github.com/lrstanley/bubblezone"
+	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/icon"
+	"github.com/vivi-app/vivi/key"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
 	"strings"
@@ -29,7 +31,11 @@ func newItem(internal any) *lItem {
 }
 
 func (l *lItem) clickable(s string) string {
-	return zone.Mark(l.id, s)
+	if viper.GetBool(key.TUIClickable) {
+		return zone.Mark(l.id, s)
+	}
+
+	return s
 }
 
 func (l *lItem) title() string {
@@ -48,7 +54,7 @@ func (l *lItem) Title() string {
 		title += " " + style.Fg(color.Green)(icon.CDot)
 	}
 
-	return zone.Mark(l.id, title)
+	return l.clickable(title)
 }
 
 func (l *lItem) description() string {

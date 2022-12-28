@@ -21,3 +21,7 @@ const (
 	ExtensionsTemplateGitignore    = "extensions.template.gitignore"
 	ExtensionsUpdateTryPull        = "extensions.update.try_pull"
 )
+
+const (
+	TUIClickable = "tui.clickable"
+)
