@@ -17,6 +17,7 @@ type KeyMap struct {
 	Reset,
 	Select,
 	SelectAll,
+	Info,
 	Confirm,
 	GoBack,
 
@@ -30,6 +31,7 @@ func NewKeyMap() *KeyMap {
 		Reset:     bind("Reset", "backspace"),
 		Select:    bind("Select", " "),
 		SelectAll: bind("Select All", "tab"),
+		Info:      bind("Info", "i"),
 		Confirm:   bind("Confirm", "enter"),
 		GoBack:    bind("Go Back", "esc"),
 		Reverse:   bind("Reverse", "r"),

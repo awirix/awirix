@@ -11,6 +11,7 @@ import (
 	"github.com/vivi-app/vivi/lualib/sdk/pdf"
 	"github.com/vivi-app/vivi/lualib/sdk/regexp"
 	"github.com/vivi-app/vivi/lualib/sdk/strings"
+	"github.com/vivi-app/vivi/lualib/sdk/time"
 	"github.com/vivi-app/vivi/luautil"
 )
 
@@ -25,5 +26,6 @@ func New(L *lua.LState) *lua.LTable {
 		"cmd":     cmd.New(L),
 		"strings": strings.New(L),
 		"pdf":     pdf.New(L),
+		"time":    time.New(L),
 	}, nil)
 }

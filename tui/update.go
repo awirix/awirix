@@ -79,6 +79,10 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case msgActionDone:
 		// TODO: push final state
 		return m, m.popState()
+	case msgMediaInfoDone:
+		m.current.mediaInfo = string(msg)
+		m.resize(m.current.width, m.current.height)
+		return m, m.pushState(stateMediaInfo)
 	case spinner.TickMsg:
 		var cmd tea.Cmd
 		m.component.spinner, cmd = m.component.spinner.Update(msg)
@@ -173,6 +177,20 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Reset):
 			m.resetSelected()
+		case key.Matches(msg, m.keyMap.Info):
+			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			if !media.HasInfo() {
+				goto end
+			}
+
+			return m, tea.Batch(
+				m.pushState(stateLoading),
+				m.handleMediaInfo(media),
+			)
 		case key.Matches(msg, m.keyMap.SelectAll):
 			if m.current.extension.Scraper().HasLayers() {
 				goto end
@@ -254,6 +272,20 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 			for _, item := range thisList.Items() {
 				m.toggleSelect(item.(*lItem))
 			}
+		case key.Matches(msg, m.keyMap.Info):
+			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			if !media.HasInfo() {
+				goto end
+			}
+
+			return m, tea.Batch(
+				m.pushState(stateLoading),
+				m.handleMediaInfo(media),
+			)
 		case key.Matches(msg, m.keyMap.Select):
 			if m.nextLayer() != nil {
 				goto end
@@ -351,5 +383,19 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 end:
 	model, cmd := thisList.Update(msg)
 	m.component.actionSelect = model
+	return m, cmd
+}
+
+func (m *model) updateMediaInfo(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var cmd tea.Cmd
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keyMap.Quit):
+			return m, tea.Quit
+		}
+	}
+
+	m.component.mediaInfo, cmd = m.component.mediaInfo.Update(msg)
 	return m, cmd
 }

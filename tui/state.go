@@ -16,7 +16,6 @@ type state int
 //go:generate enumer -type=state -trimprefix=state -transform=kebab-case
 const (
 	stateExtensionSelect state = iota + 1
-	stateExtensionConfig
 
 	stateSearch
 	stateSearchResults
@@ -24,7 +23,8 @@ const (
 	stateLayer
 
 	stateActionSelect
-	stateFinal
+
+	stateMediaInfo
 
 	stateLoading
 	stateError
@@ -128,6 +128,15 @@ func (m *model) getCurrentStateHandler() *handler {
 			Back: func() tea.Cmd {
 				return listBack(&m.component.actionSelect)
 			},
+		},
+
+		stateMediaInfo: {
+			Update: m.updateMediaInfo,
+			View: func() string {
+				//view := wrap.String(m.component.mediaInfo.View(), m.component.mediaInfo.Width)
+				return m.styles.global.Render(m.component.mediaInfo.View())
+			},
+			Back: defaultBack,
 		},
 	}[m.current.state]
 

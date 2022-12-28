@@ -14,7 +14,7 @@ func (s *Scraper) checkMedia() (*Media, error) {
 		return nil, fmt.Errorf("invalid return value: expected 'table' got '%s'", ret.Type().String())
 	}
 
-	media, err := newMedia(table)
+	media, err := s.newMedia(table)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func (s *Scraper) checkMediaSlice() ([]*Media, error) {
 			return nil, fmt.Errorf("invalid value in returned table: expected 'table' got '%s'", item.Type().String())
 		}
 
-		media, err := newMedia(table)
+		media, err := s.newMedia(table)
 		if err != nil {
 			return nil, err
 		}

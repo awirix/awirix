@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-const _stateName = "ExtensionSelectExtensionConfigSearchSearchResultsLayerActionSelectFinalLoadingError"
+const _stateName = "ExtensionSelectSearchSearchResultsLayerActionSelectMediaInfoLoadingError"
 
-var _stateIndex = [...]uint8{0, 15, 30, 36, 49, 54, 66, 71, 78, 83}
+var _stateIndex = [...]uint8{0, 15, 21, 34, 39, 51, 60, 67, 72}
 
 func (i state) String() string {
 	i -= 1
@@ -18,18 +18,17 @@ func (i state) String() string {
 	return _stateName[_stateIndex[i]:_stateIndex[i+1]]
 }
 
-var _stateValues = []state{1, 2, 3, 4, 5, 6, 7, 8, 9}
+var _stateValues = []state{1, 2, 3, 4, 5, 6, 7, 8}
 
 var _stateNameToValueMap = map[string]state{
 	_stateName[0:15]:  1,
-	_stateName[15:30]: 2,
-	_stateName[30:36]: 3,
-	_stateName[36:49]: 4,
-	_stateName[49:54]: 5,
-	_stateName[54:66]: 6,
-	_stateName[66:71]: 7,
-	_stateName[71:78]: 8,
-	_stateName[78:83]: 9,
+	_stateName[15:21]: 2,
+	_stateName[21:34]: 3,
+	_stateName[34:39]: 4,
+	_stateName[39:51]: 5,
+	_stateName[51:60]: 6,
+	_stateName[60:67]: 7,
+	_stateName[67:72]: 8,
 }
 
 // stateString retrieves an enum value from the enum constants string name.

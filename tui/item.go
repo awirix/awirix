@@ -50,8 +50,13 @@ func (l *lItem) title() string {
 func (l *lItem) Title() string {
 	title := l.title()
 
-	if ext, ok := l.internal.(*extension.Extension); ok {
-		title += " " + style.Faint("by "+ext.Author())
+	switch internal := l.internal.(type) {
+	case *extension.Extension:
+		title += " " + style.Faint("by "+internal.Author())
+	case *scraper.Media:
+		if internal.HasInfo() {
+			title += " " + style.Fg(color.Blue)(icon.Info)
+		}
 	}
 
 	if l.Selected() {
@@ -79,7 +84,7 @@ func (l *lItem) description() string {
 		b.WriteString(about)
 		return b.String()
 	case *scraper.Media:
-		description := item.Description
+		description := item.Description()
 		if description == "" {
 			return noDescription
 		}

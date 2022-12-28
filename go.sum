@@ -349,8 +349,6 @@ github.com/vivi-app/libopen v1.0.0 h1:QOPxhlaUVs19WynaLFXPDddO0zQpMm0rZnVcSmylR7
 github.com/vivi-app/libopen v1.0.0/go.mod h1:nfTJ+t23vbyebw9xJYj1vQv8O+1P1Nit2m2Rg90LUK0=
 github.com/vivi-app/lua v1.5.0 h1:4nB/G2JImMDQvE9ucyOjsxnPdO9U+o5ukkq4DBpy/SE=
 github.com/vivi-app/lua v1.5.0/go.mod h1:dyreQL+dKurMwBe4Dos+tSd33znmw7poABLAuaWPHjM=
-github.com/vivi-app/templates v0.7.0 h1:hghSjeQPUCSNWpeMNxwrJuasX3q3SnHH7fB68KYw9+k=
-github.com/vivi-app/templates v0.7.0/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/vivi-app/templates v0.7.1 h1:gNFR2EC/C3hYWYMJgXi6qxBom/S1H6TRaDX3nThHolU=
 github.com/vivi-app/templates v0.7.1/go.mod h1:PAXghVTkypgyJnS0w/7HLvQBaCTneWkRXgcVWfMYoAM=
 github.com/xanzy/ssh-agent v0.3.3 h1:+/15pJfg/RsTxqYcX6fHqOXZwwMP+2VyYWJeWM2qQFM=
@@ -390,8 +388,6 @@ golang.org/x/exp v0.0.0-20191227195350-da58074b4299/go.mod h1:2RIsYlXP63K8oxa1u0
 golang.org/x/exp v0.0.0-20200119233911-0405dc783f0a/go.mod h1:2RIsYlXP63K8oxa1u096TMicItID8zy7Y6sNkU49FU4=
 golang.org/x/exp v0.0.0-20200207192155-f17229e696bd/go.mod h1:J/WKrq2StrnmMY6+EHIKF9dgMWnmCNThgcyBT1FY9mM=
 golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6/go.mod h1:3jZMyOhIsHpP37uCMkUooju7aAi5cS1Q23tOzKc+0MU=
-golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15 h1:5oN1Pz/eDhCpbMbLstvIPa0b/BEQo6g6nwV3pLjfM6w=
-golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 golang.org/x/exp v0.0.0-20221227203929-1b447090c38c h1:Govq2W3bnHJimHT2ium65kXcI7ZzTniZHcFATnLJM0Q=
 golang.org/x/exp v0.0.0-20221227203929-1b447090c38c/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 golang.org/x/image v0.0.0-20190227222117-0694c2d4d067/go.mod h1:kZ7UVZpmo3dzQBMxlp+ypCbDeSB+sBbTgSJuh5dn5js=

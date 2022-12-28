@@ -5,6 +5,8 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/viewport"
+	"github.com/muesli/reflow/wrap"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/scraper"
@@ -32,6 +34,7 @@ type model struct {
 		error         error
 		context       context.Context
 		cancelContext context.CancelFunc
+		mediaInfo     string
 	}
 
 	component struct {
@@ -41,6 +44,7 @@ type model struct {
 		layers          map[string]*list.Model
 		actionSelect    list.Model
 		spinner         spinner.Model
+		mediaInfo       viewport.Model
 	}
 
 	status string
@@ -70,6 +74,10 @@ func (m *model) resize(width, height int) {
 	for _, lst := range m.lists() {
 		lst.SetSize(width-frameX, height-frameY)
 	}
+
+	m.component.mediaInfo.Height = height - frameY
+	m.component.mediaInfo.Width = width - frameX
+	m.component.mediaInfo.SetContent(wrap.String(m.current.mediaInfo, m.component.mediaInfo.Width))
 }
 
 func (m *model) nextLayer() *scraper.Layer {

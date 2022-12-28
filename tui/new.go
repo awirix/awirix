@@ -2,6 +2,7 @@ package tui
 
 import (
 	"github.com/charmbracelet/bubbles/textinput"
+	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/vivi-app/vivi/stack"
 	"github.com/vivi-app/vivi/tui/bind"
 	"golang.org/x/term"
@@ -36,6 +37,8 @@ func newModel(options *Options) *model {
 	model.component.searchResults = newList("Search Results", "media", "media")
 	model.component.textInput = newTextInput("Search...")
 	model.component.actionSelect = newList("Actions", "action", "actions")
+
+	model.component.mediaInfo = viewport.New(0, 0)
 
 	width, height, err := term.GetSize(int(os.Stdout.Fd()))
 	if err != nil {

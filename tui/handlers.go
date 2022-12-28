@@ -112,3 +112,15 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 		return msgActionDone(action)
 	})
 }
+
+func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
+	return m.handleWrapper(func() tea.Msg {
+		m.status = "Loading info for " + style.Fg(color.Yellow)(media.String())
+		info, err := media.Info()
+		if err != nil {
+			return msgError(err)
+		}
+
+		return msgMediaInfoDone(info)
+	})
+}

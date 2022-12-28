@@ -1,6 +1,7 @@
 package scraper
 
 import (
+	"fmt"
 	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
 )
@@ -23,7 +24,7 @@ func (a *Action) String() string {
 
 func (a *Action) Call(media []*Media) error {
 	if a.Max != 0 && len(media) > a.Max {
-		return errors.New("too many medias")
+		return fmt.Errorf("%q accepts a maximum of %d medias", a.String(), a.Max)
 	}
 
 	table := a.scraper.state.NewTable()
