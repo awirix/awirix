@@ -38,7 +38,7 @@ interface Search {
     /**
      * Function that will be called to search for the media.
      */
-    handler: (query: string, progress: Progress) => Media[];
+    handler: (query: string, ctx: Context) => Media[];
 
     /**
      * Title to show when typing query.
@@ -66,7 +66,7 @@ interface Layer {
     /**
      * Function that will be called to get the list of sub-media for the given one.
      */
-    handler: (media: Media, progress: Progress) => Media[];
+    handler: (media: Media, ctx: Context) => Media[];
 
     /**
      * Name of the layer
@@ -86,7 +86,7 @@ interface Action {
     /**
      * Function that will be called to perform the action.
      */
-    handler: (media: Media[], progress: Progress) => void;
+    handler: (media: Media[], ctx: Context) => void;
 
     /**
      * Title to show in the list of actions.
@@ -98,6 +98,11 @@ interface Action {
      * Description to show in the list of actions.
      */
     description?: string;
+
+    /**
+     * Maximum number of media that can be passed to the action.
+     */
+    max?: number;
 }
 
 /**
@@ -138,6 +143,7 @@ export const layers = [
 export const actions = [
     {
         title: "Stream",
+        max: 1,
         handler: (medias: Media[], ctx: Context): void => {},
     },
     {

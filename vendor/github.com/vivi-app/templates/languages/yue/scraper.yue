@@ -11,6 +11,7 @@ export layers =
 
 export actions =
     * title: 'Stream'
+      max: 1
       description: 'Stream description'
       handler: (medias, ctx) ->
 

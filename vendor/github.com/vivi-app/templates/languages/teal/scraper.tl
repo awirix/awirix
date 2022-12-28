@@ -31,6 +31,7 @@ local record Action
    handler: function(media: {Media}, ctx: Context)
    title: string
    description: string|nil
+   max: number|nil
 end
 
 local record Module
@@ -59,6 +60,7 @@ M.layers = {
 M.actions = {
    {
       title = 'Stream',
+      max = 1,
       handler = function(media: {Media}, ctx: Context)
          ctx.error('Not implemented')
       end,

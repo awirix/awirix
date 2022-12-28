@@ -8,6 +8,7 @@
                            [])}])
 
 (local actions [{:title :Stream
+                 :max 1
                  :handler (fn [medias ctx]
                             (ctx.error "Not implemented"))}
                 {:title :Download
