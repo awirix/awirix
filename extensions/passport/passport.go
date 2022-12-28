@@ -16,16 +16,15 @@ import (
 )
 
 type Passport struct {
-	Name         string                    `json:"name"`
-	ID           string                    `json:"id"`
-	About        string                    `json:"about"`
-	VersionRaw   string                    `json:"version"`
-	LanguageRaw  string                    `json:"language"`
-	NSFW         bool                      `json:"nsfw"`
-	Tags         []string                  `json:"tags,omitempty"`
-	Repository   *github.Repository        `json:"repository,omitempty"`
-	Requirements *Requirements             `json:"requirements,omitempty"`
-	Config       map[string]*ConfigSection `json:"config,omitempty"`
+	Name         string             `json:"name"`
+	ID           string             `json:"id"`
+	About        string             `json:"about"`
+	VersionRaw   string             `json:"version"`
+	LanguageRaw  string             `json:"language"`
+	NSFW         bool               `json:"nsfw"`
+	Tags         []string           `json:"tags,omitempty"`
+	Repository   *github.Repository `json:"repository,omitempty"`
+	Requirements *Requirements      `json:"requirements,omitempty"`
 }
 
 var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{

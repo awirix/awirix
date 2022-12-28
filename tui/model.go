@@ -5,10 +5,11 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
-	"github.com/charmbracelet/lipgloss"
+	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/stack"
+	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/tui/bind"
 	"golang.org/x/exp/slices"
 )
@@ -45,10 +46,7 @@ type model struct {
 	status string
 	keyMap *bind.KeyMap
 
-	style struct {
-		global,
-		title, titleError, titleBar lipgloss.Style
-	}
+	styles Styles
 }
 
 func (m *model) lists() []*list.Model {
@@ -67,7 +65,7 @@ func (m *model) lists() []*list.Model {
 
 func (m *model) resize(width, height int) {
 	m.current.width, m.current.height = width, height
-	frameX, frameY := m.style.global.GetFrameSize()
+	frameX, frameY := m.styles.global.GetFrameSize()
 
 	for _, lst := range m.lists() {
 		lst.SetSize(width-frameX, height-frameY)
@@ -149,5 +147,6 @@ func (m *model) injectContext(ext *extension.Extension) {
 
 func (m *model) resetSpinner() {
 	m.component.spinner = spinner.New()
+	m.component.spinner.Style = style.New().Foreground(color.Purple)
 	m.component.spinner.Spinner = spinner.Dot
 }

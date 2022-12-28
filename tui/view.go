@@ -7,6 +7,6 @@ func (m *model) View() string {
 }
 
 func (m *model) renderLines(title string, lines ...string) string {
-	l := m.style.titleBar.Render(title) + "\n\n" + strings.Join(lines, "\n")
-	return m.style.global.Render(l)
+	l := m.styles.titleBar.Render(title) + "\n" + strings.Join(lines, "\n")
+	return m.styles.global.Render(l)
 }

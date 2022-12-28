@@ -9,7 +9,6 @@ import (
 func init() {
 	rootCmd.AddCommand(miniCmd)
 	miniCmd.Flags().BoolP("debug", "d", false, "enable debug mode")
-	miniCmd.Flags().BoolP("edit-config", "e", false, "edit config")
 }
 
 var miniCmd = &cobra.Command{
@@ -18,8 +17,7 @@ var miniCmd = &cobra.Command{
 	Long:  `Run a mini version of Vivi`,
 	Run: func(cmd *cobra.Command, args []string) {
 		options := &mini.Options{
-			Debug:      lo.Must(cmd.Flags().GetBool("debug")),
-			EditConfig: lo.Must(cmd.Flags().GetBool("edit-config")),
+			Debug: lo.Must(cmd.Flags().GetBool("debug")),
 		}
 
 		err := mini.Run(options)

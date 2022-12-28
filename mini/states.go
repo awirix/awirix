@@ -2,15 +2,12 @@ package mini
 
 import (
 	"fmt"
-	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/extensions/manager"
-	"github.com/vivi-app/vivi/extensions/passport"
 	"github.com/vivi-app/vivi/icon"
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/style"
-	"golang.org/x/exp/slices"
 )
 
 func notFound() {
@@ -56,38 +53,6 @@ func stateSelectExtension(s *state) (err error) {
 			progress(err.Error())
 		},
 	})
-
-	if s.Options.EditConfig {
-		return stateExtensionConfig(s)
-	}
-
-	if s.Extension.Scraper().HasSearch() {
-		return stateInputQuery(s)
-	}
-
-	return stateLayers(s)
-}
-
-func stateExtensionConfig(s *state) (err error) {
-	type sectionWithName *lo.Tuple2[string, *passport.ConfigSection]
-	var sections = make([]sectionWithName, 0)
-	for name, section := range s.Extension.Passport().Config {
-		sections = append(sections, &lo.Tuple2[string, *passport.ConfigSection]{A: name, B: section})
-	}
-
-	slices.SortFunc(sections, func(a, b sectionWithName) bool {
-		return a.A < b.A
-	})
-
-	for _, t := range sections {
-		section := t.B
-		value, err := getConfigValue(section)
-		if err != nil {
-			return err
-		}
-
-		section.SetValue(value)
-	}
 
 	if s.Extension.Scraper().HasSearch() {
 		return stateInputQuery(s)

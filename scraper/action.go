@@ -22,6 +22,10 @@ func (a *Action) String() string {
 }
 
 func (a *Action) Call(media []*Media) error {
+	if a.Max != 0 && len(media) > a.Max {
+		return errors.New("too many medias")
+	}
+
 	table := a.scraper.state.NewTable()
 	for _, m := range media {
 		table.Append(m.Value())

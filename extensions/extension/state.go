@@ -1,7 +1,6 @@
 package extension
 
 import (
-	"fmt"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/key"
@@ -73,30 +72,6 @@ func inject(ext *Extension, L *lua.LState) {
 			"name":    lua.LString(ext.Passport().Name),
 			"version": lua.LString(ext.Passport().Version().String()),
 			"about":   lua.LString(ext.Passport().About),
-			"config": luautil.NewTable(L, nil, map[string]lua.LGFunction{
-				"get": func(L *lua.LState) int {
-					key := L.ToString(1)
-					value, ok := ext.Passport().Config[key]
-					if !ok {
-						L.ArgError(1, fmt.Sprintf(`config key "%s" not found`, key))
-						return 1
-					}
-
-					lvalue, err := luautil.ToLValue(L, value)
-					if err != nil {
-						L.RaiseError(err.Error())
-					}
-
-					L.Push(lvalue)
-					return 1
-				},
-				"has": func(L *lua.LState) int {
-					key := L.ToString(1)
-					_, ok := ext.Passport().Config[key]
-					L.Push(lua.LBool(ok))
-					return 1
-				},
-			}),
 		}, nil),
 	}, nil)
 

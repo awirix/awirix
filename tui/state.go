@@ -59,8 +59,8 @@ func (m *model) getCurrentStateHandler() *handler {
 			Update: m.updateLoading,
 			View: func() string {
 				return m.renderLines(
-					m.style.title.Render("Loading"),
-					m.component.spinner.View()+m.status,
+					m.styles.title.Render("Loading"),
+					m.component.spinner.View()+style.Faint(m.status),
 				)
 			},
 			Back: defaultBack,
@@ -70,7 +70,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			Update: m.updateError,
 			View: func() string {
 				return m.renderLines(
-					m.style.titleError.Render("Error"),
+					m.styles.titleError.Render("Error"),
 					style.Fg(color.Red)(m.current.error.Error()),
 				)
 			},
@@ -80,7 +80,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateExtensionSelect: {
 			Update: m.updateExtensionSelect,
 			View: func() string {
-				return zone.Scan(m.style.global.Render(m.component.extensionSelect.View()))
+				return zone.Scan(m.styles.global.Render(m.component.extensionSelect.View()))
 			},
 			Back: func() tea.Cmd {
 				return listBack(&m.component.extensionSelect)
@@ -92,7 +92,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					// TODO: use title from extension
-					m.style.title.Render("Search"),
+					m.styles.title.Render("Search"),
 					m.component.textInput.View(),
 				)
 			},
@@ -102,7 +102,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateSearchResults: {
 			Update: m.updateSearchResults,
 			View: func() string {
-				return zone.Scan(m.style.global.Render(m.component.searchResults.View()))
+				return zone.Scan(m.styles.global.Render(m.component.searchResults.View()))
 			},
 			Back: func() tea.Cmd {
 				return listBack(&m.component.searchResults)
@@ -113,7 +113,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			Update: m.updateLayer,
 			View: func() string {
 				current := m.component.layers[m.current.layer.String()]
-				return zone.Scan(m.style.global.Render(current.View()))
+				return zone.Scan(m.styles.global.Render(current.View()))
 			},
 			Back: func() tea.Cmd {
 				return listBack(m.component.layers[m.current.layer.String()])
@@ -123,7 +123,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateActionSelect: {
 			Update: m.updateActionSelect,
 			View: func() string {
-				return zone.Scan(m.style.global.Render(m.component.actionSelect.View()))
+				return zone.Scan(m.styles.global.Render(m.component.actionSelect.View()))
 			},
 			Back: func() tea.Cmd {
 				return listBack(&m.component.actionSelect)
