@@ -1,8 +1,8 @@
 package passport
 
 import (
-	"encoding/json"
 	"fmt"
+	"github.com/ghodss/yaml"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/github"
@@ -16,17 +16,16 @@ import (
 )
 
 type Passport struct {
-	MetaSchema   string                    `json:"$schema,omitempty"`
-	Name         string                    `json:"name" jsonschema:"description=title of the extension"`
-	ID           string                    `json:"id" jsonschema:"description=ID of the extension"`
-	About        string                    `json:"about" jsonschema:"description=Brief description"`
-	VersionRaw   string                    `json:"version" jsonschema:"required,description=Semantic version of the extension,example=1.0.0"`
-	LanguageRaw  string                    `json:"language" jsonschema:"required,description=Primary language of the content"`
-	NSFW         bool                      `json:"nsfw" jsonschema:"description=Whether the extension contains NSFW content"`
-	Tags         []string                  `json:"tags,omitempty" jsonschema:"description=Tags"`
-	Repository   *github.Repository        `json:"repository,omitempty" jsonschema:"description=Repository which contains the extension"`
-	Requirements *Requirements             `json:"requirements,omitempty" jsonschema:"description=Requirements that must be met to use the extension"`
-	Config       map[string]*ConfigSection `json:"config,omitempty" jsonschema:"description=Configuration fields"`
+	Name         string                    `json:"name"`
+	ID           string                    `json:"id"`
+	About        string                    `json:"about"`
+	VersionRaw   string                    `json:"version"`
+	LanguageRaw  string                    `json:"language"`
+	NSFW         bool                      `json:"nsfw"`
+	Tags         []string                  `json:"tags,omitempty"`
+	Repository   *github.Repository        `json:"repository,omitempty"`
+	Requirements *Requirements             `json:"requirements,omitempty"`
+	Config       map[string]*ConfigSection `json:"config,omitempty"`
 }
 
 var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
@@ -98,11 +97,16 @@ func (p *Passport) CheckRequirements() bool {
 }
 
 func New(reader io.Reader) (*Passport, error) {
-	var passport Passport
-	err := json.NewDecoder(reader).Decode(&passport)
+	var passport = &Passport{}
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, err
 	}
 
-	return &passport, passport.Validate()
+	err = yaml.Unmarshal(data, passport)
+	if err != nil {
+		return nil, err
+	}
+
+	return passport, passport.Validate()
 }

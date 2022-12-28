@@ -1,7 +1,7 @@
 package filename
 
 const (
-	Passport     = "passport.json"
+	Passport     = "passport.yml"
 	Scraper      = "scraper.lua"
 	Tester       = "tester.lua"
 	EditorConfig = ".editorconfig"

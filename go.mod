@@ -9,9 +9,9 @@ require (
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/lipgloss v0.6.0
+	github.com/ghodss/yaml v1.0.0
 	github.com/go-git/go-git/v5 v5.5.1
 	github.com/google/go-github/v48 v48.2.0
-	github.com/invopop/jsonschema v0.7.0
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/ka-weihe/fast-levenshtein v0.0.0-20201227151214-4c99ee36a1ba
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
@@ -32,7 +32,7 @@ require (
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
 	github.com/vivi-app/templates v0.7.0
-	golang.org/x/exp v0.0.0-20221217163422-3c43f8badb15
+	golang.org/x/exp v0.0.0-20221227203929-1b447090c38c
 	golang.org/x/term v0.3.0
 )
 
@@ -54,7 +54,6 @@ require (
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/hhrutter/lzw v0.0.0-20190829144645-6f07a24e8650 // indirect
 	github.com/hhrutter/tiff v0.0.0-20190829141212-736cae8d0bc7 // indirect
-	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
