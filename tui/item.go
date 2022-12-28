@@ -50,6 +50,10 @@ func (l *lItem) title() string {
 func (l *lItem) Title() string {
 	title := l.title()
 
+	if ext, ok := l.internal.(*extension.Extension); ok {
+		title += " " + style.Faint("by "+ext.Author())
+	}
+
 	if l.Selected() {
 		title += " " + style.Fg(color.Green)(icon.CDot)
 	}

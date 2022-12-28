@@ -85,7 +85,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 	default:
 		return m, func() tea.Msg {
-			return msg
+			return nil
 		}
 	}
 }
@@ -323,8 +323,8 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if action.Max != 0 && len(m.selectedMedia) > action.Max {
 				var noun scraper.Noun
-				if m.previousLayer() != nil {
-					noun = m.previousLayer().Noun
+				if m.current.layer != nil {
+					noun = m.current.layer.Noun
 				} else {
 					noun = m.current.extension.Scraper().Search().Noun
 				}
@@ -332,7 +332,7 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var s strings.Builder
 				_, _ = log.WriteErrorf(
 					&s,
-					"%q only supports %s max, but %d were selected",
+					"%q supports %s max, %d were selected",
 					action.String(),
 					text.Quantify(action.Max, noun.Singular(), noun.Plural()),
 					len(m.selectedMedia),

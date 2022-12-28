@@ -8,7 +8,6 @@ import (
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/tester"
 	"github.com/vivi-app/vivi/where"
 	"path/filepath"
@@ -98,14 +97,7 @@ func (e *Extension) IsScraperLoaded() bool {
 }
 
 func (e *Extension) String() string {
-	var name string
-	if e.Passport() != nil {
-		name = e.Passport().Name
-	} else {
-		name = filepath.Base(e.Path())
-	}
-
-	return fmt.Sprintf("%s %s", name, style.Faint("by "+e.Author()))
+	return e.Passport().Name
 }
 
 func (e *Extension) Author() string {
