@@ -9,6 +9,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/style"
+	"strings"
 )
 
 type state int
@@ -60,7 +61,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					m.styles.title.Render("Loading"),
-					m.component.spinner.View()+style.Faint(m.status),
+					m.component.spinner.View()+style.Faint(m.text.status),
 				)
 			},
 			Back: defaultBack,
@@ -91,8 +92,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			Update: m.updateSearch,
 			View: func() string {
 				return m.renderLines(
-					// TODO: use title from extension
-					m.styles.title.Render("Search"),
+					m.styles.title.Render(m.text.searchTitle),
 					m.component.textInput.View(),
 				)
 			},
@@ -134,7 +134,13 @@ func (m *model) getCurrentStateHandler() *handler {
 			Update: m.updateMediaInfo,
 			View: func() string {
 				//view := wrap.String(m.component.mediaInfo.View(), m.component.mediaInfo.Width)
-				return m.styles.global.Render(m.component.mediaInfo.View())
+				title := m.styles.title.Render(m.text.mediaInfoTitle)
+				title = m.styles.titleBar.Render(title)
+				return m.styles.global.Render(strings.Join([]string{
+					title,
+					m.styles.statusBar.Render(m.text.mediaInfoName),
+					m.component.mediaInfo.View(),
+				}, "\n"))
 			},
 			Back: defaultBack,
 		},

@@ -19,7 +19,7 @@ func (m *model) handleWrapper(cmd tea.Cmd) tea.Cmd {
 
 func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
-		m.status = "Loading extension"
+		m.text.status = "Loading extension"
 
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)
@@ -33,6 +33,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			m.component.searchResults.Title = search.Subtitle()
 			m.component.textInput.Placeholder = search.Placeholder()
 			m.component.searchResults.SetStatusBarItemName(search.Noun.Singular(), search.Noun.Plural())
+			m.text.searchTitle = search.String()
 		}
 
 		if ext.Scraper().HasLayers() {
@@ -61,7 +62,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 
 func (m *model) handleSearch(query string) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
-		m.status = "Searching for " + style.Fg(color.Yellow)(query)
+		m.text.status = "Searching for " + style.Fg(color.Yellow)(query)
 
 		search := m.current.extension.Scraper().Search()
 		media, err := search.Call(query)
@@ -78,9 +79,9 @@ func (m *model) handleSearch(query string) tea.Cmd {
 func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		if media != nil {
-			m.status = "Loading " + style.Fg(color.Yellow)(media.String())
+			m.text.status = "Loading " + style.Fg(color.Yellow)(media.String())
 		} else {
-			m.status = "Loading " + style.Fg(color.Yellow)(layer.Noun.Plural())
+			m.text.status = "Loading " + style.Fg(color.Yellow)(layer.Noun.Plural())
 		}
 
 		layerMedia, err := layer.Call(media)
@@ -96,7 +97,7 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 
 func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
-		m.status = "Performing " + style.Fg(color.Yellow)(action.String()) + " action"
+		m.text.status = "Performing " + style.Fg(color.Yellow)(action.String()) + " action"
 
 		var media = make([]*scraper.Media, 0)
 		for item := range m.selectedMedia {
@@ -115,12 +116,14 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 
 func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
-		m.status = "Loading info for " + style.Fg(color.Yellow)(media.String())
+		m.text.status = "Loading info for " + style.Fg(color.Yellow)(media.String())
 		info, err := media.Info()
 		if err != nil {
 			return msgError(err)
 		}
 
-		return msgMediaInfoDone(info)
+		m.text.mediaInfoName = media.String()
+		m.current.mediaInfo = info
+		return msgMediaInfoDone{}
 	})
 }

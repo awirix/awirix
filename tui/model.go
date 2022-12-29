@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/glamour"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/scraper"
@@ -14,6 +15,7 @@ import (
 	"github.com/vivi-app/vivi/style"
 	"github.com/vivi-app/vivi/tui/bind"
 	"golang.org/x/exp/slices"
+	"strings"
 )
 
 type model struct {
@@ -47,7 +49,13 @@ type model struct {
 		mediaInfo       viewport.Model
 	}
 
-	status string
+	text struct {
+		searchTitle    string
+		mediaInfoTitle string
+		mediaInfoName  string
+		status         string
+	}
+
 	keyMap *bind.KeyMap
 
 	styles Styles
@@ -75,17 +83,19 @@ func (m *model) resize(width, height int) {
 		lst.SetSize(width-frameX, height-frameY)
 	}
 
-	m.component.mediaInfo.Height = height - frameY
+	mediaInfoHeaderHeight := lipgloss.Height(m.styles.titleBar.Render(m.styles.title.Render(m.text.mediaInfoTitle))) + lipgloss.Height(m.styles.statusBar.Render(m.text.mediaInfoName))
+	m.component.mediaInfo.Height = height - frameY - mediaInfoHeaderHeight
 	m.component.mediaInfo.Width = width - frameX
 
 	// error can not occur here
 	r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle(), glamour.WithWordWrap(m.component.mediaInfo.Width))
+	// but it can here
 	md, err := r.Render(m.current.mediaInfo)
 	if err != nil {
 		md = m.current.mediaInfo
 	}
 
-	m.component.mediaInfo.SetContent(md)
+	m.component.mediaInfo.SetContent(strings.TrimSpace(md))
 }
 
 func (m *model) nextLayer() *scraper.Layer {
@@ -153,7 +163,7 @@ func (m *model) injectContext(ext *extension.Extension) {
 	ext.SetContext(m.current.context)
 	ext.Scraper().SetExtensionContext(&scraper.Context{
 		Progress: func(message string) {
-			m.status = message
+			m.text.status = message
 		},
 		Error: func(err error) {
 			m.errorChan <- err

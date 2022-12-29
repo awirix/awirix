@@ -11,15 +11,18 @@ type Styles struct {
 	global,
 	title,
 	titleError,
-	titleBar lipgloss.Style
+	titleBar,
+	statusBar lipgloss.Style
 }
 
 func DefaultStyles() (s Styles) {
 	listStyles := list.DefaultStyles()
+
 	s.global = style.New()
 	s.title = listStyles.Title
 	s.titleError = s.title.Copy().Background(color.Red)
 	s.titleBar = listStyles.TitleBar
+	s.statusBar = listStyles.StatusBar
 
 	return
 }

@@ -80,7 +80,6 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// TODO: push final state
 		return m, m.popState()
 	case msgMediaInfoDone:
-		m.current.mediaInfo = string(msg)
 		// to set it to the media info viewport
 		m.resize(m.current.width, m.current.height)
 		return m, m.pushState(stateMediaInfo)
