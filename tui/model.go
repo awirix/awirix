@@ -2,6 +2,7 @@ package tui
 
 import (
 	"context"
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -13,7 +14,6 @@ import (
 	"github.com/vivi-app/vivi/scraper"
 	"github.com/vivi-app/vivi/stack"
 	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/tui/bind"
 	"golang.org/x/exp/slices"
 	"strings"
 )
@@ -47,6 +47,7 @@ type model struct {
 		actionSelect    list.Model
 		spinner         spinner.Model
 		mediaInfo       viewport.Model
+		help            help.Model
 	}
 
 	text struct {
@@ -56,7 +57,7 @@ type model struct {
 		status         string
 	}
 
-	keyMap *bind.KeyMap
+	keyMap *KeyMap
 
 	styles Styles
 }
@@ -84,9 +85,12 @@ func (m *model) resize(width, height int) {
 	}
 
 	mediaInfoHeaderHeight := lipgloss.Height(m.styles.titleBar.Render(m.styles.title.Render(m.text.mediaInfoTitle))) + lipgloss.Height(m.styles.statusBar.Render(m.text.mediaInfoName))
-	m.component.mediaInfo.Height = height - frameY - mediaInfoHeaderHeight
+	helpHeight := lipgloss.Height(m.styles.helpStyle.Render(m.component.help.View(m.keyMap)))
+
+	m.component.mediaInfo.Height = height - frameY - mediaInfoHeaderHeight - helpHeight
 	m.component.mediaInfo.Width = width - frameX
 
+	m.component.mediaInfo.SetContent(strings.TrimSpace(m.current.mediaInfo))
 	// error can not occur here
 	r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle(), glamour.WithWordWrap(m.component.mediaInfo.Width))
 	// but it can here

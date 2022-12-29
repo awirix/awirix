@@ -80,6 +80,11 @@ and the extension will be unable to access the filesystem.`,
 		false,
 		"Enable support for mouse clicks in TUI",
 	},
+	{
+		key.TUIPadding,
+		0,
+		"Global padding for TUI",
+	},
 	// END TUI
 }
 

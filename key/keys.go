@@ -24,4 +24,5 @@ const (
 
 const (
 	TUIClickable = "tui.clickable"
+	TUIPadding   = "tui.padding"
 )

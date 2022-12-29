@@ -9,7 +9,6 @@ import (
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/style"
-	"strings"
 )
 
 type state int
@@ -133,14 +132,11 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateMediaInfo: {
 			Update: m.updateMediaInfo,
 			View: func() string {
-				//view := wrap.String(m.component.mediaInfo.View(), m.component.mediaInfo.Width)
-				title := m.styles.title.Render(m.text.mediaInfoTitle)
-				title = m.styles.titleBar.Render(title)
-				return m.styles.global.Render(strings.Join([]string{
-					title,
+				return m.renderLines(
+					m.styles.title.Render(m.text.mediaInfoTitle),
 					m.styles.statusBar.Render(m.text.mediaInfoName),
 					m.component.mediaInfo.View(),
-				}, "\n"))
+				)
 			},
 			Back: defaultBack,
 		},
