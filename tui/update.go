@@ -81,6 +81,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.popState()
 	case msgMediaInfoDone:
 		m.current.mediaInfo = string(msg)
+		// to set it to the media info viewport
 		m.resize(m.current.width, m.current.height)
 		return m, m.pushState(stateMediaInfo)
 	case spinner.TickMsg:

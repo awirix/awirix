@@ -6,7 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
-	"github.com/muesli/reflow/wrap"
+	"github.com/charmbracelet/glamour"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/scraper"
@@ -77,7 +77,15 @@ func (m *model) resize(width, height int) {
 
 	m.component.mediaInfo.Height = height - frameY
 	m.component.mediaInfo.Width = width - frameX
-	m.component.mediaInfo.SetContent(wrap.String(m.current.mediaInfo, m.component.mediaInfo.Width))
+
+	// error can not occur here
+	r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle(), glamour.WithWordWrap(m.component.mediaInfo.Width))
+	md, err := r.Render(m.current.mediaInfo)
+	if err != nil {
+		md = m.current.mediaInfo
+	}
+
+	m.component.mediaInfo.SetContent(md)
 }
 
 func (m *model) nextLayer() *scraper.Layer {
