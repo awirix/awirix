@@ -233,7 +233,7 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 					m.toggleSelect(item)
 				}
 
-				m.pushState(stateActionSelect)
+				return m, m.pushState(stateActionSelect)
 			}
 
 			return m, nil

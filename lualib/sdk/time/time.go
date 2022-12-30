@@ -172,8 +172,8 @@ func New(L *lua.LState) *lua.LTable {
 		"second":      lua.LNumber(time.Second),
 		"minute":      lua.LNumber(time.Minute),
 		"hour":        lua.LNumber(time.Hour),
-		"kitchen":     lua.LString(time.Kitchen),
 		"layout":      lua.LString(time.Layout),
+		"kitchen":     lua.LString(time.Kitchen),
 		"ansic":       lua.LString(time.ANSIC),
 		"unixdate":    lua.LString(time.UnixDate),
 		"rubydate":    lua.LString(time.RubyDate),
@@ -192,6 +192,7 @@ func New(L *lua.LState) *lua.LTable {
 		"now":   timeNow,
 		"parse": timeParse,
 		"date":  timeNewDate,
+		"unix":  timeUnix,
 	})
 }
 
@@ -222,6 +223,14 @@ func timeNewDate(L *lua.LState) int {
 	sec := L.CheckInt(6)
 	nsec := L.CheckInt(7)
 	t := time.Date(year, time.Month(month), day, hour, min, sec, nsec, time.Local)
+	pushTime(L, t)
+	return 1
+}
+
+func timeUnix(L *lua.LState) int {
+	sec := L.CheckInt64(1)
+	nsec := L.CheckInt64(2)
+	t := time.Unix(sec, nsec)
 	pushTime(L, t)
 	return 1
 }

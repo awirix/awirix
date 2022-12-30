@@ -8,10 +8,11 @@ import (
 const headerTypeName = "header"
 
 var headerMethods = map[string]lua.LGFunction{
-	"get": headerGet,
-	"set": headerSet,
-	"add": headerAdd,
-	"del": headerDel,
+	"get":   headerGet,
+	"set":   headerSet,
+	"add":   headerAdd,
+	"del":   headerDel,
+	"clone": headerClone,
 }
 
 func registerHeaderType(L *lua.LState) {

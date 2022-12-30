@@ -1,12 +1,9 @@
 package http
 
 import (
-	"bufio"
-	"bytes"
 	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/log"
+	"github.com/vivi-app/vivi/cache"
 	"net/http"
-	"net/http/httputil"
 	"sync"
 	"time"
 )
@@ -46,45 +43,28 @@ func newClient(L *lua.LState) int {
 	return 1
 }
 
-var cacheClient = make(map[string][]byte)
-
 func clientSend(L *lua.LState) int {
 	client := checkClient(L, 1)
 	req := checkRequest(L, 2)
+	doCache := L.OptBool(3, false)
 
-	dumpedReq, dumpErr := httputil.DumpRequest(req, true)
-	if dumpErr == nil {
-		dumpedRes, ok := cacheClient[string(dumpedReq)]
-		if ok {
-			res, err := http.ReadResponse(
-				bufio.NewReaderSize(bytes.NewBuffer(dumpedRes), len(dumpedRes)),
-				req,
-			)
-
-			if err == nil {
-				pushResponse(L, res)
-				return 1
-			} else {
-				log.Error(err)
-			}
-		}
+	if res, ok := cache.HTTP.Get(req); ok {
+		pushResponse(L, res)
+		return 1
 	}
 
-	resp, err := client.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
 		return 2
 	}
 
-	if dumpErr == nil {
-		dumpedRes, err := httputil.DumpResponse(resp, true)
-		if err == nil {
-			cacheClient[string(dumpedReq)] = dumpedRes
-		}
+	if doCache {
+		_ = cache.HTTP.Set(req, res)
 	}
 
-	pushResponse(L, resp)
+	pushResponse(L, res)
 	return 1
 }
 
@@ -111,6 +91,8 @@ func clientSendBatch(L *lua.LState) int {
 		requests[key] = req
 	})
 
+	doCache := L.OptBool(3, false)
+
 	var (
 		responses = L.NewTable()
 		err       error
@@ -127,14 +109,22 @@ func clientSendBatch(L *lua.LState) int {
 				return
 			}
 
-			var resp *http.Response
-			resp, err = client.Do(req)
-			if err != nil {
-				return
+			var response *http.Response
+			if res, ok := cache.HTTP.Get(req); ok {
+				response = res
+			} else {
+				response, err = client.Do(req)
+				if err != nil {
+					return
+				}
+
+				if doCache {
+					_ = cache.HTTP.Set(req, response)
+				}
 			}
 
 			ud := L.NewUserData()
-			ud.Value = resp
+			ud.Value = response
 			L.SetMetatable(ud, L.GetTypeMetatable(responseTypeName))
 			responses.RawSet(key, ud)
 		}(key, req)

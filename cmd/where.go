@@ -15,14 +15,16 @@ type whereTarget struct {
 	where func() string
 
 	argShort, argLong string
+	hidden            bool
 }
 
 // Specify what paths to show
 var wherePaths = []whereTarget{
-	{"Downloads", where.Downloads, "d", "downloads"},
-	{"Extensions", where.Extensions, "e", "extensions"},
-	{"Config", where.Config, "c", "config"},
-	{"Logs", where.Logs, "l", "logs"},
+	{"Downloads", where.Downloads, "d", "downloads", false},
+	{"Extensions", where.Extensions, "e", "extensions", false},
+	{"Config", where.Config, "c", "config", false},
+	{"Logs", where.Logs, "l", "logs", false},
+	{"Cache", where.Cache, "", "cache", true},
 }
 
 func init() {
@@ -33,6 +35,10 @@ func init() {
 			whereCmd.Flags().BoolP(n.argLong, n.argShort, false, n.name+" path")
 		} else {
 			whereCmd.Flags().Bool(n.argLong, false, n.name+" path")
+		}
+
+		if n.hidden {
+			whereCmd.Flags().MarkHidden(n.argLong)
 		}
 	}
 
@@ -58,7 +64,15 @@ var whereCmd = &cobra.Command{
 			}
 		}
 
+		wherePaths = lo.Filter(wherePaths, func(t whereTarget, _ int) bool {
+			return !t.hidden
+		})
+
 		for i, n := range wherePaths {
+			if n.hidden {
+				continue
+			}
+
 			cmd.Printf("%s %s\n", headerStyle(n.name+"?"), argStyle("--"+n.argLong))
 			cmd.Println(n.where())
 

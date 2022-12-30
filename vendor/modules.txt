@@ -279,6 +279,9 @@ github.com/mattn/go-localereader
 # github.com/mattn/go-runewidth v0.0.14
 ## explicit; go 1.9
 github.com/mattn/go-runewidth
+# github.com/metafates/gache v0.0.2
+## explicit; go 1.19
+github.com/metafates/gache
 # github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 ## explicit
 github.com/mgutz/ansi

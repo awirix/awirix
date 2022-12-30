@@ -19,6 +19,7 @@ require (
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/lithammer/fuzzysearch v1.1.5
 	github.com/lrstanley/bubblezone v0.0.0-20221222153816-e95291e2243e
+	github.com/metafates/gache v0.0.2
 	github.com/muesli/reflow v0.3.0
 	github.com/mvdan/xurls v1.1.0
 	github.com/pdfcpu/pdfcpu v0.3.13
