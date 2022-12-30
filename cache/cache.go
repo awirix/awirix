@@ -18,7 +18,7 @@ var HTTP *httpCache
 func init() {
 	cache := gache.New[map[string][]byte](&gache.Options{
 		Path:       filepath.Join(where.Cache(), "http.json"),
-		Lifetime:   time.Hour * 24,
+		Lifetime:   time.Hour * 5,
 		FileSystem: &filesystem.GacheFs{},
 	})
 
