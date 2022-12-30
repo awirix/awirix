@@ -8,7 +8,6 @@ import (
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/text"
 	"strings"
 )
 
@@ -81,7 +80,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.popState()
 	case msgMediaInfoDone:
 		// to set it to the media info viewport
-		m.resize(m.current.width, m.current.height)
+		m.resize(m.current.dimensions.terminalWidth, m.current.dimensions.terminalHeight)
 		return m, m.pushState(stateMediaInfo)
 	case spinner.TickMsg:
 		var cmd tea.Cmd
@@ -353,7 +352,7 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 				goto end
 			}
 
-			if action.Max != 0 && len(m.selectedMedia) > action.Max {
+			if !action.InBounds(len(m.selectedMedia)) {
 				var noun scraper.Noun
 				if m.current.layer != nil {
 					noun = m.current.layer.Noun
@@ -364,9 +363,10 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var s strings.Builder
 				_, _ = log.WriteErrorf(
 					&s,
-					"%q supports %s max, %d were selected",
+					"%q supports %s %s, %d were selected",
 					action.String(),
-					text.Quantify(action.Max, noun.Singular(), noun.Plural()),
+					action.BoundsString(),
+					noun.Plural(),
 					len(m.selectedMedia),
 				)
 

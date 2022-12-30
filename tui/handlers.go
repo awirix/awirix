@@ -40,7 +40,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			layers := ext.Scraper().Layers()
 			m.component.layers = make(map[string]*list.Model, len(layers))
 			for i, layer := range layers {
-				lst := newList(
+				lst := m.newList(
 					fmt.Sprintf("%s - %d/%d", layer.String(), i+1, len(layers)),
 					layer.Noun.Singular(),
 					layer.Noun.Plural(),
@@ -49,7 +49,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 			}
 
 			// to update layers lists
-			m.resize(m.current.width, m.current.height)
+			m.resize(m.current.dimensions.terminalWidth, m.current.dimensions.terminalHeight)
 		}
 
 		// it returns tea cmd it's just nil if we don't have any filter applied,

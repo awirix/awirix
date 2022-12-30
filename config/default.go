@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/key"
+	"runtime"
 )
 
 // fields is the config fields with their default values and descriptions
@@ -77,13 +78,28 @@ and the extension will be unable to access the filesystem.`,
 	// TUI
 	{
 		key.TUIClickable,
-		false,
+		runtime.GOOS == "android",
 		"Enable support for mouse clicks in TUI",
 	},
 	{
-		key.TUIPadding,
+		key.TUIPaddingLeft,
 		0,
-		"Global padding for TUI",
+		"Left padding for TUI",
+	},
+	{
+		key.TUIPaddingRight,
+		0,
+		"Right padding for TUI",
+	},
+	{
+		key.TUIPaddingTop,
+		0,
+		"Top padding for TUI",
+	},
+	{
+		key.TUIPaddingBottom,
+		0,
+		"Bottom padding for TUI",
 	},
 	// END TUI
 }

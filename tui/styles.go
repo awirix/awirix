@@ -21,7 +21,13 @@ type Styles struct {
 func DefaultStyles() (s Styles) {
 	listStyles := list.DefaultStyles()
 
-	s.global = style.New().Padding(viper.GetInt(key.TUIPadding))
+	s.global = style.New().Padding(
+		viper.GetInt(key.TUIPaddingTop),
+		viper.GetInt(key.TUIPaddingRight),
+		viper.GetInt(key.TUIPaddingBottom),
+		viper.GetInt(key.TUIPaddingLeft),
+	)
+
 	s.title = listStyles.Title
 	s.titleError = s.title.Copy().Background(color.Red)
 	s.titleBar = listStyles.TitleBar

@@ -29,7 +29,10 @@ type model struct {
 	selectedMedia map[*lItem]struct{}
 
 	current struct {
-		width, height int
+		dimensions struct {
+			terminalWidth, terminalHeight   int
+			availableWidth, availableHeight int
+		}
 		state         state
 		extension     *extension.Extension
 		layer         *scraper.Layer
@@ -77,20 +80,24 @@ func (m *model) lists() []*list.Model {
 }
 
 func (m *model) resize(width, height int) {
-	m.current.width, m.current.height = width, height
 	frameX, frameY := m.styles.global.GetFrameSize()
 
+	m.current.dimensions.terminalWidth, m.current.dimensions.terminalHeight = width, height
+	m.current.dimensions.availableWidth, m.current.dimensions.availableHeight = width-frameX, height-frameY
+
 	for _, lst := range m.lists() {
-		lst.SetSize(width-frameX, height-frameY)
+		lst.SetSize(
+			m.current.dimensions.availableWidth,
+			m.current.dimensions.availableHeight,
+		)
 	}
 
 	mediaInfoHeaderHeight := lipgloss.Height(m.styles.titleBar.Render(m.styles.title.Render(m.text.mediaInfoTitle))) + lipgloss.Height(m.styles.statusBar.Render(m.text.mediaInfoName))
 	helpHeight := lipgloss.Height(m.styles.helpStyle.Render(m.component.help.View(m.keyMap)))
 
-	m.component.mediaInfo.Height = height - frameY - mediaInfoHeaderHeight - helpHeight
-	m.component.mediaInfo.Width = width - frameX
+	m.component.mediaInfo.Height = m.current.dimensions.availableHeight - mediaInfoHeaderHeight - helpHeight
+	m.component.mediaInfo.Width = m.current.dimensions.availableWidth
 
-	m.component.mediaInfo.SetContent(strings.TrimSpace(m.current.mediaInfo))
 	// error can not occur here
 	r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle(), glamour.WithWordWrap(m.component.mediaInfo.Width))
 	// but it can here
@@ -147,7 +154,8 @@ func (m *model) previousLayer() *scraper.Layer {
 }
 
 func (m *model) resetContext() {
-	m.current.context, m.current.cancelContext = context.WithCancel(context.Background())
+	ctx := context.WithValue(context.Background(), "extension", m.current.extension)
+	m.current.context, m.current.cancelContext = context.WithCancel(ctx)
 	if m.current.extension != nil {
 		m.injectContext(m.current.extension)
 	}

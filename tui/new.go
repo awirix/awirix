@@ -2,7 +2,6 @@ package tui
 
 import (
 	"github.com/charmbracelet/bubbles/help"
-	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/vivi-app/vivi/stack"
 	"golang.org/x/term"
@@ -25,18 +24,10 @@ func newModel(options *Options) *model {
 	m.current.state = stateExtensionSelect
 	m.styles = DefaultStyles()
 
-	newTextInput := func(placeholder string) textinput.Model {
-		t := textinput.New()
-		t.CharLimit = 80
-		t.Placeholder = placeholder
-		t.SetCursorMode(textinput.CursorStatic)
-		return t
-	}
-
-	m.component.extensionSelect = newList("Extensions", "extension", "extensions")
-	m.component.searchResults = newList("Search Results", "media", "media")
+	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions")
+	m.component.searchResults = m.newList("Search Results", "media", "media")
 	m.component.textInput = newTextInput("Search...")
-	m.component.actionSelect = newList("Actions", "action", "actions")
+	m.component.actionSelect = m.newList("Actions", "action", "actions")
 	m.component.mediaInfo = viewport.New(0, 0)
 	m.component.help = help.New()
 

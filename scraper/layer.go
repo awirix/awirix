@@ -17,6 +17,10 @@ type layer struct {
 	Noun    Noun `lua:"noun"`
 }
 
+func errLayer(err error) error {
+	return errors.Wrap(err, "layer")
+}
+
 func (l *Layer) String() string {
 	if l.Title != "" {
 		return l.Title
@@ -42,13 +46,14 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 		NRet:    1,
 		Protect: true,
 	}, value, l.scraper.context)
+
 	if err != nil {
-		return nil, err
+		return nil, errLayer(err)
 	}
 
 	medias, err := l.scraper.checkMediaSlice()
 	if err != nil {
-		return nil, err
+		return nil, errLayer(err)
 	}
 
 	l.cache[media] = medias
@@ -58,16 +63,17 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
 	aux := &layer{}
 	err := tableMapper.Map(table, aux)
+
 	if err != nil {
-		return nil, err
+		return nil, errLayer(err)
 	}
 
 	if aux.Title == "" {
-		return nil, ErrMissingTitle
+		return nil, errLayer(ErrMissingTitle)
 	}
 
 	if aux.Handler == nil {
-		return nil, errors.Wrap(ErrMissingHandler, "layer")
+		return nil, errLayer(ErrMissingHandler)
 	}
 
 	return &Layer{scraper: s, layer: aux, cache: make(map[*Media][]*Media)}, nil

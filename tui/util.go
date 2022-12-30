@@ -1,7 +1,9 @@
 package tui
 
 import (
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"
@@ -11,7 +13,15 @@ import (
 	"strings"
 )
 
-func newList(title, singular, plural string) list.Model {
+func newTextInput(placeholder string) textinput.Model {
+	t := textinput.New()
+	t.CharLimit = 80
+	t.Placeholder = placeholder
+	t.SetCursorMode(textinput.CursorStatic)
+	return t
+}
+
+func (m *model) newList(title, singular, plural string) list.Model {
 	delegate := list.NewDefaultDelegate()
 	border := lipgloss.Border{
 		Left: "█",
@@ -31,6 +41,18 @@ func newList(title, singular, plural string) list.Model {
 	l := list.New(nil, delegate, 0, 0)
 	l.Title = title
 	l.SetStatusBarItemName(singular, plural)
+	l.AdditionalShortHelpKeys = func() []key.Binding {
+		return m.keyMap.ShortHelp()
+	}
+
+	l.AdditionalFullHelpKeys = func() (keys []key.Binding) {
+		for _, k := range m.keyMap.FullHelp() {
+			keys = append(keys, k...)
+		}
+
+		return
+	}
+
 	return l
 }
 

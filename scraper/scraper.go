@@ -1,8 +1,8 @@
 package scraper
 
 import (
-	"errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/luautil"
@@ -16,6 +16,10 @@ type Scraper struct {
 	layers  []*Layer
 	actions []*Action
 	context *lua.LTable
+}
+
+func errScraper(err error) error {
+	return errors.Wrap(err, "scraper")
 }
 
 func (s *Scraper) HasSearch() bool {
@@ -130,8 +134,9 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 		NRet:    1,
 		Protect: true,
 	})
+
 	if err != nil {
-		return nil, err
+		return nil, errScraper(err)
 	}
 
 	module := L.Get(-1)
@@ -139,29 +144,29 @@ func New(L *lua.LState, r io.Reader) (*Scraper, error) {
 
 	table, ok := module.(*lua.LTable)
 	if !ok {
-		return nil, fmt.Errorf("scraper module must return a table, got %s", module.Type().String())
+		return nil, errScraper(fmt.Errorf("scraper module must return a table, got %s", module.Type().String()))
 	}
 
 	searchTable := table.RawGetString(FieldSearch)
 	if searchTable.Type() != lua.LTNil {
 		theScraper.search, err = theScraper.newSearch(searchTable.(*lua.LTable))
 		if err != nil {
-			return nil, err
+			return nil, errScraper(err)
 		}
 	}
 
 	theScraper.layers, err = theScraper.getLayers(table)
 	if err != nil {
-		return nil, err
+		return nil, errScraper(err)
 	}
 
 	theScraper.actions, err = theScraper.getActions(table)
 	if err != nil {
-		return nil, err
+		return nil, errScraper(err)
 	}
 
 	if !theScraper.HasLayers() && !theScraper.HasSearch() {
-		return nil, fmt.Errorf("scraper must implement `search` handler or have more than 0 layers")
+		return nil, errScraper(fmt.Errorf("scraper must implement `search` handler or have more than 0 layers"))
 	}
 
 	return theScraper, nil

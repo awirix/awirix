@@ -17,47 +17,52 @@ type media struct {
 	Info        *lua.LFunction
 }
 
-func (i *Media) String() string {
-	return i.Title
+func errMedia(err error) error {
+	return errors.Wrap(err, "media")
 }
 
-func (i *Media) Description() string {
-	return i.media.Description
+func (m *Media) String() string {
+	return m.Title
 }
 
-func (i *Media) Value() lua.LValue {
-	return i.internal
+func (m *Media) Description() string {
+	return m.media.Description
 }
 
-func (i *Media) HasInfo() bool {
-	return i.media.Info != nil
+func (m *Media) Value() lua.LValue {
+	return m.internal
 }
 
-func (i *Media) Info() (string, error) {
-	err := i.scraper.state.CallByParam(lua.P{
-		Fn:      i.media.Info,
+func (m *Media) HasInfo() bool {
+	return m.media.Info != nil
+}
+
+func (m *Media) Info() (string, error) {
+	err := m.scraper.state.CallByParam(lua.P{
+		Fn:      m.media.Info,
 		NRet:    1,
 		Protect: true,
-	}, i.internal, i.scraper.context)
+	}, m.internal, m.scraper.context)
 
 	if err != nil {
-		return "", err
+		return "", errMedia(err)
 	}
 
-	info := i.scraper.state.CheckString(-1)
-	i.scraper.state.Pop(1)
+	info := m.scraper.state.CheckString(-1)
+	m.scraper.state.Pop(1)
 	return info, nil
 }
 
 func (s *Scraper) newMedia(table *lua.LTable) (*Media, error) {
 	aux := &media{}
 	err := tableMapper.Map(table, aux)
+
 	if err != nil {
-		return nil, errors.Wrap(err, "media")
+		return nil, errMedia(err)
 	}
 
 	if aux.Title == "" {
-		return nil, errors.Wrap(ErrMissingTitle, "media")
+		return nil, errMedia(ErrMissingTitle)
 	}
 
 	return &Media{scraper: s, media: aux, internal: table}, nil

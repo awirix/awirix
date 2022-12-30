@@ -20,6 +20,10 @@ type search struct {
 	Noun        Noun `lua:"noun"`
 }
 
+func errSearch(err error) error {
+	return errors.Wrap(err, "search")
+}
+
 func (s *Search) String() string {
 	if s.Title != "" {
 		return s.Title
@@ -58,12 +62,12 @@ func (s *Search) Call(query string) (subMedia []*Media, err error) {
 	}, lua.LString(query), s.scraper.context)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "search")
+		return nil, errSearch(err)
 	}
 
 	media, err := s.scraper.checkMediaSlice()
 	if err != nil {
-		return nil, err
+		return nil, errSearch(err)
 	}
 
 	s.cache[query] = media
@@ -73,12 +77,13 @@ func (s *Search) Call(query string) (subMedia []*Media, err error) {
 func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
 	aux := &search{}
 	err := tableMapper.Map(table, aux)
+
 	if err != nil {
-		return nil, err
+		return nil, errSearch(err)
 	}
 
 	if aux.Handler == nil {
-		return nil, errors.Wrap(ErrMissingHandler, "search")
+		return nil, errSearch(ErrMissingHandler)
 	}
 
 	return &Search{scraper: s, search: aux, cache: make(map[string][]*Media)}, nil

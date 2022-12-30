@@ -12,7 +12,7 @@ func save(L *lua.LState) int {
 	data := L.CheckString(1)
 	segments := L.CheckTable(2)
 
-	var path = ext.Downloads()
+	path := ext.Downloads()
 
 	if segments.Len() == 0 {
 		L.ArgError(2, "table must not be empty")

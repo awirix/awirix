@@ -32,7 +32,7 @@ func NewKeyMap(m *model) *KeyMap {
 		Quit:      bind("quit", "q"),
 		ForceQuit: bind("force quit", "ctrl+c", "ctrl+d"),
 		Reset:     bind("reset", "backspace"),
-		Select:    bind("select", " "),
+		Select:    bind("select", "space", " "),
 		SelectAll: bind("select all", "tab"),
 		Info:      bind("info", "i"),
 		Confirm:   bind("confirm", "enter"),

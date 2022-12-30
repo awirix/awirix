@@ -5,10 +5,10 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	zone "github.com/lrstanley/bubblezone"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/style"
+	"strings"
 )
 
 type state int
@@ -69,9 +69,11 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateError: {
 			Update: m.updateError,
 			View: func() string {
+				err := m.current.error.Error()
+				err = strings.TrimSpace(err)
 				return m.renderLines(
 					m.styles.titleError.Render("Error"),
-					style.Fg(color.Red)(m.current.error.Error()),
+					style.Fg(color.Red)(err),
 				)
 			},
 			Back: defaultBack,
@@ -80,7 +82,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateExtensionSelect: {
 			Update: m.updateExtensionSelect,
 			View: func() string {
-				return zone.Scan(m.styles.global.Render(m.component.extensionSelect.View()))
+				return m.component.extensionSelect.View()
 			},
 			Back: func() tea.Cmd {
 				return listBack(&m.component.extensionSelect)
@@ -101,7 +103,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateSearchResults: {
 			Update: m.updateSearchResults,
 			View: func() string {
-				return zone.Scan(m.styles.global.Render(m.component.searchResults.View()))
+				return m.component.searchResults.View()
 			},
 			Back: func() tea.Cmd {
 				return listBack(&m.component.searchResults)
@@ -112,7 +114,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			Update: m.updateLayer,
 			View: func() string {
 				current := m.component.layers[m.current.layer.String()]
-				return zone.Scan(m.styles.global.Render(current.View()))
+				return current.View()
 			},
 			Back: func() tea.Cmd {
 				return listBack(m.component.layers[m.current.layer.String()])
@@ -122,7 +124,7 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateActionSelect: {
 			Update: m.updateActionSelect,
 			View: func() string {
-				return zone.Scan(m.styles.global.Render(m.component.actionSelect.View()))
+				return m.component.actionSelect.View()
 			},
 			Back: func() tea.Cmd {
 				return listBack(&m.component.actionSelect)
@@ -214,6 +216,7 @@ func (m *model) popState() tea.Cmd {
 			m.resetSelected()
 		}
 
+		m.component.mediaInfo.GotoTop()
 		cmds = append(cmds, m.resetListStatusMessages())
 		m.current.state = popped
 		return tea.Batch(cmds...)

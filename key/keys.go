@@ -23,6 +23,9 @@ const (
 )
 
 const (
-	TUIClickable = "tui.clickable"
-	TUIPadding   = "tui.padding"
+	TUIClickable     = "tui.clickable"
+	TUIPaddingLeft   = "tui.padding.left"
+	TUIPaddingRight  = "tui.padding.right"
+	TUIPaddingTop    = "tui.padding.top"
+	TUIPaddingBottom = "tui.padding.bottom"
 )
