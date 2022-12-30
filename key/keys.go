@@ -16,10 +16,7 @@ const (
 )
 
 const (
-	ExtensionsSafeMode             = "extensions.safe_mode"
-	ExtensionsTemplateEditorConfig = "extensions.template.editorconfig"
-	ExtensionsTemplateGitignore    = "extensions.template.gitignore"
-	ExtensionsUpdateTryPull        = "extensions.update.try_pull"
+	ExtensionsSafeMode = "extensions.safe_mode"
 )
 
 const (

@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
-	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/key"
 	"os"
 	"time"
 )
@@ -22,21 +20,6 @@ func UpdateExtension(ext *extension.Extension) (*extension.Extension, error) {
 	theSpinner.Start()
 	defer theSpinner.Stop()
 
-	path := ext.Path()
-
-	// Will try to pull first, if that fails, it will clone
-	if viper.GetBool(key.ExtensionsUpdateTryPull) {
-		var repo *git.Repository
-		repo, err := git.PlainOpen(path)
-
-		if err == nil {
-			err = updatePull(progress, ext, repo)
-			if err == nil {
-				return extension.New(ext.Path())
-			}
-		}
-	}
-
 	err := updateClone(progress, ext)
 	if err != nil {
 		return nil, err
@@ -48,34 +31,6 @@ func UpdateExtension(ext *extension.Extension) (*extension.Extension, error) {
 	}
 
 	return updated, nil
-}
-
-func updatePull(progress func(string), ext *extension.Extension, repo *git.Repository) (err error) {
-	if repo == nil {
-		progress("Opening repository")
-		repo, err = git.PlainOpen(ext.Path())
-		if err != nil {
-			return err
-		}
-	}
-
-	passportRepo := ext.Passport().Repository
-	pullOptions := &git.PullOptions{
-		Depth: 1,
-		Force: true,
-	}
-
-	if passportRepo != nil {
-		pullOptions.RemoteURL = passportRepo.URL()
-	}
-
-	progress("Pulling changes")
-	tree, err := repo.Worktree()
-	if err != nil {
-		return err
-	}
-
-	return tree.Pull(pullOptions)
 }
 
 func updateClone(progress func(string), ext *extension.Extension) error {

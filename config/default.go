@@ -58,21 +58,6 @@ panic, fatal, error, warn, info, debug, trace`,
 If enabled, system commands will be disabled
 and the extension will be unable to access the filesystem.`,
 	},
-	{
-		key.ExtensionsTemplateEditorConfig,
-		true,
-		"Generate .editorconfig file when creating new extension",
-	},
-	{
-		key.ExtensionsTemplateGitignore,
-		true,
-		"Generate .gitignore file when creating new extension",
-	},
-	{
-		key.ExtensionsUpdateTryPull,
-		false,
-		"Try to perform git pull instead of cloning the repo when updating.",
-	},
 	// EXTENSIONS
 
 	// TUI

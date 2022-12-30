@@ -5,7 +5,6 @@ import (
 	"github.com/spf13/viper"
 	"github.com/vivi-app/vivi/app"
 	"github.com/vivi-app/vivi/key"
-	"github.com/vivi-app/vivi/prefix"
 	"os"
 	"path/filepath"
 )
@@ -43,14 +42,14 @@ func Cache() string {
 		osCacheDir = "."
 	}
 
-	cacheDir := filepath.Join(osCacheDir, prefix.Cache)
+	cacheDir := filepath.Join(osCacheDir, app.Name)
 	return mkdir(cacheDir)
 }
 
 // Temp path
 // Will create the directory if it doesn't exist
 func Temp() string {
-	tempDir := filepath.Join(os.TempDir(), prefix.Temp)
+	tempDir := filepath.Join(os.TempDir(), app.Name)
 	return mkdir(tempDir)
 }
 
@@ -61,7 +60,8 @@ func Downloads() string {
 
 func Extensions() string {
 	path := viper.GetString(key.PathExtensions)
-	if len(path) == 0 {
+
+	if path == "" {
 		path = filepath.Join(Config(), "extensions")
 	}
 
