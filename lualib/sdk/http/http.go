@@ -23,6 +23,8 @@ func New(L *lua.LState) *lua.LTable {
 	})
 }
 
+var cacheDefaultGet = make(map[string]*http.Response)
+
 func defaultClientGet(L *lua.LState) int {
 	url := L.CheckString(1)
 	response, err := http.Get(url)
@@ -32,6 +34,7 @@ func defaultClientGet(L *lua.LState) int {
 		return 2
 	}
 
+	cacheDefaultGet[url] = response
 	pushResponse(L, response)
 	return 1
 }

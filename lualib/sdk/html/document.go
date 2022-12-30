@@ -1,6 +1,7 @@
 package html
 
 import (
+	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
 	lua "github.com/vivi-app/lua"
 	"strings"
@@ -9,8 +10,9 @@ import (
 const documentTypeName = "document"
 
 var documentMethods = map[string]lua.LGFunction{
-	"find": documentFind,
-	"html": documentHtml,
+	"find":     documentFind,
+	"html":     documentHtml,
+	"markdown": documentMarkdown,
 }
 
 func registerDocumentType(L *lua.LState) {
@@ -67,5 +69,13 @@ func documentHtml(L *lua.LState) int {
 	}
 
 	L.Push(lua.LString(html))
+	return 1
+}
+
+func documentMarkdown(L *lua.LState) int {
+	document := checkDocument(L, 1)
+	converter := md.NewConverter("", true, nil)
+
+	L.Push(lua.LString(converter.Convert(document.Selection)))
 	return 1
 }

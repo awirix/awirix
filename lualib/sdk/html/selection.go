@@ -1,8 +1,9 @@
 package html
 
 import (
+	"github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
-	lua "github.com/vivi-app/lua"
+	"github.com/vivi-app/lua"
 )
 
 const selectionTypeName = "selection"
@@ -44,6 +45,7 @@ var selectionMethods = map[string]lua.LGFunction{
 	"add":           selectionAdd,
 	"add_selection": selectionAddSelection,
 	"add_back":      selectionAddBack,
+	"markdown":      selectionMarkdown,
 }
 
 func registerSelectionType(L *lua.LState) {
@@ -361,5 +363,13 @@ func selectionAddSelection(L *lua.LState) int {
 func selectionAddBack(L *lua.LState) int {
 	selection := checkSelection(L, 1)
 	pushSelection(L, selection.AddBack())
+	return 1
+}
+
+func selectionMarkdown(L *lua.LState) int {
+	selection := checkSelection(L, 1)
+	converter := md.NewConverter("", true, nil)
+
+	L.Push(lua.LString(converter.Convert(selection)))
 	return 1
 }

@@ -1,8 +1,12 @@
 package http
 
 import (
+	"bufio"
+	"bytes"
 	"github.com/vivi-app/lua"
+	"github.com/vivi-app/vivi/log"
 	"net/http"
+	"net/http/httputil"
 	"sync"
 	"time"
 )
@@ -42,15 +46,42 @@ func newClient(L *lua.LState) int {
 	return 1
 }
 
+var cacheClient = make(map[string][]byte)
+
 func clientSend(L *lua.LState) int {
 	client := checkClient(L, 1)
 	req := checkRequest(L, 2)
+
+	dumpedReq, dumpErr := httputil.DumpRequest(req, true)
+	if dumpErr == nil {
+		dumpedRes, ok := cacheClient[string(dumpedReq)]
+		if ok {
+			res, err := http.ReadResponse(
+				bufio.NewReaderSize(bytes.NewBuffer(dumpedRes), len(dumpedRes)),
+				req,
+			)
+
+			if err == nil {
+				pushResponse(L, res)
+				return 1
+			} else {
+				log.Error(err)
+			}
+		}
+	}
 
 	resp, err := client.Do(req)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
 		return 2
+	}
+
+	if dumpErr == nil {
+		dumpedRes, err := httputil.DumpResponse(resp, true)
+		if err == nil {
+			cacheClient[string(dumpedReq)] = dumpedRes
+		}
 	}
 
 	pushResponse(L, resp)
