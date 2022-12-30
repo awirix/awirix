@@ -3,6 +3,7 @@ package scraper
 import (
 	"github.com/pkg/errors"
 	"github.com/vivi-app/lua"
+	"strings"
 )
 
 type Media struct {
@@ -64,6 +65,9 @@ func (s *Scraper) newMedia(table *lua.LTable) (*Media, error) {
 	if aux.Title == "" {
 		return nil, errMedia(ErrMissingTitle)
 	}
+
+	aux.Title = strings.TrimSpace(aux.Title)
+	aux.Description = strings.TrimSpace(aux.Description)
 
 	return &Media{scraper: s, media: aux, internal: table}, nil
 }
