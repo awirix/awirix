@@ -58,7 +58,7 @@ M.layers = {
 --- @type Action[]
 M.actions = {
    {
-      title = 'Search',
+      title = 'Stream',
       max = 1,
       handler = function (medias, ctx)
          ctx.error('Not implemented')
