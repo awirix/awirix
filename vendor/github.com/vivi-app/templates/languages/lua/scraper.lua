@@ -3,7 +3,7 @@
 
 --- Table that have a string field named `title` used for string representation
 --- with optional `description` for a brief description.
---- @alias Media { title: string, description: string?, [any]: any }
+--- @alias Media { title: string, description: string?, info: (fun(self: Media): string)?, [any]: any }
 
 --- Searches for the media
 --- @alias Search { title: string?, subtitle: string?, placholder: string?, handler: fun(query: string, ctx: Context): Media[], noun: Noun? }
@@ -16,7 +16,7 @@
 
 --- Actions are further actions that can be performed on the selected media.
 --- Something like 'Stream' or 'Download'
---- @alias Action { title: string, handler: fun(media: Media[], ctx: Context), description: string?, max: number? }
+--- @alias Action { title: string, handler: fun(media: Media[], ctx: Context), description: string?, max: number?, min: number? }
 
 --- Context that is passed to the handler functions to report progress and errors.
 --- @alias Context { progress: fun(message: string), error: fun(message: string) }

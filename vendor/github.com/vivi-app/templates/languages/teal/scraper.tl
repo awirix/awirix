@@ -11,6 +11,7 @@ end
 local record Media
 	title: string
 	description: string|nil
+   info: function(self: Media): string
 end
 
 local record Search
@@ -32,6 +33,7 @@ local record Action
    title: string
    description: string|nil
    max: number|nil
+   min: number|nil
 end
 
 local record Module

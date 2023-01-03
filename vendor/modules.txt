@@ -415,7 +415,7 @@ github.com/vivi-app/lua
 github.com/vivi-app/lua/ast
 github.com/vivi-app/lua/parse
 github.com/vivi-app/lua/pm
-# github.com/vivi-app/templates v0.7.1
+# github.com/vivi-app/templates v0.7.2
 ## explicit; go 1.19
 github.com/vivi-app/templates
 # github.com/xanzy/ssh-agent v0.3.3
@@ -457,7 +457,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20221229233502-02c3fc3b3eb4
+# golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices

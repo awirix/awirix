@@ -30,6 +30,11 @@ interface Media {
      */
     description?: string;
 
+    /**
+     * Method that will be called to get the full description of the media.
+     */
+    info?: (this: Media) => string;
+
     // Any other fields will be preserved
     // when passing media between states.
 }
@@ -103,6 +108,11 @@ interface Action {
      * Maximum number of media that can be passed to the action.
      */
     max?: number;
+
+    /**
+     * Minimum number of media that can be passed to the action.
+     */
+    min?: number;
 }
 
 /**

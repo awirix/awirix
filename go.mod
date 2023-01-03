@@ -35,8 +35,8 @@ require (
 	github.com/vivi-app/gluamapper v1.0.0
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
-	github.com/vivi-app/templates v0.7.1
-	golang.org/x/exp v0.0.0-20221229233502-02c3fc3b3eb4
+	github.com/vivi-app/templates v0.7.2
+	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
 	golang.org/x/term v0.3.0
 )
 
