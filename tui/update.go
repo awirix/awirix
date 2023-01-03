@@ -8,6 +8,7 @@ import (
 	"github.com/vivi-app/vivi/extensions/extension"
 	"github.com/vivi-app/vivi/log"
 	"github.com/vivi-app/vivi/scraper"
+	"github.com/vivi-app/vivi/text"
 	"strings"
 )
 
@@ -363,11 +364,11 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 				var s strings.Builder
 				_, _ = log.WriteErrorf(
 					&s,
-					"%q supports %s %s, %d were selected",
+					"%q supports %s %s, %s were selected",
 					action.String(),
 					action.BoundsString(),
 					noun.Plural(),
-					len(m.selectedMedia),
+					text.Quantify(len(m.selectedMedia), "was", "were"),
 				)
 
 				return m, thisList.NewStatusMessage(s.String())

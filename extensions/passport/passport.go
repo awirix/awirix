@@ -1,8 +1,8 @@
 package passport
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/ghodss/yaml"
 	"github.com/samber/lo"
 	"github.com/vivi-app/vivi/color"
 	"github.com/vivi-app/vivi/github"
@@ -69,6 +69,14 @@ func (p *Passport) Language() *language.Language {
 }
 
 func (p *Passport) Validate() error {
+	if p.ID == "" {
+		return fmt.Errorf("passport: id is empty")
+	}
+
+	if p.Name == "" {
+		return fmt.Errorf("passport: name is empty")
+	}
+
 	if _, err := version.NewVersion(p.VersionRaw); err != nil {
 		return fmt.Errorf("invalid version: %s", err)
 	}
@@ -97,12 +105,11 @@ func (p *Passport) CheckRequirements() bool {
 
 func New(reader io.Reader) (*Passport, error) {
 	var passport = &Passport{}
-	data, err := io.ReadAll(reader)
-	if err != nil {
-		return nil, err
-	}
 
-	err = yaml.Unmarshal(data, passport)
+	decoder := json.NewDecoder(reader)
+	decoder.DisallowUnknownFields()
+
+	err := decoder.Decode(passport)
 	if err != nil {
 		return nil, err
 	}

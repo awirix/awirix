@@ -3,10 +3,10 @@ package extension
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/ghodss/yaml"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/samber/lo"
 	"github.com/vivi-app/templates"
@@ -196,7 +196,10 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	data, err := yaml.Marshal(p)
+	var buffer bytes.Buffer
+	encoder := json.NewEncoder(&buffer)
+	encoder.SetIndent("", "  ")
+	err = encoder.Encode(p)
 	if err != nil {
 		return nil, err
 	}
@@ -216,7 +219,7 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	tree[filename.Passport] = bytes.NewBuffer(data)
+	tree[filename.Passport] = &buffer
 
 	for name, contents := range tree {
 		err = filesystem.Api().WriteFile(filepath.Join(path, name), contents.Bytes(), os.ModePerm)

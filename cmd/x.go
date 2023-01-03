@@ -83,10 +83,9 @@ var xLsCmd = &cobra.Command{
 
 			for _, e := range byAuthor[author] {
 				fmt.Printf(
-					"%s %s %s\n",
+					"%s %s\n",
 					style.Fg(color.Purple)(e.Passport().Name),
 					style.Bold(e.Passport().Version().String()),
-					style.Faint(e.Passport().About),
 				)
 			}
 		}

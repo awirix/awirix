@@ -101,7 +101,14 @@ func (m *model) resize(width, height int) {
 	// error can not occur here
 	r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle(), glamour.WithWordWrap(m.component.mediaInfo.Width))
 	// but it can here
-	md, err := r.Render(m.current.mediaInfo)
+
+	var mediaInfo string
+	if strings.TrimSpace(m.current.mediaInfo) == "" {
+		mediaInfo = `*No info*`
+	} else {
+		mediaInfo = m.current.mediaInfo
+	}
+	md, err := r.Render(mediaInfo)
 	if err != nil {
 		md = m.current.mediaInfo
 	}

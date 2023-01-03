@@ -3,7 +3,7 @@ package cache
 import (
 	"bufio"
 	"bytes"
-	"fmt"
+	"errors"
 	"github.com/metafates/gache"
 	"github.com/vivi-app/vivi/filesystem"
 	"github.com/vivi-app/vivi/where"
@@ -12,6 +12,8 @@ import (
 	"path/filepath"
 	"time"
 )
+
+var ErrCacheTooLarge = errors.New("cache too large")
 
 var HTTP *httpCache
 
@@ -65,7 +67,7 @@ func (h *httpCache) Get(r *http.Request) (*http.Response, bool) {
 
 func (h *httpCache) Set(r *http.Request, res *http.Response) error {
 	if res.ContentLength > 1024*1024 {
-		return fmt.Errorf("response too large")
+		return ErrCacheTooLarge
 	}
 
 	data, expired, err := h.cache.Get()
