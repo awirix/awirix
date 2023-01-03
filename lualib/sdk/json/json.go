@@ -4,14 +4,66 @@ import (
 	"encoding/json"
 	"errors"
 	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luautil"
+	"github.com/vivi-app/vivi/luadoc"
 )
 
-func New(L *lua.LState) *lua.LTable {
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"decode": apiDecode,
-		"encode": apiEncode,
-	})
+func Lib() *luadoc.Lib {
+	return &luadoc.Lib{
+		Name:        "json",
+		Description: "Provides functions for encoding and decoding JSON.",
+		Funcs: []*luadoc.Func{
+			{
+				Name:        "decode",
+				Description: "Decodes a JSON string into a Lua value.",
+				Value:       apiDecode,
+				Params: []*luadoc.Param{
+					{
+						Name:        "json",
+						Type:        luadoc.String,
+						Description: "The JSON string to decode.",
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "value",
+						Type:        luadoc.Any,
+						Description: "The decoded value.",
+					},
+					{
+						Name:        "error",
+						Type:        luadoc.String,
+						Description: "The error message if the JSON string is invalid.",
+						Opt:         true,
+					},
+				},
+			},
+			{
+				Name:        "encode",
+				Description: "Encodes a Lua value into a JSON string.",
+				Value:       apiEncode,
+				Params: []*luadoc.Param{
+					{
+						Name:        "value",
+						Type:        luadoc.Any,
+						Description: "The value to encode.",
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "json",
+						Type:        luadoc.String,
+						Description: "The encoded JSON string.",
+					},
+					{
+						Name:        "error",
+						Type:        luadoc.String,
+						Description: "The error message if the value cannot be encoded.",
+						Opt:         true,
+					},
+				},
+			},
+		},
+	}
 }
 
 func apiDecode(L *lua.LState) int {
@@ -137,7 +189,7 @@ func decode(L *lua.LState, data []byte) (lua.LValue, error) {
 //
 // This function only converts values that the encoding/json package decodes to.
 // All other values will return lua.LNil.
-func decodeValue(L *lua.LState, value interface{}) lua.LValue {
+func decodeValue(L *lua.LState, value any) lua.LValue {
 	switch converted := value.(type) {
 	case bool:
 		return lua.LBool(converted)
@@ -147,13 +199,13 @@ func decodeValue(L *lua.LState, value interface{}) lua.LValue {
 		return lua.LString(converted)
 	case json.Number:
 		return lua.LString(converted)
-	case []interface{}:
+	case []any:
 		arr := L.CreateTable(len(converted), 0)
 		for _, item := range converted {
 			arr.Append(decodeValue(L, item))
 		}
 		return arr
-	case map[string]interface{}:
+	case map[string]any:
 		tbl := L.CreateTable(0, len(converted))
 		for key, item := range converted {
 			tbl.RawSetH(lua.LString(key), decodeValue(L, item))

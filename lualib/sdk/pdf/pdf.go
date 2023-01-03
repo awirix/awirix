@@ -4,15 +4,35 @@ import (
 	"bytes"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
 	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luautil"
+	"github.com/vivi-app/vivi/luadoc"
 	"io"
 	"strings"
 )
 
-func New(L *lua.LState) *lua.LTable {
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"from_images": fromImages,
-	})
+func Lib() *luadoc.Lib {
+	return &luadoc.Lib{
+		Name:        "pdf",
+		Description: "PDF utilities",
+		Funcs: []*luadoc.Func{
+			{
+				Name:        "from_images",
+				Description: "Converts a table of images to a PDF",
+				Value:       fromImages,
+				Params: []*luadoc.Param{
+					{
+						Name: "images",
+						Type: luadoc.List(luadoc.String),
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name: "pdf",
+						Type: luadoc.String,
+					},
+				},
+			},
+		},
+	}
 }
 
 func fromImages(L *lua.LState) int {

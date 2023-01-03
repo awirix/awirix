@@ -40,11 +40,6 @@ func regexpFind(L *lua.LState) int {
 	re := checkRegexp(L, 1)
 	text := L.CheckString(2)
 	matches := re.FindStringSubmatch(text)
-	if matches == nil {
-		L.Push(lua.LNil)
-		return 1
-	}
-
 	tbl := L.NewTable()
 	for _, match := range matches {
 		tbl.Append(lua.LString(match))
