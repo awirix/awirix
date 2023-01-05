@@ -279,6 +279,12 @@ func Lib() *luadoc.Lib {
 						Description: "The request to send.",
 						Type:        requestTypeName,
 					},
+					{
+						Name:        "cache",
+						Description: "Whether to cache the response.",
+						Type:        luadoc.Boolean,
+						Opt:         true,
+					},
 				},
 				Returns: []*luadoc.Param{
 					{
