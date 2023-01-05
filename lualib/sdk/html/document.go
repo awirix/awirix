@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const documentTypeName = "document"
+const documentTypeName = "html_document"
 
 var documentMethods = map[string]lua.LGFunction{
 	"find":     documentFind,
@@ -69,6 +69,13 @@ func documentHtml(L *lua.LState) int {
 	}
 
 	L.Push(lua.LString(html))
+	return 1
+}
+
+func documentSelection(L *lua.LState) int {
+	document := checkDocument(L, 1)
+	selection := document.Selection
+	pushSelection(L, selection)
 	return 1
 }
 

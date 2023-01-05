@@ -1,6 +1,7 @@
 package extension
 
 import (
+	"context"
 	"github.com/spf13/viper"
 	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/key"
@@ -23,8 +24,6 @@ func (e *Extension) initState(debug bool) {
 		lua.OpenTable,
 		lua.OpenString,
 		lua.OpenMath,
-		lua.OpenCoroutine,
-		lua.OpenChannel,
 		lua.OpenPackage,
 		lua.OpenIo,
 	}
@@ -76,4 +75,5 @@ func inject(ext *Extension, L *lua.LState) {
 	}, nil)
 
 	L.SetGlobal(scraper.GlobalExtension, table)
+	L.SetContext(context.WithValue(context.Background(), "extension", ext))
 }

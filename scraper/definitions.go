@@ -7,13 +7,7 @@ const (
 )
 
 const (
-	FunctionPrepare  = "prepare"
-	FunctionStream   = "stream"
-	FunctionDownload = "download"
-)
-
-const (
-	FieldLayers  = "layers"
 	FieldSearch  = "search"
+	FieldLayers  = "layers"
 	FieldActions = "actions"
 )

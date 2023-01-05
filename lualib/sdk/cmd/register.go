@@ -15,8 +15,8 @@ func registerCommandType(L *lua.LState) {
 var commandMethods = map[string]lua.LGFunction{
 	"run":      commandRun,
 	"output":   commandOutput,
-	"set_args": commandSetArgs,
-	"args":     commandArgs,
+	"set_args": commandArgs,
+	"args":     commandGetArgs,
 }
 
 func checkCommand(L *lua.LState, n int) *exec.Cmd {

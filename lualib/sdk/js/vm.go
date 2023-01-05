@@ -8,11 +8,6 @@ import (
 
 const vmTypeName = "js_vm"
 
-func registerVMType(L *lua.LState) {
-	mt := L.NewTypeMetatable(vmTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), vmMethods))
-}
-
 func pushVM(L *lua.LState, vm *otto.Otto) {
 	ud := L.NewUserData()
 	ud.Value = vm
@@ -27,12 +22,6 @@ func checkVM(L *lua.LState, n int) *otto.Otto {
 	}
 	L.ArgError(n, "js_vm expected")
 	return nil
-}
-
-var vmMethods = map[string]lua.LGFunction{
-	"run": vmRun,
-	"set": vmSet,
-	"get": vmGet,
 }
 
 func newVM(L *lua.LState) int {

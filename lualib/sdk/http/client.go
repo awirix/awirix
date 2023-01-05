@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-const clientTypeName = "client"
+const clientTypeName = httpTypeName + "_client"
 
 func registerClientType(L *lua.LState) {
 	mt := L.NewTypeMetatable(clientTypeName)

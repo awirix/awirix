@@ -6,23 +6,7 @@ import (
 	"github.com/vivi-app/vivi/luautil"
 )
 
-const vmValueTypeName = "js_vm_value"
-
-func registerVMValueType(L *lua.LState) {
-	mt := L.NewTypeMetatable(vmValueTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), map[string]lua.LGFunction{
-		"export":       vmValueExport,
-		"string":       vmValueString,
-		"is_null":      vmValueIsNull,
-		"is_undefined": vmValueIsUndefined,
-		"is_number":    vmValueIsNumber,
-		"is_bool":      vmValueIsBool,
-		"is_string":    vmValueIsString,
-		"is_object":    vmValueIsObject,
-		"is_nan":       vmValueIsNaN,
-		"is_function":  vmValueIsFunction,
-	}))
-}
+const vmValueTypeName = vmTypeName + "_value"
 
 func pushVMValue(L *lua.LState, value *otto.Value) {
 	ud := L.NewUserData()
@@ -43,7 +27,6 @@ func checkVMValue(L *lua.LState, n int) *otto.Value {
 
 func vmValueExport(L *lua.LState) int {
 	value := checkVMValue(L, 1)
-
 	nativeValue, err := value.Export()
 	if err != nil {
 		L.Push(lua.LNil)
@@ -80,7 +63,7 @@ func vmValueIsNumber(L *lua.LState) int {
 	return 1
 }
 
-func vmValueIsBool(L *lua.LState) int {
+func vmValueIsBoolean(L *lua.LState) int {
 	value := checkVMValue(L, 1)
 	L.Push(lua.LBool(value.IsBoolean()))
 	return 1

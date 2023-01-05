@@ -25,7 +25,19 @@ func (l *Lib) Value(state *lua.LState) *lua.LTable {
 
 	for _, f := range l.Funcs {
 		if f.Value == nil {
-			panic(fmt.Sprintf("function %s has no value", f.Name))
+			panic(fmt.Sprintf("function %s.%s has no value", l.Name, f.Name))
+		}
+
+		for _, param := range f.Params {
+			if param.Type == "" {
+				panic(fmt.Sprintf("function %s.%s has a parameter %s with no type", l.Name, f.Name, param.Name))
+			}
+		}
+
+		for _, ret := range f.Returns {
+			if ret.Type == "" {
+				panic(fmt.Sprintf("function %s.%s has a return %s with no type", l.Name, f.Name, ret.Name))
+			}
 		}
 
 		funcs[f.Name] = f.Value
@@ -33,7 +45,7 @@ func (l *Lib) Value(state *lua.LState) *lua.LTable {
 
 	for _, v := range l.Vars {
 		if v.Value == nil {
-			panic(fmt.Sprintf("variable %s has no value", v.Name))
+			panic(fmt.Sprintf("variable %s.%s has no value", l.Name, v.Name))
 		}
 
 		vars[v.Name] = v.Value
@@ -47,8 +59,21 @@ func (l *Lib) Value(state *lua.LState) *lua.LTable {
 		var methods = make(map[string]lua.LGFunction)
 		for _, m := range c.Methods {
 			if m.Value == nil {
-				panic(fmt.Sprintf("method %s of class %s has no value", m.Name, c.Name))
+				panic(fmt.Sprintf("method %s of class %s.%s has no value", m.Name, l.Name, c.Name))
 			}
+
+			for _, param := range m.Params {
+				if param.Type == "" {
+					panic(fmt.Sprintf("method %s of class %s.%s has a parameter %s with no type", m.Name, l.Name, c.Name, param.Name))
+				}
+			}
+
+			for _, ret := range m.Returns {
+				if ret.Type == "" {
+					panic(fmt.Sprintf("method %s of class %s.%s has a return %s with no type", m.Name, l.Name, c.Name, ret.Name))
+				}
+			}
+
 			methods[m.Name] = m.Value
 		}
 

@@ -12,8 +12,8 @@ import (
 )
 
 type Requirements struct {
-	OS       map[string]bool `json:"os,omitempty" jsonschema:"title=OS,description=Operating systems that this extension is available on"`
-	Programs []string        `json:"programs,omitempty" jsonschema:"title=Programs,description=Programs that this extension requires to be in PATH,examples=[git, curl],type=array,items={type=string}"`
+	OS       map[string]bool `json:"os,omitempty"`
+	Programs []string        `json:"programs,omitempty"`
 }
 
 func (d *Requirements) Info() string {

@@ -4,11 +4,105 @@ import (
 	"fmt"
 	"github.com/kballard/go-shellquote"
 	"github.com/samber/lo"
-	lua "github.com/vivi-app/lua"
+	"github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/extensions"
+	"github.com/vivi-app/vivi/luadoc"
 	"github.com/vivi-app/vivi/luautil"
 	"os/exec"
 )
+
+func Lib() *luadoc.Lib {
+	classCmd := &luadoc.Class{
+		Name:        "command",
+		Description: "Command object that is used to execute external programs.",
+		Methods: []*luadoc.Method{
+			{
+				Name:        "run",
+				Description: "Runs the command and returns an error if it fails.",
+				Value:       commandRun,
+				Params:      []*luadoc.Param{},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "error",
+						Description: "Error if the command fails.",
+						Type:        luadoc.String,
+						Opt:         true,
+					},
+				},
+			},
+			{
+				Name:        "output",
+				Description: "Runs the command and returns the output and an error if it fails.",
+				Value:       commandOutput,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "output",
+						Description: "Output of the command.",
+						Type:        luadoc.String,
+					},
+					{
+						Name:        "error",
+						Description: "Error if the command fails.",
+						Type:        luadoc.String,
+						Opt:         true,
+					},
+				},
+			},
+			{
+				Name:        "get_args",
+				Description: "Returns the arguments of the command.",
+				Value:       commandGetArgs,
+				Params:      []*luadoc.Param{},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "args",
+						Description: "Arguments of the command.",
+						Type:        luadoc.List(luadoc.String),
+					},
+				},
+			},
+			{
+				Name:        "set_args",
+				Description: "Sets the arguments of the command.",
+				Value:       commandArgs,
+				Params: []*luadoc.Param{
+					{
+						Name:        "args",
+						Description: "Arguments of the command.",
+						Type:        luadoc.List(luadoc.String),
+					},
+				},
+			},
+		},
+	}
+
+	return &luadoc.Lib{
+		Name:        "cmd",
+		Description: "The `cmd` library provides a way to run external programs.",
+		Funcs: []*luadoc.Func{
+			{
+				Name:        "new",
+				Description: "Creates a new command object. The command object is a wrapper around the `exec.Cmd` object from the Go standard library.",
+				Value:       newCommand,
+				Params: []*luadoc.Param{
+					{
+						Name:        "command",
+						Description: "The command to run. This must be a string and must be in the list of allowed programs in the extension's passport.",
+						Type:        luadoc.String,
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "command",
+						Description: "The command object.",
+						Type:        classCmd.Name,
+					},
+				},
+			},
+		},
+		Classes: []*luadoc.Class{classCmd},
+	}
+}
 
 func New(L *lua.LState) *lua.LTable {
 	registerCommandType(L)
@@ -20,7 +114,7 @@ func New(L *lua.LState) *lua.LTable {
 func newCommand(L *lua.LState) int {
 	command := L.CheckString(1)
 
-	programs := L.Context().Value(true).(extensions.ExtensionContainer).Passport().Requirements.Programs
+	programs := L.Context().Value("extension").(extensions.ExtensionContainer).Passport().Requirements.Programs
 
 	if !lo.Contains(programs, command) {
 		L.RaiseError("command `%s` is not allowed because it is not in the list of allowed programs %s in the extension's passport", command, programs)
@@ -75,7 +169,7 @@ func checkArgs(L *lua.LState, n int) []string {
 	return argsSlice
 }
 
-func commandSetArgs(L *lua.LState) int {
+func commandArgs(L *lua.LState) int {
 	cmd := checkCommand(L, 1)
 	args := checkArgs(L, 2)
 
@@ -84,7 +178,7 @@ func commandSetArgs(L *lua.LState) int {
 	return 0
 }
 
-func commandArgs(L *lua.LState) int {
+func commandGetArgs(L *lua.LState) int {
 	cmd := checkCommand(L, 1)
 	table, err := luautil.ToLValue(L, cmd.Args[1:])
 	if err != nil {

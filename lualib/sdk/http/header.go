@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-const headerTypeName = "header"
+const headerTypeName = httpTypeName + "_header"
 
 var headerMethods = map[string]lua.LGFunction{
 	"get":   headerGet,

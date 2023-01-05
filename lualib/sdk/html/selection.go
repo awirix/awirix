@@ -6,59 +6,14 @@ import (
 	"github.com/vivi-app/lua"
 )
 
-const selectionTypeName = "selection"
-
-var selectionMethods = map[string]lua.LGFunction{
-	"find":          selectionFind,
-	"each":          selectionEach,
-	"text":          selectionText,
-	"html":          selectionHtml,
-	"first":         selectionFirst,
-	"last":          selectionLast,
-	"parent":        selectionParent,
-	"eq":            selectionEq,
-	"attr":          selectionAttr,
-	"attr_or":       selectionAttrOr,
-	"has_class":     selectionHasClass,
-	"add_class":     selectionAddClass,
-	"remove_class":  selectionRemoveClass,
-	"toggle_class":  selectionToggleClass,
-	"next":          selectionNext,
-	"next_all":      selectionNextAll,
-	"next_until":    selectionNextUntil,
-	"prev":          selectionPrev,
-	"prev_all":      selectionPrevAll,
-	"prev_until":    selectionPrevUntil,
-	"not":           selectionNot,
-	"filter":        selectionFilter,
-	"children":      selectionChildren,
-	"contents":      selectionContents,
-	"closest":       selectionClosest,
-	"parents":       selectionParents,
-	"parents_until": selectionParentsUntil,
-	"siblings":      selectionSiblings,
-	"slice":         selectionSlice,
-	"map":           selectionMap,
-	"end":           selectionEnd,
-	"size":          selectionSize,
-	"length":        selectionLength,
-	"add":           selectionAdd,
-	"add_selection": selectionAddSelection,
-	"add_back":      selectionAddBack,
-	"markdown":      selectionMarkdown,
-}
-
-func registerSelectionType(L *lua.LState) {
-	mt := L.NewTypeMetatable(selectionTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), selectionMethods))
-}
+const selectionTypeName = documentTypeName + "_selection"
 
 func checkSelection(L *lua.LState, n int) *goquery.Selection {
-	ud := L.CheckUserData(1)
+	ud := L.CheckUserData(n)
 	if v, ok := ud.Value.(*goquery.Selection); ok {
 		return v
 	}
-	L.ArgError(1, "selection expected")
+	L.ArgError(n, "selection expected")
 	return nil
 }
 
@@ -255,7 +210,7 @@ func selectionFilter(L *lua.LState) int {
 	return 1
 }
 
-func selectionNot(L *lua.LState) int {
+func selectionRefine(L *lua.LState) int {
 	selection := checkSelection(L, 1)
 	selector := L.CheckString(2)
 	pushSelection(L, selection.Not(selector))
@@ -328,7 +283,7 @@ func selectionSlice(L *lua.LState) int {
 	return 1
 }
 
-func selectionEnd(L *lua.LState) int {
+func selectionTerminate(L *lua.LState) int {
 	selection := checkSelection(L, 1)
 	pushSelection(L, selection.End())
 	return 1
@@ -338,12 +293,6 @@ func selectionAdd(L *lua.LState) int {
 	selection := checkSelection(L, 1)
 	selector := L.CheckString(2)
 	pushSelection(L, selection.Add(selector))
-	return 1
-}
-
-func selectionSize(L *lua.LState) int {
-	selection := checkSelection(L, 1)
-	L.Push(lua.LNumber(selection.Size()))
 	return 1
 }
 

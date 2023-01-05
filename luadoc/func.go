@@ -2,6 +2,7 @@ package luadoc
 
 import (
 	"github.com/vivi-app/lua"
+	"strings"
 )
 
 type Param struct {
@@ -21,4 +22,29 @@ type Func struct {
 	Value       lua.LGFunction
 	Params      []*Param
 	Returns     []*Param
+}
+
+func (f Func) AsType() string {
+	var b strings.Builder
+	b.WriteString("fun(")
+	for i, param := range f.Params {
+		b.WriteString(param.Name)
+		b.WriteString(": ")
+		b.WriteString(param.Type)
+		if param.Opt {
+			b.WriteString("?")
+		}
+
+		if i < len(f.Params)-1 {
+			b.WriteString(", ")
+		}
+	}
+	b.WriteString(")")
+
+	if len(f.Returns) > 0 {
+		b.WriteString(": ")
+		b.WriteString(f.Returns[0].Type)
+	}
+
+	return b.String()
 }

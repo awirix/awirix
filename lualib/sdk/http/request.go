@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const requestTypeName = "request"
+const requestTypeName = httpTypeName + "_request"
 
 var requestMethods = map[string]lua.LGFunction{
 	"set_header":     requestSetHeader,
@@ -39,17 +39,12 @@ func pushRequest(L *lua.LState, request *http.Request) {
 func newRequest(L *lua.LState) int {
 	method := L.CheckString(1)
 	url := L.CheckString(2)
-	body := L.Get(3)
+	body := L.OptString(3, "")
 
 	var reqBody io.Reader
 
-	if body.Type() == lua.LTNil {
-		reqBody = nil
-	} else if body.Type() == lua.LTString {
-		reqBody = strings.NewReader(body.String())
-	} else {
-		L.ArgError(3, "string or nil expected")
-		return 0
+	if body != "" {
+		reqBody = strings.NewReader(body)
 	}
 
 	request, err := http.NewRequest(method, url, reqBody)

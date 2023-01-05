@@ -5,6 +5,7 @@ import (
 	"github.com/vivi-app/vivi/luadoc"
 	"github.com/vivi-app/vivi/lualib/sdk/cmd"
 	"github.com/vivi-app/vivi/lualib/sdk/crypto"
+	"github.com/vivi-app/vivi/lualib/sdk/filepath"
 	"github.com/vivi-app/vivi/lualib/sdk/html"
 	"github.com/vivi-app/vivi/lualib/sdk/http"
 	"github.com/vivi-app/vivi/lualib/sdk/js"
@@ -25,6 +26,12 @@ func Lib(L *lua.LState) *luadoc.Lib {
 			strings.Lib(),
 			pdf.Lib(),
 			json.Lib(),
+			cmd.Lib(),
+			crypto.Lib(L),
+			filepath.Lib(),
+			js.Lib(),
+			http.Lib(),
+			html.Lib(),
 		},
 	}
 }
@@ -32,12 +39,12 @@ func Lib(L *lua.LState) *luadoc.Lib {
 func New(L *lua.LState) *lua.LTable {
 	return luautil.NewTable(L, map[string]lua.LValue{
 		//"json":   json.New(L),
-		"html":   html.New(L),
-		"crypto": crypto.New(L),
-		"http":   http.New(L),
+		//"html": html.New(L),
+		//"crypto": crypto.New(L),
+		//"http": http.New(L),
 		//"regexp": regexp.New(L),
-		"js":  js.New(L),
-		"cmd": cmd.New(L),
+		//"js": js.New(L),
+		//"cmd": cmd.New(L),
 		//"strings": strings.New(L),
 		//"pdf":  pdf.New(L),
 		"time": time.New(L),

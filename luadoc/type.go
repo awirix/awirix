@@ -11,3 +11,7 @@ const (
 func List(of string) string {
 	return of + "[]"
 }
+
+func Map(keys string, values string) string {
+	return Table + "<" + keys + ", " + values + ">"
+}

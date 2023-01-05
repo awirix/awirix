@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-const cookieTypeName = "cookie"
+const cookieTypeName = httpTypeName + "_cookie"
 
 func registerCookieType(L *lua.LState) {
 	mt := L.NewTypeMetatable(cookieTypeName)

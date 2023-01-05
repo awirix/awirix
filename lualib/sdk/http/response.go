@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-const responseTypeName = "response"
+const responseTypeName = httpTypeName + "_response"
 
 var responseMethods = map[string]lua.LGFunction{
 	"status_code":       responseStatusCode,

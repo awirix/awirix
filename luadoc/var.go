@@ -6,8 +6,5 @@ type Var struct {
 	Name        string
 	Description string
 	Value       lua.LValue
-}
-
-func (v *Var) LuaDoc() string {
-	return ""
+	Type        string
 }
