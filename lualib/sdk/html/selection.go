@@ -210,7 +210,7 @@ func selectionFilter(L *lua.LState) int {
 	return 1
 }
 
-func selectionRefine(L *lua.LState) int {
+func selectionRemove(L *lua.LState) int {
 	selection := checkSelection(L, 1)
 	selector := L.CheckString(2)
 	pushSelection(L, selection.Not(selector))

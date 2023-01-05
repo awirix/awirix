@@ -302,9 +302,9 @@ func Lib() *luadoc.Lib {
 				Returns:     []*luadoc.Param{selection},
 			},
 			{
-				Name:        "refine",
+				Name:        "remove",
 				Description: `Removes elements from the selection that match the selector string. It returns a new selection object with the matching elements removed.`,
-				Value:       selectionRefine,
+				Value:       selectionRemove,
 				Params:      []*luadoc.Param{selector},
 				Returns:     []*luadoc.Param{selection},
 			},
