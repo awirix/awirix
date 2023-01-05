@@ -7,11 +7,6 @@ import (
 
 const regexpTypeName = "regexp"
 
-func registerRegexpType(L *lua.LState) {
-	mt := L.NewTypeMetatable(regexpTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), regexpMethods))
-}
-
 func pushRegexp(L *lua.LState, regexp *regexp.Regexp) {
 	ud := L.NewUserData()
 	ud.Value = regexp
@@ -26,14 +21,6 @@ func checkRegexp(L *lua.LState, n int) *regexp.Regexp {
 	}
 	L.ArgError(n, "regexp expected")
 	return nil
-}
-
-var regexpMethods = map[string]lua.LGFunction{
-	"find":    regexpFind,
-	"match":   regexpMatch,
-	"replace": regexpReplace,
-	"split":   regexpSplit,
-	"groups":  regexpGroups,
 }
 
 func regexpFind(L *lua.LState) int {

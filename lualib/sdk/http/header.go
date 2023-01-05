@@ -7,19 +7,6 @@ import (
 
 const headerTypeName = httpTypeName + "_header"
 
-var headerMethods = map[string]lua.LGFunction{
-	"get":   headerGet,
-	"set":   headerSet,
-	"add":   headerAdd,
-	"del":   headerDel,
-	"clone": headerClone,
-}
-
-func registerHeaderType(L *lua.LState) {
-	mt := L.NewTypeMetatable(headerTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), headerMethods))
-}
-
 func pushHeader(L *lua.LState, header *http.Header) {
 	ud := L.NewUserData()
 	ud.Value = header

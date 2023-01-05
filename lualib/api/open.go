@@ -10,13 +10,13 @@ import (
 
 func openDefault(L *lua.LState) int {
 	target := L.CheckString(1)
-	app := L.Get(2)
+	app := L.OptString(2, "")
 
 	var err error
-	if app.Type() == lua.LTNil {
+	if app == "" {
 		err = open.Start(target)
 	} else {
-		err = open.StartWith(target, app.String())
+		err = open.StartWith(target, app)
 	}
 
 	if err != nil {
@@ -29,7 +29,7 @@ func openDefault(L *lua.LState) int {
 func openData(L *lua.LState) int {
 	ext := L.CheckString(1)
 	data := L.CheckString(2)
-	app := L.Get(3)
+	app := L.OptString(3, "")
 
 	file, err := filesystem.Api().TempFile(where.Temp(), "*."+ext)
 	if err != nil {
@@ -41,10 +41,10 @@ func openData(L *lua.LState) int {
 
 	path := file.Name()
 
-	if app.Type() == lua.LTNil {
+	if app == "" {
 		err = open.Start(path)
 	} else {
-		err = open.StartWith(path, app.String())
+		err = open.StartWith(path, app)
 	}
 
 	return 0

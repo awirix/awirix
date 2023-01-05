@@ -9,17 +9,6 @@ import (
 
 const documentTypeName = "html_document"
 
-var documentMethods = map[string]lua.LGFunction{
-	"find":     documentFind,
-	"html":     documentHtml,
-	"markdown": documentMarkdown,
-}
-
-func registerDocumentType(L *lua.LState) {
-	mt := L.NewTypeMetatable(documentTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), documentMethods))
-}
-
 func checkDocument(L *lua.LState, n int) *goquery.Document {
 	ud := L.CheckUserData(n)
 	if v, ok := ud.Value.(*goquery.Document); ok {

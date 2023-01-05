@@ -178,7 +178,13 @@ func Lib() *luadoc.Lib {
 }
 
 func join(L *lua.LState) int {
-	L.Push(lua.LString(filepath.Join(L.CheckString(1), L.CheckString(2))))
+	var path string
+	table := L.CheckTable(1)
+	for i := 1; i <= table.Len(); i++ {
+		path = filepath.Join(path, table.RawGetInt(i).String())
+	}
+
+	L.Push(lua.LString(path))
 	return 1
 }
 

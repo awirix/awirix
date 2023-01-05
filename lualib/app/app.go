@@ -4,18 +4,51 @@ import (
 	"github.com/spf13/viper"
 	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/luautil"
+	"github.com/vivi-app/vivi/luadoc"
 	"runtime"
 )
 
-func New(L *lua.LState) *lua.LTable {
-	return luautil.NewTable(L, map[string]lua.LValue{
-		"version": lua.LString(app.Version),
-		"os":      lua.LString(runtime.GOOS),
-		"arch":    lua.LString(runtime.GOARCH),
-	}, map[string]lua.LGFunction{
-		"config": config,
-	})
+func Lib() *luadoc.Lib {
+	return &luadoc.Lib{
+		Name:        "app",
+		Description: "Information about platform and configuration",
+		Vars: []*luadoc.Var{
+			{
+				Name:        "version",
+				Description: "Vivi version",
+				Value:       lua.LString(app.Version),
+			},
+			{
+				Name:        "os",
+				Description: "Operating system",
+				Value:       lua.LString(runtime.GOOS),
+			},
+			{
+				Name:        "arch",
+				Description: "Architecture",
+				Value:       lua.LString(runtime.GOARCH),
+			},
+		},
+		Funcs: []*luadoc.Func{
+			{
+				Name:        "config",
+				Description: "Get configuration value",
+				Value:       config,
+				Params: []*luadoc.Param{
+					{
+						Name: "key",
+						Type: "string",
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name: "value",
+						Type: luadoc.Any,
+					},
+				},
+			},
+		},
+	}
 }
 
 func config(L *lua.LState) int {

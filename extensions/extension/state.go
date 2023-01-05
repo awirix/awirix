@@ -50,7 +50,7 @@ func (e *Extension) initState(debug bool) {
 		lib(L)
 	}
 
-	lualib.Preload2(L)
+	lualib.Preload(L)
 
 	// add local files to the path
 	pkg := L.GetGlobal("package").(*lua.LTable)

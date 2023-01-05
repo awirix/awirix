@@ -7,11 +7,6 @@ import (
 
 const cookieTypeName = httpTypeName + "_cookie"
 
-func registerCookieType(L *lua.LState) {
-	mt := L.NewTypeMetatable(cookieTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), cookieMethods))
-}
-
 func pushCookie(L *lua.LState, cookie *http.Cookie) {
 	ud := L.NewUserData()
 	ud.Value = cookie
@@ -26,11 +21,6 @@ func checkCookie(L *lua.LState, n int) *http.Cookie {
 	}
 	L.ArgError(n, "cookie expected")
 	return nil
-}
-
-var cookieMethods = map[string]lua.LGFunction{
-	"name":  cookieName,
-	"value": cookieValue,
 }
 
 func cookieName(L *lua.LState) int {

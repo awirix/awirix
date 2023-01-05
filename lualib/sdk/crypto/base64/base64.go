@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/luautil"
 )
 
 func encodingToLua(L *lua.LState, encoding *base64.Encoding) *lua.LUserData {
@@ -103,13 +102,6 @@ func Lib(L *lua.LState) *luadoc.Lib {
 			},
 		},
 	}
-}
-
-func New(L *lua.LState) *lua.LTable {
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"encode": encode,
-		"decode": decode,
-	})
 }
 
 func encode(L *lua.LState) int {

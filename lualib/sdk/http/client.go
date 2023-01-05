@@ -10,11 +10,6 @@ import (
 
 const clientTypeName = httpTypeName + "_client"
 
-func registerClientType(L *lua.LState) {
-	mt := L.NewTypeMetatable(clientTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), clientMethods))
-}
-
 func pushClient(L *lua.LState, client *http.Client) {
 	ud := L.NewUserData()
 	ud.Value = client
@@ -29,12 +24,6 @@ func checkClient(L *lua.LState, n int) *http.Client {
 	}
 	L.ArgError(n, "client expected")
 	return nil
-}
-
-var clientMethods = map[string]lua.LGFunction{
-	"send":        clientSend,
-	"batch":       clientSendBatch,
-	"set_timeout": clientSetTimeout,
 }
 
 func newClient(L *lua.LState) int {

@@ -1,9 +1,7 @@
 package html
 
 import (
-	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/luautil"
 )
 
 func Lib() *luadoc.Lib {
@@ -540,12 +538,4 @@ func Lib() *luadoc.Lib {
 			classDocument,
 		},
 	}
-}
-
-func New(L *lua.LState) *lua.LTable {
-	registerDocumentType(L)
-
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"parse": parse,
-	})
 }

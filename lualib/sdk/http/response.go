@@ -9,28 +9,6 @@ import (
 
 const responseTypeName = httpTypeName + "_response"
 
-var responseMethods = map[string]lua.LGFunction{
-	"status_code":       responseStatusCode,
-	"body":              responseBody,
-	"headers":           responseHeaders,
-	"cookies":           responseCookies,
-	"status":            responseStatus,
-	"content_length":    responseContentLength,
-	"transfer_encoding": responseTransferEncoding,
-	"proto":             responseProto,
-	"proto_major":       responseProtoMajor,
-	"proto_minor":       responseProtoMinor,
-	"trailer":           responseTrailer,
-	"close":             responseClose,
-	"uncompressed":      responseUncompressed,
-	"request":           responseRequest,
-}
-
-func registerResponseType(L *lua.LState) {
-	mt := L.NewTypeMetatable(responseTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), responseMethods))
-}
-
 func pushResponse(L *lua.LState, response *http.Response) {
 	ud := L.NewUserData()
 	ud.Value = response
@@ -80,7 +58,7 @@ func responseBody(L *lua.LState) int {
 	return 1
 }
 
-func responseHeaders(L *lua.LState) int {
+func responseHeader(L *lua.LState) int {
 	response := checkResponse(L, 1)
 	headers := response.Header
 

@@ -4,7 +4,6 @@ import (
 	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/cache"
 	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/luautil"
 	"net/http"
 	"strings"
 )
@@ -191,6 +190,30 @@ func Lib() *luadoc.Lib {
 					},
 				},
 			},
+			{
+				Name:        "header",
+				Description: "Returns the header of the response.",
+				Value:       responseHeader,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "header",
+						Description: "The header of the response.",
+						Type:        headerTypeName,
+					},
+				},
+			},
+			{
+				Name:        "cookies",
+				Description: "Returns the cookies of the response.",
+				Value:       responseCookies,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "cookies",
+						Description: "The cookies of the response.",
+						Type:        luadoc.List(cookieTypeName),
+					},
+				},
+			},
 		},
 	}
 
@@ -318,6 +341,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "get",
 				Description: "Performs a GET request to the specified URL.",
+				Value:       defaultClientGet,
 				Params: []*luadoc.Param{
 					{
 						Name:        "url",
@@ -348,6 +372,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "post",
 				Description: "Performs a POST request to the specified URL.",
+				Value:       defaultClientPost,
 				Params: []*luadoc.Param{
 					{
 						Name:        "url",
@@ -377,6 +402,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "request",
 				Description: "Creates a new request object.",
+				Value:       newRequest,
 				Params: []*luadoc.Param{
 					{
 						Name:        "method",
@@ -412,6 +438,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "client",
 				Description: "Creates a new client object.",
+				Value:       newClient,
 				Returns: []*luadoc.Param{
 					{
 						Name:        "client",
@@ -423,6 +450,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "header",
 				Description: "Creates a new header object.",
+				Value:       newHeader,
 				Returns: []*luadoc.Param{
 					{
 						Name:        "header",
@@ -440,22 +468,6 @@ func Lib() *luadoc.Lib {
 			classClient,
 		},
 	}
-}
-
-func New(L *lua.LState) *lua.LTable {
-	registerResponseType(L)
-	registerRequestType(L)
-	registerHeaderType(L)
-	registerClientType(L)
-	registerCookieType(L)
-
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"get":     defaultClientGet,
-		"post":    defaultClientPost,
-		"request": newRequest,
-		"header":  newHeader,
-		"client":  newClient,
-	})
 }
 
 func defaultClientGet(L *lua.LState) int {

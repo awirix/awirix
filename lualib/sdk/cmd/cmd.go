@@ -104,13 +104,6 @@ func Lib() *luadoc.Lib {
 	}
 }
 
-func New(L *lua.LState) *lua.LTable {
-	registerCommandType(L)
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"new": newCommand,
-	})
-}
-
 func newCommand(L *lua.LState) int {
 	command := L.CheckString(1)
 
@@ -215,4 +208,22 @@ func commandRun(L *lua.LState) int {
 
 	L.Push(lua.LNil)
 	return 1
+}
+
+const commandTypeName = "command"
+
+func checkCommand(L *lua.LState, n int) *exec.Cmd {
+	ud := L.CheckUserData(n)
+	if v, ok := ud.Value.(*exec.Cmd); ok {
+		return v
+	}
+	L.ArgError(1, "command expected")
+	return nil
+}
+
+func pushCommand(L *lua.LState, cmd *exec.Cmd) {
+	ud := L.NewUserData()
+	ud.Value = cmd
+	L.SetMetatable(ud, L.GetTypeMetatable(commandTypeName))
+	L.Push(ud)
 }

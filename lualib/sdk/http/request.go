@@ -9,17 +9,6 @@ import (
 
 const requestTypeName = httpTypeName + "_request"
 
-var requestMethods = map[string]lua.LGFunction{
-	"set_header":     requestSetHeader,
-	"header":         requestGetHeader,
-	"set_basic_auth": requestSetBasicAuth,
-}
-
-func registerRequestType(L *lua.LState) {
-	mt := L.NewTypeMetatable(requestTypeName)
-	L.SetField(mt, "__index", L.SetFuncs(L.NewTable(), requestMethods))
-}
-
 func checkRequest(L *lua.LState, idx int) *http.Request {
 	ud := L.CheckUserData(idx)
 	if v, ok := ud.Value.(*http.Request); ok {

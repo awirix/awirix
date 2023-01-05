@@ -4,7 +4,6 @@ import (
 	"github.com/mvdan/xurls"
 	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/luautil"
 	"regexp"
 )
 
@@ -144,6 +143,7 @@ Inside replacement, $ signs are interpreted as in expand, so for instance $1 rep
 			{
 				Name:        "match",
 				Description: "Matches the given pattern against the given text.",
+				Value:       match,
 				Params: []*luadoc.Param{
 					{
 						Name:        "pattern",
@@ -169,11 +169,11 @@ Inside replacement, $ signs are interpreted as in expand, so for instance $1 rep
 						Opt:         true,
 					},
 				},
-				Value: regexpMatch,
 			},
 			{
 				Name:        "compile",
 				Description: "Compiles the given pattern into a regular expression.",
+				Value:       compile,
 				Params: []*luadoc.Param{
 					{
 						Name:        "pattern",
@@ -194,32 +194,12 @@ Inside replacement, $ signs are interpreted as in expand, so for instance $1 rep
 						Opt:         true,
 					},
 				},
-				Value: compile,
 			},
 		},
 		Classes: []*luadoc.Class{
 			classRe,
 		},
 	}
-}
-
-func New(L *lua.LState) *lua.LTable {
-	registerRegexpType(L)
-
-	toLValue := func(r *regexp.Regexp) *lua.LUserData {
-		ud := L.NewUserData()
-		ud.Value = r
-		L.SetMetatable(ud, L.GetTypeMetatable(regexpTypeName))
-		return ud
-	}
-
-	return luautil.NewTable(L, map[string]lua.LValue{
-		"urls_relaxed": toLValue(xurls.Relaxed),
-		"urls_strict":  toLValue(xurls.Strict),
-	}, map[string]lua.LGFunction{
-		"match":   match,
-		"compile": compile,
-	})
 }
 
 func match(L *lua.LState) int {

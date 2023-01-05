@@ -4,7 +4,6 @@ import (
 	"crypto/aes"
 	lua "github.com/vivi-app/lua"
 	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/luautil"
 )
 
 func Lib() *luadoc.Lib {
@@ -73,13 +72,6 @@ func Lib() *luadoc.Lib {
 			},
 		},
 	}
-}
-
-func New(L *lua.LState) *lua.LTable {
-	return luautil.NewTable(L, nil, map[string]lua.LGFunction{
-		"encrypt": encrypt,
-		"decrypt": decrypt,
-	})
 }
 
 func encrypt(L *lua.LState) int {
