@@ -58,7 +58,7 @@ func Lib(L *lua.LState) *luadoc.Lib {
 						Name:        "encoding",
 						Description: "The encoding to use. Defaults to `std_encoding`.",
 						Type:        encodingTypeName,
-						Opt:         true,
+						Optional:    true,
 					},
 				},
 				Returns: []*luadoc.Param{
@@ -71,7 +71,7 @@ func Lib(L *lua.LState) *luadoc.Lib {
 						Name:        "error",
 						Description: "The error message if the string could not be decoded.",
 						Type:        luadoc.String,
-						Opt:         true,
+						Optional:    true,
 					},
 				},
 			},
@@ -89,7 +89,7 @@ func Lib(L *lua.LState) *luadoc.Lib {
 						Name:        "encoding",
 						Description: "The encoding to use. Defaults to `std_encoding`.",
 						Type:        encodingTypeName,
-						Opt:         true,
+						Optional:    true,
 					},
 				},
 				Returns: []*luadoc.Param{

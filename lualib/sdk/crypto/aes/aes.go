@@ -37,7 +37,7 @@ func Lib() *luadoc.Lib {
 						Name:        "error",
 						Description: "The error message, if any.",
 						Type:        luadoc.String,
-						Opt:         true,
+						Optional:    true,
 					},
 				},
 			},

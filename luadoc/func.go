@@ -9,7 +9,7 @@ type Param struct {
 	Name        string
 	Description string
 	Type        string
-	Opt         bool
+	Optional    bool
 }
 
 func (p *Param) String() string {
@@ -31,7 +31,7 @@ func (f Func) AsType() string {
 		b.WriteString(param.Name)
 		b.WriteString(": ")
 		b.WriteString(param.Type)
-		if param.Opt {
+		if param.Optional {
 			b.WriteString("?")
 		}
 

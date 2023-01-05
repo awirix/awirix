@@ -81,10 +81,10 @@ local {{ $class.Name }} = {}
 {{ range $method := $class.Methods }}
 {{ doc $method.Description }}
 {{- range $param := $method.Params }}
-{{ doc "@param" }} {{ $param.Name }} {{ $param.Type }}{{ if $param.Opt }}?{{ end }} {{ $param.Description }}
+{{ doc "@param" }} {{ $param.Name }} {{ $param.Type }}{{ if $param.Optional }}?{{ end }} {{ $param.Description }}
 {{- end }}
 {{- range $return := $method.Returns }}
-{{ doc "@return" }} {{ $return.Type }}{{ if $return.Opt }}?{{ end }} {{ $return.Name }} {{ $return.Description }}
+{{ doc "@return" }} {{ $return.Type }}{{ if $return.Optional }}?{{ end }} {{ $return.Name }} {{ $return.Description }}
 {{- end }}
 function {{ $class.Name }}:{{ $method.Name }}({{ join (params $method.Params) ", " }}) end
 {{ end }}
@@ -93,10 +93,10 @@ function {{ $class.Name }}:{{ $method.Name }}({{ join (params $method.Params) ",
 {{ range $func := .Funcs }}
 {{ doc $func.Description }}
 {{- range $param := $func.Params }}
-{{ doc "@param" }} {{ $param.Name }} {{ $param.Type }}{{ if $param.Opt }}?{{ end }} {{ $param.Description }}
+{{ doc "@param" }} {{ $param.Name }} {{ $param.Type }}{{ if $param.Optional }}?{{ end }} {{ $param.Description }}
 {{- end }}
 {{- range $return := $func.Returns }}
-{{ doc "@return" }} {{ $return.Type }}{{ if $return.Opt }}?{{ end }} {{ $return.Name }} {{ $return.Description }}
+{{ doc "@return" }} {{ $return.Type }}{{ if $return.Optional }}?{{ end }} {{ $return.Name }} {{ $return.Description }}
 {{- end }}
 function {{ $.Name }}.{{ $func.Name }}({{ join (params $func.Params) ", " }}) end
 {{ end }}

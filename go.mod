@@ -36,8 +36,8 @@ require (
 	github.com/vivi-app/libopen v1.0.0
 	github.com/vivi-app/lua v1.5.0
 	github.com/vivi-app/templates v0.7.2
-	golang.org/x/exp v0.0.0-20221230185412-738e83a70c30
-	golang.org/x/term v0.3.0
+	golang.org/x/exp v0.0.0-20230105202349-8879d0199aa3
+	golang.org/x/term v0.4.0
 )
 
 require (
@@ -91,13 +91,13 @@ require (
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/yuin/goldmark v1.5.3 // indirect
 	github.com/yuin/goldmark-emoji v1.0.1 // indirect
-	golang.org/x/crypto v0.4.0 // indirect
-	golang.org/x/image v0.2.0 // indirect
+	golang.org/x/crypto v0.5.0 // indirect
+	golang.org/x/image v0.3.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
-	golang.org/x/net v0.4.0 // indirect
-	golang.org/x/sys v0.3.0 // indirect
-	golang.org/x/text v0.5.0 // indirect
-	golang.org/x/tools v0.4.0 // indirect
+	golang.org/x/net v0.5.0 // indirect
+	golang.org/x/sys v0.4.0 // indirect
+	golang.org/x/text v0.6.0 // indirect
+	golang.org/x/tools v0.5.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/sourcemap.v1 v1.0.5 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
