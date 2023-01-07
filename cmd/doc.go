@@ -23,8 +23,7 @@ func init() {
 
 var docLuaCmd = &cobra.Command{
 	Use:   "lua",
-	Short: "Generate Lua documentation",
-	Long:  `Generate Lua documentation`,
+	Short: "Generate Lua documentation that can used by language server",
 	Run: func(cmd *cobra.Command, args []string) {
 		state := lua.NewState(nil)
 		lib := lualib.Lib(state)
