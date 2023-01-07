@@ -2,9 +2,9 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/where"
 	"strings"
 )
 

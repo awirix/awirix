@@ -2,9 +2,9 @@ package pdf
 
 import (
 	"bytes"
+	"github.com/awirix/awirix/luadoc"
+	"github.com/awirix/lua"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luadoc"
 	"io"
 	"strings"
 )

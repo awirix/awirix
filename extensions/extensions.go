@@ -1,6 +1,6 @@
 package extensions
 
-import "github.com/vivi-app/vivi/extensions/passport"
+import "github.com/awirix/awirix/extensions/passport"
 
 type ExtensionContainer interface {
 	String() string

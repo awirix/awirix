@@ -2,9 +2,9 @@ package luadoc
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/luautil"
+	"github.com/awirix/lua"
 	"github.com/samber/lo"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luautil"
 	"strings"
 )
 

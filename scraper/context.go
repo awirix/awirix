@@ -1,6 +1,6 @@
 package scraper
 
-import "github.com/vivi-app/lua"
+import "github.com/awirix/lua"
 
 type Context struct {
 	Progress func(message string)

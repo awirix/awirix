@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/style"
 	"html/template"
 	"runtime"
 

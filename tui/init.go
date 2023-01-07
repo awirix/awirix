@@ -3,7 +3,7 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/vivi-app/vivi/extensions/manager"
+	"github.com/awirix/awirix/extensions/manager"
 )
 
 func (m *model) Init() tea.Cmd {

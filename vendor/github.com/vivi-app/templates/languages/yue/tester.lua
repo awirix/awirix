@@ -1,1 +1,0 @@
-error('`tester.yue` is not compiled. See README.md for compilation instructions')

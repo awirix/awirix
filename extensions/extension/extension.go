@@ -2,14 +2,14 @@ package extension
 
 import (
 	"fmt"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/extensions/passport"
-	"github.com/vivi-app/vivi/filename"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/tester"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/extensions/passport"
+	"github.com/awirix/awirix/filename"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/tester"
+	"github.com/awirix/awirix/where"
+	"github.com/awirix/lua"
 	"path/filepath"
 )
 

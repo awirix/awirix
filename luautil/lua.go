@@ -2,7 +2,7 @@ package luautil
 
 import (
 	"fmt"
-	lua "github.com/vivi-app/lua"
+	lua "github.com/awirix/lua"
 	"strconv"
 )
 

@@ -1,8 +1,8 @@
 package manager
 
 import (
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/filesystem"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/filesystem"
 )
 
 func UninstallExtension(ext *extension.Extension) error {

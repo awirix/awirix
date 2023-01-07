@@ -8,8 +8,8 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/option"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/option"
 	"strings"
 )
 

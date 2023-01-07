@@ -2,12 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/extensions"
+	"github.com/awirix/awirix/luadoc"
+	"github.com/awirix/awirix/luautil"
+	"github.com/awirix/lua"
 	"github.com/kballard/go-shellquote"
 	"github.com/samber/lo"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/extensions"
-	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/luautil"
 	"os/exec"
 )
 

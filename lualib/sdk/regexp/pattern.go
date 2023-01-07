@@ -1,7 +1,7 @@
 package regexp
 
 import (
-	lua "github.com/vivi-app/lua"
+	lua "github.com/awirix/lua"
 	"regexp"
 )
 

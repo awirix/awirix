@@ -1,8 +1,8 @@
 package scraper
 
 import (
+	"github.com/awirix/lua"
 	"github.com/pkg/errors"
-	"github.com/vivi-app/lua"
 )
 
 type Layer struct {

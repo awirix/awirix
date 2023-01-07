@@ -3,8 +3,8 @@ package where
 import (
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/key"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/key"
 	"os"
 	"path/filepath"
 )

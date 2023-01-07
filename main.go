@@ -2,9 +2,9 @@ package main
 
 import (
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/cmd"
-	"github.com/vivi-app/vivi/config"
-	"github.com/vivi-app/vivi/log"
+	"github.com/awirix/awirix/cmd"
+	"github.com/awirix/awirix/config"
+	"github.com/awirix/awirix/log"
 )
 
 func init() {

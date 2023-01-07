@@ -1,10 +1,10 @@
 package app
 
 import (
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/luadoc"
+	lua "github.com/awirix/lua"
 	"github.com/spf13/viper"
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/luadoc"
 	"runtime"
 )
 
@@ -15,7 +15,7 @@ func Lib() *luadoc.Lib {
 		Vars: []*luadoc.Var{
 			{
 				Name:        "version",
-				Description: "Vivi version",
+				Description: app.Name + " version",
 				Value:       lua.LString(app.Version),
 			},
 			{

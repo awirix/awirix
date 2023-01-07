@@ -1,15 +1,8 @@
-# Vivi
+# Awirix
 
 > One scraper to rule them all!
 
-Vivi is currently a **heavy work in progress** project that aims to replace **all** existing media scrapers.
-Watch movies, anime, read manga, download torrents, you name it!
-Literally limitless possibilities due to *extension-based* structure powered by *Lua Scripts*.
-
-At this stage, there's not much to show (in fact, by "not much" I mean nothing),
-it's not even an alpha version, more like a draft, so you probably don't want to use it right now.
-
-But you can take a look at the scraper's template to get a brief idea what is going on
+You can take a look at the extension's scraper template to get a brief idea what is going on
 
 ```lua
 --- Name of the media type to display

@@ -4,9 +4,9 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/key"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/key"
+	"github.com/awirix/awirix/style"
 )
 
 type Styles struct {

@@ -3,10 +3,10 @@ package cmd
 import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/style"
+	"github.com/awirix/awirix/where"
 	"os"
 )
 

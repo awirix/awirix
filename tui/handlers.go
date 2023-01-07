@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/style"
 )
 
 func (m *model) handleWrapper(cmd tea.Cmd) tea.Cmd {

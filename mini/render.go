@@ -1,9 +1,9 @@
 package mini
 
 import (
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/style"
 )
 
 func renderMedia(media *scraper.Media) (rendered string) {

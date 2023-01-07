@@ -1,6 +1,6 @@
 package app
 
 const (
-	Name    = "vivi"
+	Name    = "awirix"
 	Version = "0.0.1"
 )

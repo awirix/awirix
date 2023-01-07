@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/style"
 	"reflect"
 	"strconv"
 	"strings"
 	"text/template"
 
-	"github.com/vivi-app/vivi/color"
+	"github.com/awirix/awirix/color"
 )
 
 type Field struct {

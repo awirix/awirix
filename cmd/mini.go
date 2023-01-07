@@ -1,9 +1,10 @@
 package cmd
 
 import (
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/mini"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/vivi-app/vivi/mini"
 )
 
 func init() {
@@ -13,8 +14,7 @@ func init() {
 
 var miniCmd = &cobra.Command{
 	Use:   "mini",
-	Short: "Run a mini version of Vivi",
-	Long:  `Run a mini version of Vivi`,
+	Short: "Run a mini version of " + app.Name,
 	Run: func(cmd *cobra.Command, args []string) {
 		options := &mini.Options{
 			Debug: lo.Must(cmd.Flags().GetBool("debug")),

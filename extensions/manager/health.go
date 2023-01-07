@@ -1,10 +1,10 @@
 package manager
 
 import (
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/where"
 	"io"
 	"path/filepath"
 )

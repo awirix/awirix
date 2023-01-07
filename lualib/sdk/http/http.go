@@ -1,9 +1,9 @@
 package http
 
 import (
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/cache"
-	"github.com/vivi-app/vivi/luadoc"
+	"github.com/awirix/awirix/cache"
+	"github.com/awirix/awirix/luadoc"
+	lua "github.com/awirix/lua"
 	"net/http"
 	"strings"
 )

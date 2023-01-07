@@ -1,9 +1,9 @@
 package api
 
 import (
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/extensions"
-	"github.com/vivi-app/vivi/filesystem"
+	"github.com/awirix/awirix/extensions"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/lua"
 	"path/filepath"
 )
 

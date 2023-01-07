@@ -3,7 +3,7 @@ package html
 import (
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
-	lua "github.com/vivi-app/lua"
+	lua "github.com/awirix/lua"
 	"strings"
 )
 

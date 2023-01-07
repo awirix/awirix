@@ -3,11 +3,11 @@ package cmd
 import (
 	cc "github.com/ivanpirog/coloredcobra"
 	"github.com/spf13/cobra"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/tui"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/tui"
+	"github.com/awirix/awirix/where"
 	"os"
 	"strings"
 )

@@ -1,9 +1,9 @@
 package js
 
 import (
+	"github.com/awirix/awirix/luautil"
+	lua "github.com/awirix/lua"
 	"github.com/robertkrimen/otto"
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luautil"
 )
 
 const vmValueTypeName = vmTypeName + "_value"

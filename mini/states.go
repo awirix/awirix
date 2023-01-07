@@ -2,12 +2,12 @@ package mini
 
 import (
 	"fmt"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/extensions/manager"
-	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/extensions/manager"
+	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/style"
 )
 
 func notFound() {

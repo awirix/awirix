@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v48/github"
-	"github.com/vivi-app/vivi/option"
+	"github.com/awirix/awirix/option"
 	"net/http"
 )
 

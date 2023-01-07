@@ -1,11 +1,12 @@
 package lualib
 
 import (
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/lualib/api"
-	"github.com/vivi-app/vivi/lualib/app"
-	"github.com/vivi-app/vivi/lualib/sdk"
+	app2 "github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/luadoc"
+	"github.com/awirix/awirix/lualib/api"
+	"github.com/awirix/awirix/lualib/app"
+	"github.com/awirix/awirix/lualib/sdk"
+	lua "github.com/awirix/lua"
 )
 
 func Preload(L *lua.LState) {
@@ -15,8 +16,8 @@ func Preload(L *lua.LState) {
 
 func Lib(L *lua.LState) *luadoc.Lib {
 	return &luadoc.Lib{
-		Name:        "vivi",
-		Description: "Vivi library",
+		Name:        app2.Name,
+		Description: app2.Name + " library",
 		Libs: []*luadoc.Lib{
 			sdk.Lib(L),
 			app.Lib(),

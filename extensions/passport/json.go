@@ -3,7 +3,7 @@ package passport
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/vivi-app/vivi/language"
+	"github.com/awirix/awirix/language"
 	"golang.org/x/exp/slices"
 	"strings"
 )

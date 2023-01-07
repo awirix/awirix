@@ -3,7 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
-	"github.com/vivi-app/vivi/option"
+	"github.com/awirix/awirix/option"
 	"net/http"
 )
 

@@ -2,8 +2,8 @@ package app
 
 import (
 	_ "embed"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/style"
 	"strings"
 )
 

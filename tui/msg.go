@@ -1,8 +1,8 @@
 package tui
 
 import (
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/scraper"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/scraper"
 )
 
 type (

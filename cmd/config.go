@@ -3,8 +3,8 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/style"
 	"golang.org/x/exp/slices"
 	"os"
 	"path/filepath"
@@ -15,11 +15,11 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/config"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/config"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/where"
 )
 
 // errUnknownKey will generate error for key that was not found and will provide a hint

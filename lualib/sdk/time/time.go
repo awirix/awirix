@@ -1,8 +1,8 @@
 package time
 
 import (
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luautil"
+	"github.com/awirix/awirix/luautil"
+	"github.com/awirix/lua"
 	"time"
 )
 

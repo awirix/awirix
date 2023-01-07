@@ -1,6 +1,6 @@
 package stack
 
-import "github.com/vivi-app/vivi/option"
+import "github.com/awirix/awirix/option"
 
 type (
 	Stack[T any] struct {

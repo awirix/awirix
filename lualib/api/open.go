@@ -2,10 +2,10 @@ package api
 
 import (
 	"fmt"
-	"github.com/vivi-app/libopen/open"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/where"
+	"github.com/awirix/libopen/open"
+	"github.com/awirix/lua"
 )
 
 func openDefault(L *lua.LState) int {

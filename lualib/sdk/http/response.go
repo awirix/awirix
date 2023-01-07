@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/vivi-app/lua"
+	"github.com/awirix/lua"
 	"io"
 	"net/http"
 	"strings"

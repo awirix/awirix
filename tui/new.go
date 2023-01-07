@@ -3,7 +3,7 @@ package tui
 import (
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/viewport"
-	"github.com/vivi-app/vivi/stack"
+	"github.com/awirix/awirix/stack"
 	"golang.org/x/term"
 	"os"
 )

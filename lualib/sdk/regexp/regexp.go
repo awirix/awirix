@@ -1,9 +1,9 @@
 package regexp
 
 import (
+	"github.com/awirix/awirix/luadoc"
+	lua "github.com/awirix/lua"
 	"github.com/mvdan/xurls"
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luadoc"
 	"regexp"
 )
 

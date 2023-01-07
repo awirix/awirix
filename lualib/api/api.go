@@ -1,13 +1,14 @@
 package api
 
 import (
-	"github.com/vivi-app/vivi/luadoc"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/luadoc"
 )
 
 func Lib() *luadoc.Lib {
 	return &luadoc.Lib{
 		Name:        "api",
-		Description: "Vivi api. Used to interact with the system. For example, to open an app or watch a video.",
+		Description: app.Name + " api. Used to interact with the system. For example, to open an app or watch a video.",
 		Funcs: []*luadoc.Func{
 			{
 				Name:        "watch",

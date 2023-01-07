@@ -2,8 +2,8 @@ package scraper
 
 import (
 	"fmt"
+	"github.com/awirix/lua"
 	"github.com/pkg/errors"
-	"github.com/vivi-app/lua"
 )
 
 type Action struct {

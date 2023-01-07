@@ -3,10 +3,10 @@ package passport
 import (
 	"fmt"
 	"github.com/samber/lo"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/executil"
-	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/executil"
+	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/style"
 	"runtime"
 	"strings"
 )

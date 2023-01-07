@@ -2,9 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/lualib"
+	"github.com/awirix/lua"
 	"github.com/spf13/cobra"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/lualib"
 )
 
 func init() {

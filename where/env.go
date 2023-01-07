@@ -1,7 +1,7 @@
 package where
 
 import (
-	"github.com/vivi-app/vivi/app"
+	"github.com/awirix/awirix/app"
 	"strings"
 )
 

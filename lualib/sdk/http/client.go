@@ -1,8 +1,8 @@
 package http
 
 import (
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/cache"
+	"github.com/awirix/awirix/cache"
+	"github.com/awirix/lua"
 	"net/http"
 	"sync"
 	"time"

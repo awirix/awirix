@@ -3,7 +3,7 @@ package html
 import (
 	"github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
-	"github.com/vivi-app/lua"
+	"github.com/awirix/lua"
 )
 
 const selectionTypeName = documentTypeName + "_selection"

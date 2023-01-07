@@ -2,7 +2,7 @@ package scraper
 
 import (
 	"fmt"
-	"github.com/vivi-app/lua"
+	"github.com/awirix/lua"
 )
 
 func (s *Scraper) checkMedia() (*Media, error) {

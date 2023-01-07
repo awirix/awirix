@@ -1,7 +1,7 @@
 package js
 
 import (
-	"github.com/vivi-app/vivi/luadoc"
+	"github.com/awirix/awirix/luadoc"
 )
 
 func Lib() *luadoc.Lib {

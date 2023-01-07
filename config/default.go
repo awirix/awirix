@@ -2,7 +2,7 @@ package config
 
 import (
 	"github.com/spf13/viper"
-	"github.com/vivi-app/vivi/key"
+	"github.com/awirix/awirix/key"
 	"runtime"
 )
 

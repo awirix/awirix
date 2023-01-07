@@ -2,9 +2,9 @@ package log
 
 import (
 	"fmt"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/style"
 	"io"
 )
 

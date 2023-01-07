@@ -1,4 +1,4 @@
-module github.com/vivi-app/vivi
+module github.com/awirix/awirix
 
 go 1.19
 
@@ -6,13 +6,16 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/JohannesKaufmann/html-to-markdown v1.3.6
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/awirix/gluamapper v1.1.0
+	github.com/awirix/libopen v1.0.0
+	github.com/awirix/lua v1.6.0
+	github.com/awirix/templates v0.8.0
 	github.com/briandowns/spinner v1.20.0
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/charmbracelet/lipgloss v0.6.0
-	github.com/ghodss/yaml v1.0.0
-	github.com/go-git/go-git/v5 v5.5.1
+	github.com/go-git/go-git/v5 v5.5.2
 	github.com/google/go-github/v48 v48.2.0
 	github.com/ivanpirog/coloredcobra v1.0.1
 	github.com/ka-weihe/fast-levenshtein v0.0.0-20201227151214-4c99ee36a1ba
@@ -32,10 +35,6 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
-	github.com/vivi-app/gluamapper v1.0.0
-	github.com/vivi-app/libopen v1.0.0
-	github.com/vivi-app/lua v1.5.0
-	github.com/vivi-app/templates v0.7.2
 	golang.org/x/exp v0.0.0-20230105202349-8879d0199aa3
 	golang.org/x/term v0.4.0
 )

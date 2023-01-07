@@ -2,10 +2,10 @@ package scraper
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/luautil"
+	"github.com/awirix/lua"
 	"github.com/pkg/errors"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/luautil"
 	"io"
 )
 

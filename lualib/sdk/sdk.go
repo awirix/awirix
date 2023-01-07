@@ -1,26 +1,27 @@
 package sdk
 
 import (
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/luadoc"
-	"github.com/vivi-app/vivi/lualib/sdk/cmd"
-	"github.com/vivi-app/vivi/lualib/sdk/crypto"
-	"github.com/vivi-app/vivi/lualib/sdk/filepath"
-	"github.com/vivi-app/vivi/lualib/sdk/html"
-	"github.com/vivi-app/vivi/lualib/sdk/http"
-	"github.com/vivi-app/vivi/lualib/sdk/js"
-	"github.com/vivi-app/vivi/lualib/sdk/json"
-	"github.com/vivi-app/vivi/lualib/sdk/pdf"
-	"github.com/vivi-app/vivi/lualib/sdk/regexp"
-	"github.com/vivi-app/vivi/lualib/sdk/strings"
-	"github.com/vivi-app/vivi/lualib/sdk/time"
-	"github.com/vivi-app/vivi/luautil"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/luadoc"
+	"github.com/awirix/awirix/lualib/sdk/cmd"
+	"github.com/awirix/awirix/lualib/sdk/crypto"
+	"github.com/awirix/awirix/lualib/sdk/filepath"
+	"github.com/awirix/awirix/lualib/sdk/html"
+	"github.com/awirix/awirix/lualib/sdk/http"
+	"github.com/awirix/awirix/lualib/sdk/js"
+	"github.com/awirix/awirix/lualib/sdk/json"
+	"github.com/awirix/awirix/lualib/sdk/pdf"
+	"github.com/awirix/awirix/lualib/sdk/regexp"
+	"github.com/awirix/awirix/lualib/sdk/strings"
+	"github.com/awirix/awirix/lualib/sdk/time"
+	"github.com/awirix/awirix/luautil"
+	lua "github.com/awirix/lua"
 )
 
 func Lib(L *lua.LState) *luadoc.Lib {
 	return &luadoc.Lib{
 		Name:        "sdk",
-		Description: `Vivi SDK library. Contains various utilities for making HTTP requests, working with JSON, HTML, and more.`,
+		Description: app.Name + ` SDK library. Contains various utilities for making HTTP requests, working with JSON, HTML, and more.`,
 		Libs: []*luadoc.Lib{
 			regexp.Lib(L),
 			strings.Lib(),

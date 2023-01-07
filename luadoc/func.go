@@ -1,7 +1,7 @@
 package luadoc
 
 import (
-	"github.com/vivi-app/lua"
+	"github.com/awirix/lua"
 	"strings"
 )
 

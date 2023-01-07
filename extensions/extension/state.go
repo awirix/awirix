@@ -2,14 +2,14 @@ package extension
 
 import (
 	"context"
+	"github.com/awirix/awirix/key"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/lualib"
+	"github.com/awirix/awirix/luautil"
+	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/where"
+	"github.com/awirix/lua"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/key"
-	"github.com/vivi-app/vivi/log"
-	"github.com/vivi-app/vivi/lualib"
-	"github.com/vivi-app/vivi/luautil"
-	"github.com/vivi-app/vivi/scraper"
-	"github.com/vivi-app/vivi/where"
 	"path/filepath"
 	"strings"
 )
@@ -55,10 +55,10 @@ func (e *Extension) initState(debug bool) {
 	// add local files to the path
 	pkg := L.GetGlobal("package").(*lua.LTable)
 	paths := strings.Split(pkg.RawGetString("path").String(), ";")
-	viviPaths := []string{
+	appPaths := []string{
 		filepath.Join(e.Path(), "?.lua"),
 	}
-	paths = append(viviPaths, paths...)
+	paths = append(appPaths, paths...)
 	pkg.RawSetString("path", lua.LString(strings.Join(paths, ";")))
 
 	e.state = L

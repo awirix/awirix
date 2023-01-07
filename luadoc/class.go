@@ -1,6 +1,6 @@
 package luadoc
 
-import "github.com/vivi-app/lua"
+import "github.com/awirix/lua"
 
 type Method struct {
 	Name        string

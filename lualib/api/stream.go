@@ -2,11 +2,11 @@ package api
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/executil"
+	"github.com/awirix/awirix/key"
+	"github.com/awirix/libopen/open"
+	lua "github.com/awirix/lua"
 	"github.com/spf13/viper"
-	"github.com/vivi-app/libopen/open"
-	lua "github.com/vivi-app/lua"
-	"github.com/vivi-app/vivi/executil"
-	"github.com/vivi-app/vivi/key"
 	"runtime"
 )
 

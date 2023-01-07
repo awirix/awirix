@@ -3,13 +3,13 @@ package cmd
 import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
-	"github.com/vivi-app/vivi/app"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/style"
-	"github.com/vivi-app/vivi/text"
-	"github.com/vivi-app/vivi/where"
+	"github.com/awirix/awirix/app"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/style"
+	"github.com/awirix/awirix/text"
+	"github.com/awirix/awirix/where"
 )
 
 type clearTarget struct {

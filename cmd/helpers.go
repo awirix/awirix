@@ -5,12 +5,12 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
-	"github.com/vivi-app/vivi/color"
-	"github.com/vivi-app/vivi/extensions/extension"
-	"github.com/vivi-app/vivi/extensions/manager"
-	"github.com/vivi-app/vivi/filesystem"
-	"github.com/vivi-app/vivi/icon"
-	"github.com/vivi-app/vivi/style"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/extensions/manager"
+	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/style"
 )
 
 func completionExtensionsIDs(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
