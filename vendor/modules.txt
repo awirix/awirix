@@ -92,7 +92,7 @@ github.com/awirix/lua
 github.com/awirix/lua/ast
 github.com/awirix/lua/parse
 github.com/awirix/lua/pm
-# github.com/awirix/templates v0.8.0
+# github.com/awirix/templates v0.8.1
 ## explicit; go 1.19
 github.com/awirix/templates
 # github.com/aymanbagabas/go-osc52 v1.2.1

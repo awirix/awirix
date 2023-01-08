@@ -9,7 +9,7 @@ require (
 	github.com/awirix/gluamapper v1.1.0
 	github.com/awirix/libopen v1.0.0
 	github.com/awirix/lua v1.6.0
-	github.com/awirix/templates v0.8.0
+	github.com/awirix/templates v0.8.1
 	github.com/briandowns/spinner v1.20.0
 	github.com/charmbracelet/bubbles v0.14.0
 	github.com/charmbracelet/bubbletea v0.23.1
