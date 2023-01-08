@@ -1,12 +1,12 @@
 package tui
 
 import (
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/spf13/viper"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/style"
+	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/spf13/viper"
 )
 
 type Styles struct {

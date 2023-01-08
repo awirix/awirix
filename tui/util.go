@@ -1,6 +1,9 @@
 package tui
 
 import (
+	configKey "github.com/awirix/awirix/key"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/option"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -8,8 +11,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/samber/lo"
-	"github.com/awirix/awirix/log"
-	"github.com/awirix/awirix/option"
+	"github.com/spf13/viper"
 	"strings"
 )
 
@@ -27,10 +29,11 @@ func (m *model) newList(title, singular, plural string) list.Model {
 		Left: "█",
 	}
 
+	delegate.ShowDescription = viper.GetBool(configKey.TUIShowDescription)
+
 	delegate.Styles.SelectedTitle = delegate.
 		Styles.
 		SelectedTitle.
-		Bold(true).
 		Border(border, false, false, false, true)
 
 	delegate.Styles.SelectedDesc = delegate.

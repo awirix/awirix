@@ -20,9 +20,11 @@ const (
 )
 
 const (
-	TUIClickable     = "tui.clickable"
-	TUIPaddingLeft   = "tui.padding.left"
-	TUIPaddingRight  = "tui.padding.right"
-	TUIPaddingTop    = "tui.padding.top"
-	TUIPaddingBottom = "tui.padding.bottom"
+	TUIClickable           = "tui.clickable"
+	TUIPaddingLeft         = "tui.padding.left"
+	TUIPaddingRight        = "tui.padding.right"
+	TUIPaddingTop          = "tui.padding.top"
+	TUIPaddingBottom       = "tui.padding.bottom"
+	TUIShowExtensionAuthor = "tui.show_extension_author"
+	TUIShowDescription     = "tui.show_description"
 )

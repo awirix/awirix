@@ -2,12 +2,12 @@ package tui
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/samber/lo"
-	"github.com/awirix/awirix/color"
-	"github.com/awirix/awirix/style"
 	"strings"
 )
 
@@ -72,7 +72,7 @@ func (m *model) getCurrentStateHandler() *handler {
 				err := m.current.error.Error()
 				err = strings.TrimSpace(err)
 				return m.renderLines(
-					m.styles.titleError.Render("Error"),
+					m.styles.titleError.Render("️Error"),
 					style.Fg(color.Red)(err),
 				)
 			},

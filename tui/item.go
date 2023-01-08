@@ -2,14 +2,14 @@ package tui
 
 import (
 	"fmt"
-	zone "github.com/lrstanley/bubblezone"
-	"github.com/spf13/viper"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
+	zone "github.com/lrstanley/bubblezone"
+	"github.com/spf13/viper"
 	"strings"
 )
 
@@ -52,7 +52,9 @@ func (l *lItem) Title() string {
 
 	switch internal := l.internal.(type) {
 	case *extension.Extension:
-		title += " " + style.Faint("by "+internal.Author())
+		if viper.GetBool(key.TUIShowExtensionAuthor) {
+			title += " " + style.Fg(color.Yellow)(fmt.Sprintf("%s %s", icon.Star, internal.Author()))
+		}
 	case *scraper.Media:
 		if internal.HasInfo() {
 			title += " " + style.Fg(color.Blue)(icon.Info)

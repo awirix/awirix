@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/spf13/viper"
 	"github.com/awirix/awirix/key"
+	"github.com/spf13/viper"
 	"runtime"
 )
 
@@ -85,6 +85,16 @@ and the extension will be unable to access the filesystem.`,
 		key.TUIPaddingBottom,
 		0,
 		"Bottom padding for TUI",
+	},
+	{
+		key.TUIShowExtensionAuthor,
+		false,
+		"Show extension's author in TUI",
+	},
+	{
+		key.TUIShowDescription,
+		true,
+		"Show item's description in TUI",
 	},
 	// END TUI
 }
