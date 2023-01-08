@@ -1,5 +1,7 @@
 # Awirix
 
+⚠️ WORK IN PROGRESS
+
 > One scraper to rule them all!
 
 You can take a look at the extension's scraper template to get a brief idea what is going on
