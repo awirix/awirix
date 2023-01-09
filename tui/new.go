@@ -6,6 +6,7 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	"golang.org/x/term"
 	"os"
+	"time"
 )
 
 func newModel(options *Options) *model {
@@ -24,10 +25,11 @@ func newModel(options *Options) *model {
 	m.current.state = stateExtensionSelect
 	m.styles = DefaultStyles()
 
-	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions")
-	m.component.searchResults = m.newList("Search Results", "media", "media")
+	minute := time.Minute
+	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions", &minute)
+	m.component.searchResults = m.newList("Search Results", "media", "media", nil)
 	m.component.textInput = newTextInput("Search...")
-	m.component.actionSelect = m.newList("️Actions", "action", "actions")
+	m.component.actionSelect = m.newList("️Actions", "action", "actions", nil)
 	m.component.mediaInfo = viewport.New(0, 0)
 	m.component.help = help.New()
 

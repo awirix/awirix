@@ -1,13 +1,13 @@
 package cmd
 
 import (
-	cc "github.com/ivanpirog/coloredcobra"
-	"github.com/spf13/cobra"
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/tui"
 	"github.com/awirix/awirix/where"
+	cc "github.com/ivanpirog/coloredcobra"
+	"github.com/spf13/cobra"
 	"os"
 	"strings"
 )
@@ -17,7 +17,7 @@ var rootCmd = &cobra.Command{
 	Use:     strings.ToLower(app.Name),
 	Short:   "Multimedia Metascraper",
 	Long:    app.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
-	Version: app.Version,
+	Version: app.Version.String(),
 	Args:    cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		err := tui.Run(&tui.Options{AltScreen: true})

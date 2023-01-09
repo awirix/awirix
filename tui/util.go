@@ -1,9 +1,11 @@
 package tui
 
 import (
+	"github.com/awirix/awirix/color"
 	configKey "github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/option"
+	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -13,6 +15,7 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
 	"strings"
+	"time"
 )
 
 func newTextInput(placeholder string) textinput.Model {
@@ -20,10 +23,11 @@ func newTextInput(placeholder string) textinput.Model {
 	t.CharLimit = 80
 	t.Placeholder = placeholder
 	t.SetCursorMode(textinput.CursorStatic)
+	t.Prompt = style.New().Foreground(color.Purple).Bold(true).Render(viper.GetString(configKey.TUIPromptSymbol))
 	return t
 }
 
-func (m *model) newList(title, singular, plural string) list.Model {
+func (m *model) newList(title, singular, plural string, statusMessageLifetime *time.Duration) list.Model {
 	delegate := list.NewDefaultDelegate()
 	border := lipgloss.Border{
 		Left: "█",
@@ -43,6 +47,11 @@ func (m *model) newList(title, singular, plural string) list.Model {
 
 	l := list.New(nil, delegate, 0, 0)
 	l.Title = title
+
+	if statusMessageLifetime != nil {
+		l.StatusMessageLifetime = *statusMessageLifetime
+	}
+
 	l.SetStatusBarItemName(singular, plural)
 	l.AdditionalShortHelpKeys = func() []key.Binding {
 		return m.keyMap.ShortHelp()

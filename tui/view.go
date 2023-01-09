@@ -8,7 +8,8 @@ import (
 )
 
 func (m *model) View() string {
-	return zone.Scan(m.styles.global.Render(m.getCurrentStateHandler().View()))
+	view := m.getCurrentStateHandler().View()
+	return zone.Scan(m.styles.global.Render(view))
 }
 
 func (m *model) renderLines(title string, lines ...string) string {

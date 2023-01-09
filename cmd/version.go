@@ -1,10 +1,10 @@
 package cmd
 
 import (
-	"github.com/samber/lo"
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/style"
+	"github.com/samber/lo"
 	"html/template"
 	"runtime"
 
@@ -23,7 +23,7 @@ var versionCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if lo.Must(cmd.Flags().GetBool("short")) {
-			_, err := cmd.OutOrStdout().Write([]byte(app.Version + "\n"))
+			_, err := cmd.OutOrStdout().Write([]byte(app.Version.String() + "\n"))
 			handleErr(err)
 			return
 		}
@@ -35,7 +35,7 @@ var versionCmd = &cobra.Command{
 			App      string
 			Compiler string
 		}{
-			Version:  app.Version,
+			Version:  app.Version.String(),
 			App:      app.Name,
 			OS:       runtime.GOOS,
 			Arch:     runtime.GOARCH,

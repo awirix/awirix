@@ -2,6 +2,11 @@ package tui
 
 import (
 	"context"
+	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/stack"
+	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -9,11 +14,6 @@ import (
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/glamour"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/awirix/awirix/color"
-	"github.com/awirix/awirix/extensions/extension"
-	"github.com/awirix/awirix/scraper"
-	"github.com/awirix/awirix/stack"
-	"github.com/awirix/awirix/style"
 	"golang.org/x/exp/slices"
 	"strings"
 )

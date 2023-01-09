@@ -1,10 +1,10 @@
 package where
 
 import (
-	"github.com/samber/lo"
-	"github.com/spf13/viper"
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/key"
+	"github.com/samber/lo"
+	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
 )
@@ -28,7 +28,7 @@ func Config() string {
 func Logs() string {
 	path := viper.GetString(key.PathLogs)
 	if len(path) == 0 {
-		path = filepath.Join(Config(), "logs")
+		path = filepath.Join(Cache(), "logs")
 	}
 
 	return mkdir(path)

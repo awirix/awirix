@@ -1,14 +1,14 @@
 package tui
 
 import (
-	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/bubbles/list"
-	"github.com/charmbracelet/bubbles/spinner"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/text"
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/spinner"
+	tea "github.com/charmbracelet/bubbletea"
 	"strings"
 )
 
@@ -118,8 +118,6 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch {
-		case key.Matches(msg, m.keyMap.Reverse):
-			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
 			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
 			if !ok {

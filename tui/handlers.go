@@ -2,12 +2,12 @@ package tui
 
 import (
 	"fmt"
-	"github.com/charmbracelet/bubbles/list"
-	tea "github.com/charmbracelet/bubbletea"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
+	"github.com/charmbracelet/bubbles/list"
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m *model) handleWrapper(cmd tea.Cmd) tea.Cmd {
@@ -44,6 +44,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 					fmt.Sprintf("%s - %d/%d", layer.String(), i+1, len(layers)),
 					layer.Noun.Singular(),
 					layer.Noun.Plural(),
+					nil,
 				)
 				m.component.layers[layer.String()] = &lst
 			}

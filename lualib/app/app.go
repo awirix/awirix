@@ -16,7 +16,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "version",
 				Description: app.Name + " version",
-				Value:       lua.LString(app.Version),
+				Value:       lua.LString(app.Version.String()),
 			},
 			{
 				Name:        "os",

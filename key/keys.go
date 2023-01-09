@@ -33,4 +33,6 @@ const (
 	TUIPaddingBottom       = "tui.padding.bottom"
 	TUIShowExtensionAuthor = "tui.show_extension_author"
 	TUIShowDescription     = "tui.show_description"
+	TUIPromptSymbol        = "tui.prompt_symbol"
+	TUIShowAppVersion      = "tui.show_app_version"
 )

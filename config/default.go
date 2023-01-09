@@ -101,6 +101,16 @@ and the extension will be unable to access the filesystem.`,
 		true,
 		"Show item's description in TUI",
 	},
+	{
+		key.TUIPromptSymbol,
+		"> ",
+		"Prompt symbol to use in text input",
+	},
+	{
+		key.TUIShowAppVersion,
+		true,
+		"Show app version on the top left corner of the TUI",
+	},
 	// END TUI
 
 	// ICON
