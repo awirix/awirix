@@ -3,24 +3,26 @@ package passport
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/samber/lo"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/github"
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/language"
 	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/version"
+	"github.com/enescakir/emoji"
+	"github.com/samber/lo"
 	"io"
 	"strings"
 	"text/template"
 )
 
 type Passport struct {
+	Icon         emoji.Emoji        `json:"-"`
 	Name         string             `json:"name"`
 	ID           string             `json:"id"`
 	About        string             `json:"about"`
-	VersionRaw   string             `json:"version"`
-	LanguageRaw  string             `json:"language"`
+	Version      *version.Version   `json:"version"`
+	Language     *language.Language `json:"language"`
 	NSFW         bool               `json:"nsfw"`
 	Tags         []string           `json:"tags,omitempty"`
 	Repository   *github.Repository `json:"repository,omitempty"`
@@ -60,14 +62,6 @@ func (p *Passport) Info() string {
 	return strings.TrimSpace(b.String())
 }
 
-func (p *Passport) Version() *version.Version {
-	return version.MustParse(p.VersionRaw)
-}
-
-func (p *Passport) Language() *language.Language {
-	return language.Languages[p.LanguageRaw]
-}
-
 func (p *Passport) Validate() error {
 	if p.ID == "" {
 		return fmt.Errorf("passport: id is empty")
@@ -75,14 +69,6 @@ func (p *Passport) Validate() error {
 
 	if p.Name == "" {
 		return fmt.Errorf("passport: name is empty")
-	}
-
-	if _, err := version.NewVersion(p.VersionRaw); err != nil {
-		return fmt.Errorf("invalid version: %s", err)
-	}
-
-	if _, ok := language.Languages[p.LanguageRaw]; !ok {
-		return fmt.Errorf("invalid ISO 639-1 language code: %s", p.LanguageRaw)
 	}
 
 	if p.Repository != nil {

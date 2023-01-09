@@ -16,7 +16,13 @@ const (
 )
 
 const (
-	ExtensionsSafeMode = "extensions.safe_mode"
+	ExtensionsSafeMode       = "extensions.safe_mode"
+	ExtensionsNewInitGitRepo = "extensions.new.init_git_repo"
+)
+
+const (
+	IconShowExtensionIcon = "icon.show_extension_icon"
+	IconShowExtensionFlag = "icon.show_extension_flag"
 )
 
 const (

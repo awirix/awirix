@@ -3,14 +3,14 @@ package cmd
 import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/samber/lo"
-	"github.com/spf13/cobra"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/text"
+	"github.com/samber/lo"
+	"github.com/spf13/cobra"
 	"regexp"
 )
 
@@ -85,7 +85,7 @@ var xLsCmd = &cobra.Command{
 				fmt.Printf(
 					"%s %s\n",
 					style.Fg(color.Purple)(e.Passport().Name),
-					style.Bold(e.Passport().Version().String()),
+					style.Bold(e.Passport().Version.String()),
 				)
 			}
 		}
@@ -281,8 +281,8 @@ var xUpCmd = &cobra.Command{
 			}
 
 			var outcome string
-			if updated.Passport().Version().Compare(ext.Passport().Version()) > 0 {
-				outcome = fmt.Sprintf("updated %s => %s", ext.Passport().Version(), updated.Passport().Version())
+			if updated.Passport().Version.Compare(ext.Passport().Version) > 0 {
+				outcome = fmt.Sprintf("updated %s => %s", ext.Passport().Version, updated.Passport().Version)
 			} else {
 				outcome = "already up to date"
 			}

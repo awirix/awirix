@@ -11,4 +11,5 @@ const (
 	Gear     = "⚙"
 	Ellipsis = "…"
 	CDot     = "•"
+	Square   = "■"
 )

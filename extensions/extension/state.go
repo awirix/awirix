@@ -69,7 +69,7 @@ func inject(ext *Extension, L *lua.LState) {
 		"path": lua.LString(ext.Path()),
 		"passport": luautil.NewTable(L, map[string]lua.LValue{
 			"name":    lua.LString(ext.Passport().Name),
-			"version": lua.LString(ext.Passport().Version().String()),
+			"version": lua.LString(ext.Passport().Version.String()),
 			"about":   lua.LString(ext.Passport().About),
 		}, nil),
 	}, nil)

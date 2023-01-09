@@ -5,12 +5,16 @@ import (
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
 	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/tester"
 	"github.com/awirix/awirix/where"
 	"github.com/awirix/lua"
+	"github.com/enescakir/emoji"
+	"github.com/spf13/viper"
 	"path/filepath"
+	"strings"
 )
 
 type Extension struct {
@@ -97,7 +101,27 @@ func (e *Extension) IsScraperLoaded() bool {
 }
 
 func (e *Extension) String() string {
-	return e.Passport().Name
+	var b strings.Builder
+
+	b.WriteString(e.Passport().Name)
+
+	if viper.GetBool(key.IconShowExtensionIcon) && e.Passport().Icon != "" {
+		b.WriteRune(' ')
+		b.WriteString(e.Passport().Icon.String())
+	}
+
+	if viper.GetBool(key.IconShowExtensionFlag) {
+		flag, err := emoji.CountryFlag(e.Passport().Language.Code)
+		if err == nil {
+			b.WriteRune(' ')
+			b.WriteString(flag.String())
+		}
+	}
+
+	return b.String()
+
+	// having icon as a prefix looks better, but it causes problems with tui list filtering
+	//return e.Passport().Icon.String() + " " + e.Passport().Name
 }
 
 func (e *Extension) Author() string {

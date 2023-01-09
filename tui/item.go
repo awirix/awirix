@@ -53,7 +53,7 @@ func (l *lItem) Title() string {
 	switch internal := l.internal.(type) {
 	case *extension.Extension:
 		if viper.GetBool(key.TUIShowExtensionAuthor) {
-			title += " " + style.Fg(color.Yellow)(fmt.Sprintf("%s %s", icon.Star, internal.Author()))
+			title += " " + style.Faint(fmt.Sprintf("by %s", internal.Author()))
 		}
 	case *scraper.Media:
 		if internal.HasInfo() {
@@ -62,7 +62,7 @@ func (l *lItem) Title() string {
 	}
 
 	if l.Selected() {
-		title += " " + style.Fg(color.Green)(icon.CDot)
+		title += " " + style.Fg(color.Green)(icon.Square)
 	}
 
 	return l.clickable(title)

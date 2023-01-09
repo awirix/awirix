@@ -58,6 +58,11 @@ panic, fatal, error, warn, info, debug, trace`,
 If enabled, system commands will be disabled
 and the extension will be unable to access the filesystem.`,
 	},
+	{
+		key.ExtensionsNewInitGitRepo,
+		true,
+		"Initialize a git repository when creating a new extension",
+	},
 	// EXTENSIONS
 
 	// TUI
@@ -97,6 +102,19 @@ and the extension will be unable to access the filesystem.`,
 		"Show item's description in TUI",
 	},
 	// END TUI
+
+	// ICON
+	{
+		key.IconShowExtensionIcon,
+		true,
+		"Show extension's icon",
+	},
+	{
+		key.IconShowExtensionFlag,
+		false,
+		"Show extension's flag based on its language",
+	},
+	// END ICON
 }
 
 func setDefaults() {

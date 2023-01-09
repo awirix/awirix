@@ -6,7 +6,7 @@ require (
 	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/JohannesKaufmann/html-to-markdown v1.3.6
 	github.com/PuerkitoBio/goquery v1.8.0
-	github.com/awirix/gluamapper v1.1.0
+	github.com/awirix/gluamapper v1.1.1
 	github.com/awirix/libopen v1.0.0
 	github.com/awirix/lua v1.6.0
 	github.com/awirix/templates v0.8.1
@@ -15,6 +15,7 @@ require (
 	github.com/charmbracelet/bubbletea v0.23.1
 	github.com/charmbracelet/glamour v0.6.0
 	github.com/charmbracelet/lipgloss v0.6.0
+	github.com/enescakir/emoji v1.0.0
 	github.com/go-git/go-git/v5 v5.5.2
 	github.com/google/go-github/v48 v48.2.0
 	github.com/ivanpirog/coloredcobra v1.0.1
@@ -35,7 +36,7 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.14.0
-	golang.org/x/exp v0.0.0-20230105202349-8879d0199aa3
+	golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a
 	golang.org/x/term v0.4.0
 )
 

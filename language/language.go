@@ -1,6 +1,9 @@
 package language
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // Language is an ISO 639-1 language with code, name and native name.
 type Language struct {
@@ -9,18 +12,24 @@ type Language struct {
 	NativeName string
 }
 
-func (l Language) MarshalText() ([]byte, error) {
-	return []byte(l.Code), nil
-}
+func (l *Language) UnmarshalJSON(data []byte) error {
+	var s string
 
-func (l *Language) UnmarshalText(text []byte) error {
-	lang, ok := Languages[string(text)]
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+
+	lang, ok := FromCode(s)
 	if !ok {
-		return fmt.Errorf("invalid language code: %s", text)
+		return fmt.Errorf("language: invalid ISO 639-1 code: %s", s)
 	}
 
 	*l = *lang
 	return nil
+}
+
+func (l *Language) MarshalJSON() ([]byte, error) {
+	return json.Marshal(l.Code)
 }
 
 func FromCode(code string) (*Language, bool) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/awirix/awirix/lualib"
 	"github.com/awirix/lua"
+	"github.com/enescakir/emoji"
 	"github.com/spf13/cobra"
 )
 
@@ -28,5 +29,19 @@ var docLuaCmd = &cobra.Command{
 		state := lua.NewState(nil)
 		lib := lualib.Lib(state)
 		fmt.Println(lib.LuaDoc())
+	},
+}
+
+func init() {
+	docCmd.AddCommand(docEmojiCmd)
+}
+
+var docEmojiCmd = &cobra.Command{
+	Use:   "emoji",
+	Short: "Show passport icons (emoji) aliases",
+	Run: func(cmd *cobra.Command, args []string) {
+		for alias, e := range emoji.Map() {
+			fmt.Printf("%s %s\n", e, alias)
+		}
 	},
 }

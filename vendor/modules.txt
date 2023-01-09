@@ -80,7 +80,7 @@ github.com/andybalholm/cascadia
 # github.com/atotto/clipboard v0.1.4
 ## explicit
 github.com/atotto/clipboard
-# github.com/awirix/gluamapper v1.1.0
+# github.com/awirix/gluamapper v1.1.1
 ## explicit; go 1.19
 github.com/awirix/gluamapper
 # github.com/awirix/libopen v1.0.0
@@ -153,6 +153,9 @@ github.com/emirpasic/gods/lists/arraylist
 github.com/emirpasic/gods/trees
 github.com/emirpasic/gods/trees/binaryheap
 github.com/emirpasic/gods/utils
+# github.com/enescakir/emoji v1.0.0
+## explicit; go 1.13
+github.com/enescakir/emoji
 # github.com/fatih/color v1.13.0
 ## explicit; go 1.13
 github.com/fatih/color
@@ -455,7 +458,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20230105202349-8879d0199aa3
+# golang.org/x/exp v0.0.0-20230108222341-4b8118a2686a
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices

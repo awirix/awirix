@@ -10,11 +10,15 @@ import (
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
 	"github.com/awirix/awirix/filesystem"
+	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/language"
+	"github.com/awirix/awirix/version"
 	"github.com/awirix/awirix/where"
 	"github.com/awirix/templates"
+	"github.com/go-git/go-git/v5"
 	"github.com/lithammer/fuzzysearch/fuzzy"
 	"github.com/samber/lo"
+	"github.com/spf13/viper"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -73,6 +77,14 @@ func GenerateInteractive() (*Extension, error) {
 			Name: "name",
 			Prompt: &survey.Input{
 				Message: "Extension name",
+			},
+			Validate: func(ans any) error {
+				str := ans.(string)
+				if str == "" {
+					return errors.New("name cannot be empty")
+				}
+
+				return nil
 			},
 		},
 		{
@@ -154,14 +166,16 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
+	lang, _ := language.FromCode(answers.Language)
+
 	p := &passport.Passport{
-		Name:        answers.Name,
-		ID:          passport.ToID(answers.Name),
-		About:       answers.About,
-		VersionRaw:  "0.1.0",
-		Tags:        answers.Tags,
-		LanguageRaw: answers.Language,
-		NSFW:        answers.Nsfw,
+		Name:     answers.Name,
+		ID:       passport.ToID(answers.Name),
+		About:    answers.About,
+		Version:  version.MustParse("0.1.0"),
+		Tags:     answers.Tags,
+		Language: lang,
+		NSFW:     answers.Nsfw,
 	}
 
 	path := filepath.Join(where.Extensions(), username, filename.Sanitize(p.ID))
@@ -226,6 +240,10 @@ func GenerateInteractive() (*Extension, error) {
 		if err != nil {
 			return nil, err
 		}
+	}
+
+	if viper.GetBool(key.ExtensionsNewInitGitRepo) {
+		git.PlainInit(path, false)
 	}
 
 	return New(path)
