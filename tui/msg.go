@@ -6,11 +6,12 @@ import (
 )
 
 type (
-	msgExtensionLoaded *extension.Extension
-	msgSearchDone      []*scraper.Media
-	msgLayerDone       []*scraper.Media
-	msgLayerItemsSet   struct{}
-	msgActionDone      *scraper.Action
-	msgMediaInfoDone   struct{}
-	msgError           error
+	msgExtensionLoaded  *extension.Extension
+	msgSearchDone       []*scraper.Media
+	msgLayerDone        []*scraper.Media
+	msgLayerItemsSet    struct{}
+	msgActionDone       *scraper.Action
+	msgMediaInfoDone    struct{}
+	msgError            error
+	msgExtensionRemoved *extension.Extension
 )

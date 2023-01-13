@@ -2,15 +2,15 @@ package manager
 
 import (
 	"fmt"
-	"github.com/briandowns/spinner"
-	"github.com/go-git/go-git/v5"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/filesystem"
+	"github.com/briandowns/spinner"
+	"github.com/go-git/go-git/v5"
 	"os"
 	"time"
 )
 
-func UpdateExtension(ext *extension.Extension) (*extension.Extension, error) {
+func Update(ext *extension.Extension) (*extension.Extension, error) {
 	theSpinner := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithWriter(os.Stderr), spinner.WithColor("cyan"))
 	progress := func(text string) {
 		theSpinner.Suffix = " " + text

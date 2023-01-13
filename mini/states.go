@@ -30,7 +30,7 @@ type state struct {
 }
 
 func stateSelectExtension(s *state) (err error) {
-	exts, err := manager.InstalledExtensions()
+	exts, err := manager.Installed()
 	if err != nil {
 		return err
 	}

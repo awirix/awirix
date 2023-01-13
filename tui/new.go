@@ -25,8 +25,8 @@ func newModel(options *Options) *model {
 	m.current.state = stateExtensionSelect
 	m.styles = DefaultStyles()
 
-	minute := time.Minute
-	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions", &minute)
+	hour := time.Hour
+	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions", &hour)
 	m.component.searchResults = m.newList("Search Results", "media", "media", nil)
 	m.component.textInput = newTextInput("Search...")
 	m.component.actionSelect = m.newList("️Actions", "action", "actions", nil)

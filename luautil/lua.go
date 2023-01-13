@@ -3,6 +3,7 @@ package luautil
 import (
 	"fmt"
 	lua "github.com/awirix/lua"
+	"reflect"
 	"strconv"
 )
 
@@ -55,6 +56,8 @@ func FromLValue(value lua.LValue) (any, error) {
 
 func ToLValue(L *lua.LState, value any) (lua.LValue, error) {
 	switch value := value.(type) {
+	case lua.LValue:
+		return value, nil
 	case nil:
 		return lua.LNil, nil
 	case bool:
@@ -68,41 +71,45 @@ func ToLValue(L *lua.LState, value any) (lua.LValue, error) {
 		return lua.LNumber(f), nil
 	case string:
 		return lua.LString(value), nil
-	case map[string]any:
-		table := L.NewTable()
-
-		for k, v := range value {
-			lvalue, err := ToLValue(L, v)
-			if err != nil {
-				return nil, err
-			}
-
-			table.RawSetString(k, lvalue)
-		}
-
-		return table, nil
-	case []string:
-		table := L.NewTable()
-
-		for i, v := range value {
-			table.RawSetInt(i+1, lua.LString(v))
-		}
-
-		return table, nil
-	case []any:
-		table := L.NewTable()
-
-		for _, v := range value {
-			v, err := ToLValue(L, v)
-			if err != nil {
-				return nil, err
-			}
-
-			table.Append(v)
-		}
-
-		return table, nil
 	default:
-		return nil, fmt.Errorf("unsupported type: %T", value)
+		switch reflect.TypeOf(value).Kind() {
+		case reflect.Slice:
+			table := L.NewTable()
+
+			// iterate over the slice
+			slice := reflect.ValueOf(value)
+			for i := 0; i < slice.Len(); i++ {
+				lvalue, err := ToLValue(L, slice.Index(i).Interface())
+				if err != nil {
+					return nil, err
+				}
+
+				L.RawSetInt(table, i+1, lvalue)
+			}
+
+			return table, nil
+		case reflect.Map:
+			table := L.NewTable()
+
+			// iterate over the map
+			m := reflect.ValueOf(value)
+			for _, key := range m.MapKeys() {
+				lkey, err := ToLValue(L, key.Interface())
+				if err != nil {
+					return nil, err
+				}
+
+				lvalue, err := ToLValue(L, m.MapIndex(key).Interface())
+				if err != nil {
+					return nil, err
+				}
+
+				L.SetTable(table, lkey, lvalue)
+			}
+
+			return table, nil
+		default:
+			return nil, fmt.Errorf("unsupported type: %T", value)
+		}
 	}
 }

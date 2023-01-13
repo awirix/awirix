@@ -23,6 +23,9 @@ type KeyMap struct {
 	Confirm,
 	GoBack,
 
+	ExtensionAdd,
+	ExtensionRemove,
+
 	Reverse key.Binding
 }
 
@@ -38,5 +41,8 @@ func NewKeyMap(m *model) *KeyMap {
 		Confirm:   bind("confirm", "enter"),
 		GoBack:    bind("back", "esc"),
 		Reverse:   bind("reverse", "r"),
+
+		ExtensionAdd:    bind("add", "a"),
+		ExtensionRemove: bind("remove", "r"),
 	}
 }

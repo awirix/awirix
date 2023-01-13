@@ -2,19 +2,19 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/samber/lo"
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/style"
+	"github.com/samber/lo"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func completionExtensionsIDs(_ *cobra.Command, _ []string, _ string) ([]string, cobra.ShellCompDirective) {
-	exts, err := manager.InstalledExtensions()
+	exts, err := manager.Installed()
 	if err != nil {
 		exts = []*extension.Extension{}
 	}

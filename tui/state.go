@@ -7,6 +7,7 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
 	"strings"
 )
@@ -28,6 +29,9 @@ const (
 
 	stateLoading
 	stateError
+
+	stateExtensionRemove
+	stateExtensionAdd
 )
 
 type handler struct {
@@ -40,12 +44,13 @@ func (m *model) getCurrentStateHandler() *handler {
 	// TODO: optimize (create this map only once and reuse it)
 
 	defaultBack := func() tea.Cmd {
-		m.current.cancelContext()
+		if m.current.cancelContext != nil {
+			m.current.cancelContext()
+		}
 		return m.popState()
 	}
 
 	listBack := func(l *list.Model) tea.Cmd {
-
 		if l.FilterState() != list.Unfiltered {
 			l.ResetFilter()
 			return nil
@@ -142,6 +147,23 @@ func (m *model) getCurrentStateHandler() *handler {
 			},
 			Back: defaultBack,
 		},
+
+		stateExtensionRemove: {
+			Update: m.updateExtensionRemove,
+			View: func() string {
+				return m.renderLines(
+					m.styles.title.Render("Remove"),
+					m.styles.statusBar.Render("Confirm removal of extension"),
+					fmt.Sprintf(`Are you sure you want to remove the extension %s`, m.current.extensionToRemove.String()),
+					lipgloss.JoinHorizontal(
+						lipgloss.Left,
+						m.styles.titleError.Render("No - "+m.keyMap.GoBack.Help().Key),
+						m.styles.title.Render("Yes - "+m.keyMap.Confirm.Help().Key),
+					),
+				)
+			},
+			Back: defaultBack,
+		},
 	}[m.current.state]
 
 	if !ok {
@@ -158,6 +180,7 @@ func (m *model) pushState(s state) tea.Cmd {
 		blacklist := []state{
 			stateLoading,
 			stateError,
+			stateExtensionRemove,
 		}
 
 		// Layers are special case

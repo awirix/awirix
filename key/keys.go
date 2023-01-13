@@ -16,8 +16,9 @@ const (
 )
 
 const (
-	ExtensionsSafeMode       = "extensions.safe_mode"
-	ExtensionsNewInitGitRepo = "extensions.new.init_git_repo"
+	ExtensionsSafeMode         = "extensions.safe_mode"
+	ExtensionsNewInitGitRepo   = "extensions.new.init_git_repo"
+	ExtensionsNewAddLibraryDoc = "extensions.new.add_library_doc"
 )
 
 const (

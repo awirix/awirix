@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/list"
@@ -24,7 +25,9 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)
 			if err != nil {
-				return msgError(err)
+				m.errorChan <- err
+				return nil
+				//return msgError(err)
 			}
 		}
 
@@ -69,8 +72,9 @@ func (m *model) handleSearch(query string) tea.Cmd {
 		media, err := search.Call(query)
 
 		if err != nil {
-			//m.error <- err
-			return msgError(err)
+			m.errorChan <- err
+			return nil
+			//return msgError(err)
 		}
 
 		return msgSearchDone(media)
@@ -88,8 +92,9 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		layerMedia, err := layer.Call(media)
 
 		if err != nil {
-			//m.error <- err
-			return msgError(err)
+			m.errorChan <- err
+			return nil
+			//return msgError(err)
 		}
 
 		return msgLayerDone(layerMedia)
@@ -107,8 +112,9 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 
 		err := action.Call(media)
 		if err != nil {
-			//m.error <- err
-			return msgError(err)
+			m.errorChan <- err
+			return nil
+			//return msgError(err)
 		}
 
 		return msgActionDone(action)
@@ -120,11 +126,47 @@ func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
 		m.text.status = "Loading info for " + style.Fg(color.Yellow)(media.String())
 		info, err := media.Info()
 		if err != nil {
-			return msgError(err)
+			m.errorChan <- err
+			return nil
+			//return msgError(err)
 		}
 
 		m.text.mediaInfoName = media.String()
 		m.current.mediaInfo = info
 		return msgMediaInfoDone{}
+	})
+}
+
+func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
+	return m.handleWrapper(func() tea.Msg {
+		m.text.status = "Removing extension " + style.Fg(color.Yellow)(ext.String())
+		err := manager.Remove(ext)
+		if err != nil {
+			m.errorChan <- err
+			return nil
+			//return msgError(err)
+		}
+		m.current.extensionToRemove = nil
+
+		manager.ResetInstalledCache()
+		extensions, err := manager.Installed()
+		if err != nil {
+			m.errorChan <- err
+			return nil
+		}
+
+		m.extensions = extensions
+
+		var items []list.Item
+		for _, ext := range extensions {
+			items = append(items, newItem(ext))
+		}
+
+		return tea.Sequentially(
+			m.component.extensionSelect.SetItems(items),
+			func() tea.Msg {
+				return msgExtensionRemoved(ext)
+			},
+		)()
 	})
 }

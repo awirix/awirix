@@ -17,16 +17,17 @@ import (
 )
 
 type Passport struct {
-	Icon         emoji.Emoji        `json:"-"`
-	Name         string             `json:"name"`
-	ID           string             `json:"id"`
-	About        string             `json:"about"`
-	Version      *version.Version   `json:"version"`
-	Language     *language.Language `json:"language"`
-	NSFW         bool               `json:"nsfw"`
-	Tags         []string           `json:"tags,omitempty"`
-	Repository   *github.Repository `json:"repository,omitempty"`
-	Requirements *Requirements      `json:"requirements,omitempty"`
+	Icon       emoji.Emoji        `json:"-"`
+	Name       string             `json:"name"`
+	ID         string             `json:"id"`
+	About      string             `json:"about"`
+	Version    *version.Version   `json:"version"`
+	Language   *language.Language `json:"language"`
+	NSFW       bool               `json:"nsfw"`
+	Tags       []string           `json:"tags,omitempty"`
+	Repository *github.Repository `json:"repository,omitempty"`
+	//Requirements Requirements       `json:"requirements,omitempty"`
+	Programs []string `json:"programs,omitempty"`
 }
 
 var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
@@ -51,7 +52,6 @@ var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
 
 {{ yellow (.Language).Name }} {{ if not (eq (.Language).Name (.Language).NativeName) }}{{ faint (.Language).NativeName }}{{ end }}
 {{ if .Tags }}{{ tags .Tags }}{{ end }}
-{{ if .Requirements }}{{ .Requirements.Info }}{{ end }}
 {{ if .Repository }}{{ url .Repository.URL }}{{ end }}`))
 
 func (p *Passport) Info() string {
@@ -83,10 +83,6 @@ func (p *Passport) Validate() error {
 	}
 
 	return nil
-}
-
-func (p *Passport) CheckRequirements() bool {
-	return p.Requirements.Matches()
 }
 
 func New(reader io.Reader) (*Passport, error) {

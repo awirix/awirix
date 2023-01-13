@@ -1,9 +1,12 @@
 package tui
 
 import (
+	"fmt"
+	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/scraper"
+	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/text"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -31,8 +34,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case key.Matches(msg, m.keyMap.GoBack):
 			return m, m.getCurrentStateHandler().Back()
-			//m.current.cancelContext()
-			//return m, m.popState()
 		}
 	}
 
@@ -83,6 +84,14 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// to set it to the media info viewport
 		m.resize(m.current.dimensions.terminalWidth, m.current.dimensions.terminalHeight)
 		return m, m.pushState(stateMediaInfo)
+	case msgExtensionRemoved:
+		return m, tea.Sequentially(
+			m.pushState(stateExtensionSelect),
+			m.component.extensionSelect.NewStatusMessage(fmt.Sprintf(
+				"Removed %s",
+				style.Fg(color.Yellow)((*extension.Extension)(msg).String()),
+			)),
+		)
 	case spinner.TickMsg:
 		var cmd tea.Cmd
 		m.component.spinner, cmd = m.component.spinner.Update(msg)
@@ -106,6 +115,21 @@ func (m *model) updateError(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
+func (m *model) updateExtensionRemove(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.keyMap.Confirm):
+			return m, tea.Batch(
+				m.handleExtensionRemove(m.current.extensionToRemove),
+				m.pushState(stateLoading),
+			)
+		}
+	}
+
+	return m, nil
+}
+
 func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 	thisList := &m.component.extensionSelect
 
@@ -118,6 +142,14 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch {
+		case key.Matches(msg, m.keyMap.ExtensionRemove):
+			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			m.current.extensionToRemove = ext
+			return m, m.pushState(stateExtensionRemove)
 		case key.Matches(msg, m.keyMap.Confirm):
 			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
 			if !ok {

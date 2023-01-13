@@ -7,13 +7,16 @@ import (
 	"errors"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/language"
+	"github.com/awirix/awirix/lualib"
 	"github.com/awirix/awirix/version"
 	"github.com/awirix/awirix/where"
+	"github.com/awirix/lua"
 	"github.com/awirix/templates"
 	"github.com/go-git/go-git/v5"
 	"github.com/lithammer/fuzzysearch/fuzzy"
@@ -244,6 +247,12 @@ func GenerateInteractive() (*Extension, error) {
 
 	if viper.GetBool(key.ExtensionsNewInitGitRepo) {
 		git.PlainInit(path, false)
+	}
+
+	if viper.GetBool(key.ExtensionsNewAddLibraryDoc) {
+		state := lua.NewState(nil)
+		lib := lualib.Lib(state)
+		filesystem.Api().WriteFile(filepath.Join(path, fmt.Sprintf("%s.lua", app.Name)), []byte(lib.LuaDoc()), os.ModePerm)
 	}
 
 	return New(path)

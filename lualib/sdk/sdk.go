@@ -6,10 +6,13 @@ import (
 	"github.com/awirix/awirix/lualib/sdk/cmd"
 	"github.com/awirix/awirix/lualib/sdk/crypto"
 	"github.com/awirix/awirix/lualib/sdk/filepath"
+	"github.com/awirix/awirix/lualib/sdk/functional"
+	"github.com/awirix/awirix/lualib/sdk/fuzzy"
 	"github.com/awirix/awirix/lualib/sdk/html"
 	"github.com/awirix/awirix/lualib/sdk/http"
 	"github.com/awirix/awirix/lualib/sdk/js"
 	"github.com/awirix/awirix/lualib/sdk/json"
+	"github.com/awirix/awirix/lualib/sdk/levenshtein"
 	"github.com/awirix/awirix/lualib/sdk/pdf"
 	"github.com/awirix/awirix/lualib/sdk/regexp"
 	"github.com/awirix/awirix/lualib/sdk/strings"
@@ -33,6 +36,10 @@ func Lib(L *lua.LState) *luadoc.Lib {
 			js.Lib(),
 			http.Lib(),
 			html.Lib(),
+			levenshtein.Lib(),
+			fuzzy.Lib(),
+			functional.Lib(),
+			time.Lib(),
 		},
 	}
 }

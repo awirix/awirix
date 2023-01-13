@@ -5,6 +5,6 @@ import (
 	"github.com/awirix/awirix/filesystem"
 )
 
-func UninstallExtension(ext *extension.Extension) error {
+func Remove(ext *extension.Extension) error {
 	return filesystem.Api().RemoveAll(ext.Path())
 }

@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/key"
 	"github.com/spf13/viper"
 	"runtime"
@@ -62,6 +64,11 @@ and the extension will be unable to access the filesystem.`,
 		key.ExtensionsNewInitGitRepo,
 		true,
 		"Initialize a git repository when creating a new extension",
+	},
+	{
+		key.ExtensionsNewAddLibraryDoc,
+		true,
+		fmt.Sprintf(`Add library documentation "%s.lua" when creating a new extension`, app.Name),
 	},
 	// EXTENSIONS
 

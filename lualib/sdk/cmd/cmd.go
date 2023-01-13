@@ -6,9 +6,9 @@ import (
 	"github.com/awirix/awirix/luadoc"
 	"github.com/awirix/awirix/luautil"
 	"github.com/awirix/lua"
-	"github.com/kballard/go-shellquote"
 	"github.com/samber/lo"
 	"os/exec"
+	"strings"
 )
 
 func Lib() *luadoc.Lib {
@@ -32,12 +32,17 @@ func Lib() *luadoc.Lib {
 			},
 			{
 				Name:        "output",
-				Description: "Runs the command and returns the output and an error if it fails.",
+				Description: "Runs the command and returns the stdout and stderr output.",
 				Value:       commandOutput,
 				Returns: []*luadoc.Param{
 					{
-						Name:        "output",
-						Description: "Output of the command.",
+						Name:        "stdout",
+						Description: "STDOUT output of the command.",
+						Type:        luadoc.String,
+					},
+					{
+						Name:        "stderr",
+						Description: "STDERR output of the command.",
 						Type:        luadoc.String,
 					},
 					{
@@ -64,7 +69,7 @@ func Lib() *luadoc.Lib {
 			{
 				Name:        "set_args",
 				Description: "Sets the arguments of the command.",
-				Value:       commandArgs,
+				Value:       commandSetArgs,
 				Params: []*luadoc.Param{
 					{
 						Name:        "args",
@@ -107,7 +112,7 @@ func Lib() *luadoc.Lib {
 func newCommand(L *lua.LState) int {
 	command := L.CheckString(1)
 
-	programs := L.Context().Value("extension").(extensions.ExtensionContainer).Passport().Requirements.Programs
+	programs := L.Context().Value("extension").(extensions.ExtensionContainer).Passport().Programs
 
 	if !lo.Contains(programs, command) {
 		L.RaiseError("command `%s` is not allowed because it is not in the list of allowed programs %s in the extension's passport", command, programs)
@@ -120,49 +125,34 @@ func newCommand(L *lua.LState) int {
 }
 
 func checkArgs(L *lua.LState, n int) []string {
-	args := L.Get(n)
+	args := L.CheckTable(n)
 
 	var (
 		argsSlice []string
 		err       error
 	)
 
-	switch args.Type() {
-	case lua.LTString:
-		words, err := shellquote.Split(args.String())
+	args.ForEach(func(key, value lua.LValue) {
 		if err != nil {
-			L.RaiseError(err.Error())
-			return nil
+			return
 		}
 
-		argsSlice = words
-	case lua.LTTable:
-		args.(*lua.LTable).ForEach(func(key, value lua.LValue) {
-			if err != nil {
-				return
-			}
-
-			if value.Type() != lua.LTString {
-				err = fmt.Errorf("cmd.run: args must be a table of strings")
-				return
-			}
-
-			argsSlice = append(argsSlice, value.String())
-		})
-
-		if err != nil {
-			L.RaiseError(err.Error())
+		if value.Type() != lua.LTString {
+			err = fmt.Errorf("cmd.run: args must be a table of strings")
+			return
 		}
-	case lua.LTNil:
-		// do nothing
-	default:
-		L.RaiseError("cmd.run: args must be a string or a table of strings")
+
+		argsSlice = append(argsSlice, value.String())
+	})
+
+	if err != nil {
+		L.RaiseError(err.Error())
 	}
 
 	return argsSlice
 }
 
-func commandArgs(L *lua.LState) int {
+func commandSetArgs(L *lua.LState) int {
 	cmd := checkCommand(L, 1)
 	args := checkArgs(L, 2)
 
@@ -185,16 +175,29 @@ func commandGetArgs(L *lua.LState) int {
 
 func commandOutput(L *lua.LState) int {
 	cmd := checkCommand(L, 1)
+	oldStdout, oldStderr := cmd.Stdout, cmd.Stderr
+	defer func() {
+		cmd.Stdout, cmd.Stderr = oldStdout, oldStderr
+	}()
 
-	out, err := cmd.Output()
+	var (
+		stdout,
+		stderr strings.Builder
+	)
+
+	cmd.Stdout, cmd.Stderr = &stdout, &stderr
+
+	err := cmd.Run()
 	if err != nil {
 		L.Push(lua.LNil)
+		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
-		return 2
+		return 3
 	}
 
-	L.Push(lua.LString(out))
-	return 1
+	L.Push(lua.LString(stdout.String()))
+	L.Push(lua.LString(stderr.String()))
+	return 2
 }
 
 func commandRun(L *lua.LState) int {

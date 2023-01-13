@@ -1,12 +1,68 @@
 package time
 
 import (
+	"github.com/awirix/awirix/luadoc"
 	"github.com/awirix/awirix/luautil"
 	"github.com/awirix/lua"
 	"time"
 )
 
-const timeTypeName = "time"
+const (
+	timeTypeName     = "time"
+	durationTypeName = "duration"
+)
+
+func Lib() *luadoc.Lib {
+	return &luadoc.Lib{
+		Name:        "time",
+		Description: "Time library",
+		Vars: []*luadoc.Var{
+			{
+				Name:        "nanosecond",
+				Description: "Duration constant",
+				Value:       lua.LNumber(time.Nanosecond),
+			},
+			{
+				Name:        "microsecond",
+				Description: "Duration constant. 1000 * nanosecond",
+				Value:       lua.LNumber(time.Microsecond),
+			},
+			{
+				Name:        "millisecond",
+				Description: "Duration constant. 1000 * microsecond",
+				Value:       lua.LNumber(time.Millisecond),
+			},
+			{
+				Name:        "second",
+				Description: "Duration constant. 1000 * millisecond",
+				Value:       lua.LNumber(time.Second),
+			},
+			{
+				Name:        "minute",
+				Description: "Duration constant. 60 * second",
+				Value:       lua.LNumber(time.Minute),
+			},
+			{
+				Name:        "hour",
+				Description: "Duration constant. 60 * minute",
+				Value:       lua.LNumber(time.Hour),
+			},
+		},
+		Funcs: []*luadoc.Func{
+			{
+				Name:        "sleep",
+				Description: "Sleep for the given duration",
+				Value:       timeSleep,
+				Params: []*luadoc.Param{
+					{
+						Name: "duration",
+						Type: luadoc.Number,
+					},
+				},
+			},
+		},
+	}
+}
 
 func registerTimeType(L *lua.LState) {
 	mt := L.NewTypeMetatable(timeTypeName)
@@ -27,6 +83,12 @@ func checkTime(L *lua.LState, n int) time.Time {
 	}
 	L.ArgError(n, "time expected")
 	return time.Time{}
+}
+
+func timeSleep(L *lua.LState) int {
+	d := time.Duration(L.CheckInt64(1))
+	time.Sleep(d)
+	return 0
 }
 
 var timeMethods = map[string]lua.LGFunction{

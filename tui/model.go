@@ -33,13 +33,14 @@ type model struct {
 			terminalWidth, terminalHeight   int
 			availableWidth, availableHeight int
 		}
-		state         state
-		extension     *extension.Extension
-		layer         *scraper.Layer
-		error         error
-		context       context.Context
-		cancelContext context.CancelFunc
-		mediaInfo     string
+		state             state
+		extension         *extension.Extension
+		extensionToRemove *extension.Extension
+		layer             *scraper.Layer
+		error             error
+		context           context.Context
+		cancelContext     context.CancelFunc
+		mediaInfo         string
 	}
 
 	component struct {

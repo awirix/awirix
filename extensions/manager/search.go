@@ -10,10 +10,14 @@ import (
 	"path/filepath"
 )
 
-var installedExtensions = option.None[[]*extension.Extension]()
+var installed = option.None[[]*extension.Extension]()
 
-func InstalledExtensions() ([]*extension.Extension, error) {
-	if exts, ok := installedExtensions.Get(); ok {
+func ResetInstalledCache() {
+	installed = option.None[[]*extension.Extension]()
+}
+
+func Installed() ([]*extension.Extension, error) {
+	if exts, ok := installed.Get(); ok {
 		return exts, nil
 	}
 
@@ -53,12 +57,12 @@ func InstalledExtensions() ([]*extension.Extension, error) {
 		}
 	}
 
-	installedExtensions = option.Some(extensions)
+	installed = option.Some(extensions)
 	return extensions, nil
 }
 
 func GetExtensionByID(id string) (*extension.Extension, error) {
-	extensions, err := InstalledExtensions()
+	extensions, err := Installed()
 	if err != nil {
 		return nil, err
 	}

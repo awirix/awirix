@@ -4,8 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
-	"github.com/briandowns/spinner"
-	"github.com/go-git/go-git/v5"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
@@ -13,13 +11,15 @@ import (
 	"github.com/awirix/awirix/github"
 	"github.com/awirix/awirix/text"
 	"github.com/awirix/awirix/where"
+	"github.com/briandowns/spinner"
+	"github.com/go-git/go-git/v5"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 )
 
-type InstallOptions struct {
+type AddOptions struct {
 	URL          string
 	SkipConfirm  bool
 	SkipValidate bool
@@ -36,7 +36,7 @@ func confirm(msg string) (bool, error) {
 	return confirm, err
 }
 
-func InstallExtension(options *InstallOptions) (*extension.Extension, error) {
+func Add(options *AddOptions) (*extension.Extension, error) {
 	if !text.IsURL(options.URL) {
 		return nil, fmt.Errorf("invalid URL")
 	}

@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 )
 
-func CheckHealth(report io.Writer) {
+func Health(report io.Writer) {
 	path := where.Extensions()
 
 	dir, err := filesystem.Api().ReadDir(path)

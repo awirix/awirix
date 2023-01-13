@@ -59,7 +59,7 @@ var xLsCmd = &cobra.Command{
 	Short: "List installed extensions",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		extensions, err := manager.InstalledExtensions()
+		extensions, err := manager.Installed()
 		handleErr(err)
 
 		var (
@@ -116,7 +116,7 @@ var xUninstallCmd = &cobra.Command{
 	Short: "Uninstall an extension",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		extensions, err := manager.InstalledExtensions()
+		extensions, err := manager.Installed()
 		handleErr(err)
 
 		if id := lo.Must(cmd.Flags().GetString("id")); id != "" {
@@ -131,7 +131,7 @@ var xUninstallCmd = &cobra.Command{
 				))
 			}
 
-			handleErr(manager.UninstallExtension(toRemove))
+			handleErr(manager.Remove(toRemove))
 
 			return
 		}
@@ -162,7 +162,7 @@ var xUninstallCmd = &cobra.Command{
 		}
 
 		for _, s := range selected {
-			err = manager.UninstallExtension(nameExtensionMap[s])
+			err = manager.Remove(nameExtensionMap[s])
 			handleErr(err)
 		}
 
@@ -241,7 +241,7 @@ var xAddCmd = &cobra.Command{
 			url = fmt.Sprintf("https://github.com/%s", arg)
 		}
 
-		ext, err := manager.InstallExtension(&manager.InstallOptions{
+		ext, err := manager.Add(&manager.AddOptions{
 			URL:          url,
 			SkipConfirm:  lo.Must(cmd.Flags().GetBool("yes")),
 			SkipValidate: lo.Must(cmd.Flags().GetBool("force")),
@@ -262,7 +262,7 @@ var xUpCmd = &cobra.Command{
 	Short: "Update extensions",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		extensions, err := manager.InstalledExtensions()
+		extensions, err := manager.Installed()
 		handleErr(err)
 
 		for _, ext := range extensions {
@@ -273,7 +273,7 @@ var xUpCmd = &cobra.Command{
 				continue
 			}
 
-			updated, err := manager.UpdateExtension(ext)
+			updated, err := manager.Update(ext)
 
 			if err != nil {
 				printError(fmt.Sprintf("failed to update %s: %s", style.Fg(color.Purple)(ext.String()), err))
@@ -301,6 +301,6 @@ var xHealthCmd = &cobra.Command{
 	Short: "Check the health of the extensions",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
-		manager.CheckHealth(cmd.OutOrStdout())
+		manager.Health(cmd.OutOrStdout())
 	},
 }
