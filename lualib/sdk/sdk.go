@@ -6,6 +6,7 @@ import (
 	"github.com/awirix/awirix/lualib/sdk/cmd"
 	"github.com/awirix/awirix/lualib/sdk/crypto"
 	"github.com/awirix/awirix/lualib/sdk/filepath"
+	"github.com/awirix/awirix/lualib/sdk/fmt"
 	"github.com/awirix/awirix/lualib/sdk/functional"
 	"github.com/awirix/awirix/lualib/sdk/fuzzy"
 	"github.com/awirix/awirix/lualib/sdk/html"
@@ -42,6 +43,7 @@ func Lib(L *lua.LState) *luadoc.Lib {
 			functional.Lib(),
 			time.Lib(),
 			urls.Lib(),
+			fmt.Lib(),
 		},
 	}
 }
