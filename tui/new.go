@@ -28,7 +28,8 @@ func newModel(options *Options) *model {
 	hour := time.Hour
 	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions", &hour)
 	m.component.searchResults = m.newList("Search Results", "media", "media", nil)
-	m.component.textInput = newTextInput("Search...")
+	m.component.searchInput = newTextInput("Search...")
+	m.component.searchInput = newTextInput("Format: author/repository")
 	m.component.actionSelect = m.newList("️Actions", "action", "actions", nil)
 	m.component.mediaInfo = viewport.New(0, 0)
 	m.component.help = help.New()

@@ -13,7 +13,9 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	"github.com/charmbracelet/bubbles/viewport"
 	"github.com/charmbracelet/glamour"
+	"github.com/charmbracelet/glamour/ansi"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/muesli/termenv"
 	"golang.org/x/exp/slices"
 	"strings"
 )
@@ -44,14 +46,15 @@ type model struct {
 	}
 
 	component struct {
-		extensionSelect list.Model
-		textInput       textinput.Model
-		searchResults   list.Model
-		layers          map[string]*list.Model
-		actionSelect    list.Model
-		spinner         spinner.Model
-		mediaInfo       viewport.Model
-		help            help.Model
+		extensionSelect   list.Model
+		searchInput       textinput.Model
+		searchResults     list.Model
+		layers            map[string]*list.Model
+		actionSelect      list.Model
+		spinner           spinner.Model
+		mediaInfo         viewport.Model
+		help              help.Model
+		extensionAddInput textinput.Model
 	}
 
 	text struct {
@@ -82,9 +85,10 @@ func (m *model) lists() []*list.Model {
 
 func (m *model) resize(width, height int) {
 	frameX, frameY := m.styles.global.GetFrameSize()
+	frameX2, frameY2 := m.styles.nonListGlobal.GetFrameSize()
 
 	m.current.dimensions.terminalWidth, m.current.dimensions.terminalHeight = width, height
-	m.current.dimensions.availableWidth, m.current.dimensions.availableHeight = width-frameX, height-frameY
+	m.current.dimensions.availableWidth, m.current.dimensions.availableHeight = width-frameX-frameX2, height-frameY-frameY2
 
 	for _, lst := range m.lists() {
 		lst.SetSize(
@@ -93,15 +97,27 @@ func (m *model) resize(width, height int) {
 		)
 	}
 
+	// ugh...
 	mediaInfoHeaderHeight := lipgloss.Height(m.styles.titleBar.Render(m.styles.title.Render(m.text.mediaInfoTitle))) + lipgloss.Height(m.styles.statusBar.Render(m.text.mediaInfoName))
 	helpHeight := lipgloss.Height(m.styles.helpStyle.Render(m.component.help.View(m.keyMap)))
 
 	m.component.mediaInfo.Height = m.current.dimensions.availableHeight - mediaInfoHeaderHeight - helpHeight
 	m.component.mediaInfo.Width = m.current.dimensions.availableWidth
 
+	// glamour.WithAutoStyle() does the same, but it has this unnecessary document margin
+	var (
+		style               ansi.StyleConfig
+		styleDocumentMargin uint = 0
+	)
+	if termenv.HasDarkBackground() {
+		style = glamour.DarkStyleConfig
+	} else {
+		style = glamour.LightStyleConfig
+	}
+	style.Document.Margin = &styleDocumentMargin
+
 	// error can not occur here
-	r, _ := glamour.NewTermRenderer(glamour.WithAutoStyle(), glamour.WithWordWrap(m.component.mediaInfo.Width))
-	// but it can here
+	r, _ := glamour.NewTermRenderer(glamour.WithStyles(style), glamour.WithWordWrap(m.component.mediaInfo.Width))
 
 	var mediaInfo string
 	if strings.TrimSpace(m.current.mediaInfo) == "" {
@@ -109,6 +125,8 @@ func (m *model) resize(width, height int) {
 	} else {
 		mediaInfo = m.current.mediaInfo
 	}
+
+	// but it can here
 	md, err := r.Render(mediaInfo)
 	if err != nil {
 		md = m.current.mediaInfo

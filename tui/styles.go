@@ -11,6 +11,7 @@ import (
 
 type Styles struct {
 	global,
+	nonListGlobal,
 	helpStyle,
 	title,
 	titleError,
@@ -33,6 +34,7 @@ func DefaultStyles() (s Styles) {
 	s.titleBar = listStyles.TitleBar
 	s.statusBar = listStyles.StatusBar
 	s.helpStyle = listStyles.HelpStyle
+	s.nonListGlobal = style.New().Padding(0, 0, 0, 2)
 
 	return
 }

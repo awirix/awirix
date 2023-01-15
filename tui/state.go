@@ -65,6 +65,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					m.styles.title.Render("Loading"),
+					"Please, wait",
 					m.component.spinner.View()+style.Faint(m.text.status),
 				)
 			},
@@ -78,6 +79,7 @@ func (m *model) getCurrentStateHandler() *handler {
 				err = strings.TrimSpace(err)
 				return m.renderLines(
 					m.styles.titleError.Render("️Error"),
+					"An error occurred",
 					style.Fg(color.Red)(err),
 				)
 			},
@@ -100,7 +102,8 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					m.styles.title.Render(m.text.searchTitle),
-					m.component.textInput.View(),
+					"Search",
+					m.component.searchInput.View(),
 				)
 			},
 			Back: defaultBack,
@@ -142,7 +145,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					m.styles.title.Render(m.text.mediaInfoTitle),
-					m.styles.statusBar.Render(m.text.mediaInfoName),
+					m.text.mediaInfoName,
 					m.component.mediaInfo.View(),
 				)
 			},
@@ -155,7 +158,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					m.styles.title.Render("Remove"),
-					m.styles.statusBar.Render("Confirm removal of extension"),
+					"Confirm removal of extension",
 					fmt.Sprintf(`Are you sure you want to %s the extension %s`, style.Fg(color.Red)("remove"), style.Fg(color.Yellow)(m.current.extensionToRemove.String())),
 					"",
 					fmt.Sprintf(
@@ -235,7 +238,7 @@ func (m *model) popState() tea.Cmd {
 
 		switch m.current.state {
 		case stateSearch:
-			m.component.textInput.Reset()
+			m.component.searchInput.Reset()
 		case stateSearchResults:
 			m.component.searchResults.ResetSelected()
 			m.resetSelected()

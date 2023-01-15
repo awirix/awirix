@@ -34,7 +34,7 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 		if ext.Scraper().HasSearch() {
 			search := ext.Scraper().Search()
 			m.component.searchResults.Title = search.Subtitle()
-			m.component.textInput.Placeholder = search.Placeholder()
+			m.component.searchInput.Placeholder = search.Placeholder()
 			m.component.searchResults.SetStatusBarItemName(search.Noun.Singular(), search.Noun.Plural())
 			m.text.searchTitle = search.String()
 		}

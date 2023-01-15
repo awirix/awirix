@@ -12,16 +12,15 @@ func (m *model) View() string {
 	return zone.Scan(m.styles.global.Render(view))
 }
 
-func (m *model) renderLines(title string, lines ...string) string {
-	// TODO: make it more precise
+func (m *model) renderLines(title, status string, lines ...string) string {
 	var b strings.Builder
 	for _, line := range lines {
 		b.WriteString(line)
 		b.WriteRune('\n')
 	}
 
-	body := wrap.String(b.String(), m.current.dimensions.availableWidth)
-	page := m.styles.titleBar.Render(title) + "\n" + body
+	body := m.styles.nonListGlobal.Render(wrap.String(b.String(), m.current.dimensions.availableWidth))
+	page := m.styles.titleBar.Render(title) + "\n" + m.styles.statusBar.Render(status) + "\n" + body
 	help := m.styles.helpStyle.Render(m.component.help.View(m.keyMap))
 	height := lipgloss.Height(page + help)
 

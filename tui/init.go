@@ -35,7 +35,7 @@ func (m *model) Init() tea.Cmd {
 
 	return tea.Batch(
 		m.component.extensionSelect.SetItems(items),
-		m.component.textInput.Focus(),
+		m.component.searchInput.Focus(),
 		m.component.extensionSelect.NewStatusMessage(versionMsg),
 	)
 }

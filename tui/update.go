@@ -171,7 +171,7 @@ func (m *model) updateSearch(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keyMap.Confirm):
-			query := m.component.textInput.Value()
+			query := m.component.searchInput.Value()
 			if strings.TrimSpace(query) == "" {
 				return m, nil
 			}
@@ -183,8 +183,8 @@ func (m *model) updateSearch(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
-	model, cmd := m.component.textInput.Update(msg)
-	m.component.textInput = model
+	model, cmd := m.component.searchInput.Update(msg)
+	m.component.searchInput = model
 	return m, cmd
 }
 
@@ -417,5 +417,12 @@ end:
 func (m *model) updateMediaInfo(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
 	m.component.mediaInfo, cmd = m.component.mediaInfo.Update(msg)
+	return m, cmd
+}
+
+func (m *model) updateExtensionAdd(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// TODO
+	var cmd tea.Cmd
+	m.component.extensionAddInput, cmd = m.component.extensionAddInput.Update(msg)
 	return m, cmd
 }
