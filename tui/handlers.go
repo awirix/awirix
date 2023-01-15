@@ -144,10 +144,19 @@ func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
 		if err != nil {
 			m.errorChan <- err
 			return nil
-			//return msgError(err)
 		}
-		m.current.extensionToRemove = nil
 
+		return tea.Sequentially(
+			m.handleExtensionsReset(),
+			func() tea.Msg {
+				return msgExtensionRemoved(ext)
+			},
+		)()
+	})
+}
+
+func (m *model) handleExtensionsReset() tea.Cmd {
+	return func() tea.Msg {
 		manager.ResetInstalledCache()
 		extensions, err := manager.Installed()
 		if err != nil {
@@ -156,17 +165,6 @@ func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
 		}
 
 		m.extensions = extensions
-
-		var items []list.Item
-		for _, ext := range extensions {
-			items = append(items, newItem(ext))
-		}
-
-		return tea.Sequentially(
-			m.component.extensionSelect.SetItems(items),
-			func() tea.Msg {
-				return msgExtensionRemoved(ext)
-			},
-		)()
-	})
+		return listSetExtensions(extensions, &m.component.extensionSelect)
+	}
 }

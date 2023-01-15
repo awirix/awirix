@@ -2,6 +2,8 @@ package tui
 
 import (
 	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/extensions/manager"
 	configKey "github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/option"
@@ -14,6 +16,7 @@ import (
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
+	"golang.org/x/exp/slices"
 	"strings"
 	"time"
 )
@@ -75,6 +78,33 @@ func listReverseItems(lst *list.Model) tea.Cmd {
 	return tea.Batch(
 		lst.SetItems(lo.Reverse(items)),
 		lst.NewStatusMessage(b.String()),
+	)
+}
+
+func listSetExtensions(exts []*extension.Extension, lst *list.Model) tea.Cmd {
+	var (
+		regular   = make([]*extension.Extension, 0)
+		favorites = make([]*extension.Extension, 0)
+	)
+
+	for _, e := range exts {
+		if manager.IsFavorite(e) {
+			favorites = append(favorites, e)
+		} else {
+			regular = append(regular, e)
+		}
+	}
+
+	nameSorter := func(a, b *extension.Extension) bool {
+		return a.Passport().Name <= b.Passport().Name
+	}
+
+	slices.SortFunc(regular, nameSorter)
+	slices.SortFunc(favorites, nameSorter)
+
+	return listSetItems[*extension.Extension](
+		append(favorites, regular...),
+		lst,
 	)
 }
 

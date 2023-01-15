@@ -22,6 +22,7 @@ type KeyMap struct {
 	Info,
 	Confirm,
 	GoBack,
+	Favorite,
 
 	ExtensionAdd,
 	ExtensionRemove,
@@ -31,17 +32,17 @@ type KeyMap struct {
 
 func NewKeyMap(m *model) *KeyMap {
 	return &KeyMap{
-		model:     m,
-		Quit:      bind("quit", "q"),
-		ForceQuit: bind("force quit", "ctrl+c", "ctrl+d"),
-		Reset:     bind("reset", "backspace"),
-		Select:    bind("select", "space", " "),
-		SelectAll: bind("select all", "tab"),
-		Info:      bind("info", "i"),
-		Confirm:   bind("confirm", "enter"),
-		GoBack:    bind("back", "esc"),
-		Reverse:   bind("reverse", "r"),
-
+		model:           m,
+		Quit:            bind("quit", "q"),
+		ForceQuit:       bind("force quit", "ctrl+c", "ctrl+d"),
+		Reset:           bind("reset", "backspace"),
+		Select:          bind("select", "space", " "),
+		SelectAll:       bind("select all", "tab"),
+		Info:            bind("info", "i"),
+		Confirm:         bind("confirm", "enter"),
+		GoBack:          bind("back", "esc"),
+		Reverse:         bind("reverse", "r"),
+		Favorite:        bind("favorite", "f"),
 		ExtensionAdd:    bind("add", "a"),
 		ExtensionRemove: bind("remove", "r"),
 	}

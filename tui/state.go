@@ -102,7 +102,7 @@ func (m *model) getCurrentStateHandler() *handler {
 			View: func() string {
 				return m.renderLines(
 					m.styles.title.Render(m.text.searchTitle),
-					"Search",
+					"Enter a search query",
 					m.component.searchInput.View(),
 				)
 			},

@@ -85,7 +85,7 @@ and the extension will be unable to access the filesystem.`,
 	},
 	{
 		key.TUIPaddingRight,
-		0,
+		1,
 		"Right padding for TUI",
 	},
 	{

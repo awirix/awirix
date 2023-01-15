@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
@@ -139,6 +140,31 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 		switch {
+		case key.Matches(msg, m.keyMap.Favorite):
+			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			err := manager.ToggleFavorite(ext)
+			if err != nil {
+				m.errorChan <- err
+			}
+
+			return m, tea.Batch(
+				m.handleExtensionsReset(),
+				m.component.extensionSelect.NewStatusMessage(fmt.Sprintf(
+					"Marked %s as %s",
+					style.Fg(color.Yellow)(ext.String()),
+					style.Fg(color.Yellow)(func() string {
+						if manager.IsFavorite(ext) {
+							return "favorite"
+						}
+
+						return "not favorite"
+					}()),
+				)),
+			)
 		case key.Matches(msg, m.keyMap.ExtensionRemove):
 			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
 			if !ok {

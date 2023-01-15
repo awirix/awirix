@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
+	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/scraper"
@@ -52,6 +53,10 @@ func (l *lItem) Title() string {
 
 	switch internal := l.internal.(type) {
 	case *extension.Extension:
+		if manager.IsFavorite(internal) {
+			title += " " + style.Fg(color.Yellow)(icon.Star)
+		}
+
 		if viper.GetBool(key.TUIShowExtensionAuthor) {
 			title += " " + style.Faint(fmt.Sprintf("by %s", internal.Author()))
 		}

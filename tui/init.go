@@ -8,7 +8,6 @@ import (
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/text"
-	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -21,11 +20,6 @@ func (m *model) Init() tea.Cmd {
 
 	m.extensions = extensions
 
-	var items []list.Item
-	for _, ext := range extensions {
-		items = append(items, newItem(ext))
-	}
-
 	versionMsg := fmt.Sprintf(
 		"%s %s %s",
 		style.Fg(color.Pink)(icon.Heart),
@@ -34,7 +28,7 @@ func (m *model) Init() tea.Cmd {
 	)
 
 	return tea.Batch(
-		m.component.extensionSelect.SetItems(items),
+		listSetExtensions(extensions, &m.component.extensionSelect),
 		m.component.searchInput.Focus(),
 		m.component.extensionSelect.NewStatusMessage(versionMsg),
 	)
