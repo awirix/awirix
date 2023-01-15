@@ -6,5 +6,10 @@ import (
 )
 
 func Remove(ext *extension.Extension) error {
+	// remove extension from favorites on removal
+	if IsFavorite(ext) {
+		_ = ToggleFavorite(ext)
+	}
+
 	return filesystem.Api().RemoveAll(ext.Path())
 }

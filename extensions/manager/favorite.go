@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 )
 
-var favoriteExtensions = gache.New[map[string]*extension.Extension](&gache.Options{
-	Path:       filepath.Join(where.Cache(), "favorite_extensions"),
+var favoriteExtensions = gache.New[map[string]struct{}](&gache.Options{
+	Path:       filepath.Join(where.Cache(), "favorite_extensions.json"),
 	FileSystem: &filesystem.GacheFs{},
 })
 
@@ -20,14 +20,14 @@ func ToggleFavorite(ext *extension.Extension) error {
 	}
 
 	if expired || cached == nil {
-		cached = make(map[string]*extension.Extension)
+		cached = make(map[string]struct{})
 	}
 
 	id := ext.Passport().ID
 	if _, ok := cached[id]; ok {
 		delete(cached, id)
 	} else {
-		cached[id] = ext
+		cached[id] = struct{}{}
 	}
 
 	return favoriteExtensions.Set(cached)

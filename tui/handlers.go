@@ -140,6 +140,7 @@ func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
 func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Removing extension " + style.Fg(color.Yellow)(ext.String())
+
 		err := manager.Remove(ext)
 		if err != nil {
 			m.errorChan <- err
