@@ -795,6 +795,88 @@ func Lib() *luadoc.Lib {
 					},
 				},
 			},
+			{
+				Name:        "min_by",
+				Description: "Returns the minimum value of a list, based on a function",
+				Value:       minBy,
+				Params: []*luadoc.Param{
+					{
+						Name:        "list",
+						Description: "List to find the minimum value of",
+						Type:        luadoc.List(luadoc.Any),
+					},
+					{
+						Name:        "func",
+						Description: "Function to use to compare values. Returns true if the first argument is less than the second",
+						Type: luadoc.Func{
+							Params: []*luadoc.Param{
+								{
+									Name: "a",
+									Type: luadoc.Any,
+								},
+								{
+									Name: "b",
+									Type: luadoc.Any,
+								},
+							},
+							Returns: []*luadoc.Param{
+								{
+									Name: "result",
+									Type: luadoc.Boolean,
+								},
+							},
+						}.AsType(),
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "result",
+						Description: "The minimum value",
+						Type:        luadoc.Any,
+					},
+				},
+			},
+			{
+				Name:        "max_by",
+				Description: "Returns the maximum value of a list, based on a function",
+				Value:       maxBy,
+				Params: []*luadoc.Param{
+					{
+						Name:        "list",
+						Description: "List to find the maximum value of",
+						Type:        luadoc.List(luadoc.Any),
+					},
+					{
+						Name:        "func",
+						Description: "Function to use to compare values. Returns true if the first argument is less than the second",
+						Type: luadoc.Func{
+							Params: []*luadoc.Param{
+								{
+									Name: "a",
+									Type: luadoc.Any,
+								},
+								{
+									Name: "b",
+									Type: luadoc.Any,
+								},
+							},
+							Returns: []*luadoc.Param{
+								{
+									Name: "result",
+									Type: luadoc.Boolean,
+								},
+							},
+						}.AsType(),
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "result",
+						Description: "The maximum value",
+						Type:        luadoc.Any,
+					},
+				},
+			},
 			// TODO: do the rest
 		},
 	}
@@ -1231,5 +1313,37 @@ func everyBy(L *lua.LState) int {
 func id(L *lua.LState) int {
 	value := L.CheckAny(1)
 	L.Push(value)
+	return 1
+}
+
+func minBy(L *lua.LState) int {
+	list := checkList(L, 1)
+	fn := L.CheckFunction(2)
+
+	min, _ := luautil.ToLValue(L, lo.MinBy(list, func(a, b lua.LValue) bool {
+		L.Push(fn)
+		L.Push(a)
+		L.Push(b)
+		L.Call(2, 1)
+		return L.ToBool(-1)
+	}))
+
+	L.Push(min)
+	return 1
+}
+
+func maxBy(L *lua.LState) int {
+	list := checkList(L, 1)
+	fn := L.CheckFunction(2)
+
+	max, _ := luautil.ToLValue(L, lo.MaxBy(list, func(a, b lua.LValue) bool {
+		L.Push(fn)
+		L.Push(a)
+		L.Push(b)
+		L.Call(2, 1)
+		return L.ToBool(-1)
+	}))
+
+	L.Push(max)
 	return 1
 }
