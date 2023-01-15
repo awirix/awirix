@@ -7,7 +7,6 @@ import (
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/samber/lo"
 	"strings"
 )
@@ -35,9 +34,10 @@ const (
 )
 
 type handler struct {
-	Update func(msg tea.Msg) (tea.Model, tea.Cmd)
-	View   func() string
-	Back   func() tea.Cmd
+	Update   func(msg tea.Msg) (tea.Model, tea.Cmd)
+	View     func() string
+	Back     func() tea.Cmd
+	SoftQuit bool
 }
 
 func (m *model) getCurrentStateHandler() *handler {
@@ -81,7 +81,8 @@ func (m *model) getCurrentStateHandler() *handler {
 					style.Fg(color.Red)(err),
 				)
 			},
-			Back: defaultBack,
+			Back:     defaultBack,
+			SoftQuit: true,
 		},
 
 		stateExtensionSelect: {
@@ -145,7 +146,8 @@ func (m *model) getCurrentStateHandler() *handler {
 					m.component.mediaInfo.View(),
 				)
 			},
-			Back: defaultBack,
+			Back:     defaultBack,
+			SoftQuit: true,
 		},
 
 		stateExtensionRemove: {
@@ -154,15 +156,17 @@ func (m *model) getCurrentStateHandler() *handler {
 				return m.renderLines(
 					m.styles.title.Render("Remove"),
 					m.styles.statusBar.Render("Confirm removal of extension"),
-					fmt.Sprintf(`Are you sure you want to remove the extension %s`, m.current.extensionToRemove.String()),
-					lipgloss.JoinHorizontal(
-						lipgloss.Left,
-						m.styles.titleError.Render("No - "+m.keyMap.GoBack.Help().Key),
-						m.styles.title.Render("Yes - "+m.keyMap.Confirm.Help().Key),
+					fmt.Sprintf(`Are you sure you want to %s the extension %s`, style.Fg(color.Red)("remove"), style.Fg(color.Yellow)(m.current.extensionToRemove.String())),
+					"",
+					fmt.Sprintf(
+						"%s   %s",
+						"No "+style.Faint(m.keyMap.GoBack.Help().Key),
+						"Yes "+style.Faint(m.keyMap.Confirm.Help().Key),
 					),
 				)
 			},
-			Back: defaultBack,
+			Back:     defaultBack,
+			SoftQuit: true,
 		},
 	}[m.current.state]
 

@@ -25,6 +25,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	default:
 	}
 
+	currentStateHandler := m.getCurrentStateHandler()
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.resize(msg.Width, msg.Height)
@@ -32,12 +33,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch {
 		case key.Matches(msg, m.keyMap.ForceQuit):
 			return m, tea.Quit
+		case key.Matches(msg, m.keyMap.Quit):
+			if currentStateHandler.SoftQuit {
+				return m, tea.Quit
+			}
 		case key.Matches(msg, m.keyMap.GoBack):
-			return m, m.getCurrentStateHandler().Back()
+			return m, currentStateHandler.Back()
 		}
 	}
 
-	return m.getCurrentStateHandler().Update(msg)
+	return currentStateHandler.Update(msg)
 }
 
 func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -104,14 +109,6 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) updateError(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, m.keyMap.Quit):
-			return m, tea.Quit
-		}
-	}
-
 	return m, nil
 }
 
@@ -419,14 +416,6 @@ end:
 
 func (m *model) updateMediaInfo(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch {
-		case key.Matches(msg, m.keyMap.Quit):
-			return m, tea.Quit
-		}
-	}
-
 	m.component.mediaInfo, cmd = m.component.mediaInfo.Update(msg)
 	return m, cmd
 }

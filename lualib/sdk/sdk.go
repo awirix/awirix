@@ -17,6 +17,7 @@ import (
 	"github.com/awirix/awirix/lualib/sdk/regexp"
 	"github.com/awirix/awirix/lualib/sdk/strings"
 	"github.com/awirix/awirix/lualib/sdk/time"
+	"github.com/awirix/awirix/lualib/sdk/urls"
 	"github.com/awirix/awirix/luautil"
 	lua "github.com/awirix/lua"
 )
@@ -40,6 +41,7 @@ func Lib(L *lua.LState) *luadoc.Lib {
 			fuzzy.Lib(),
 			functional.Lib(),
 			time.Lib(),
+			urls.Lib(),
 		},
 	}
 }

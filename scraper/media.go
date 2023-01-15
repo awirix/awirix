@@ -49,9 +49,13 @@ func (m *Media) Info() (string, error) {
 		return "", errMedia(err)
 	}
 
-	info := m.scraper.state.CheckString(-1)
+	info := m.scraper.state.CheckAny(-1)
+	if info.Type() != lua.LTString {
+		return "", errMedia(errors.New("info must be a string"))
+	}
+
 	m.scraper.state.Pop(1)
-	return info, nil
+	return info.String(), nil
 }
 
 func (s *Scraper) newMedia(table *lua.LTable) (*Media, error) {

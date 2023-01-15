@@ -22,6 +22,8 @@ func (k *KeyMap) ShortHelp() []key.Binding {
 		return l(k.Select, k.Confirm, k.Reverse)
 	case stateMediaInfo:
 		return l(k.Quit)
+	case stateExtensionRemove:
+		return l(k.Quit, k.Confirm)
 	default:
 		return nil
 	}
