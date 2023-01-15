@@ -23,7 +23,7 @@ var versionCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if lo.Must(cmd.Flags().GetBool("short")) {
-			_, err := cmd.OutOrStdout().Write([]byte(app.Version.String() + "\n"))
+			_, err := cmd.OutOrStdout().Write([]byte(app.Version.String()))
 			handleErr(err)
 			return
 		}
