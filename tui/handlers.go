@@ -2,6 +2,7 @@ package tui
 
 import (
 	"fmt"
+	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
@@ -30,13 +31,15 @@ func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 These programs are: %s
 
 You can disable safe mode by running
-$ awirix config set -k extensions.safe_mode -v false
+$ %[3]s config set -k %[4]s -v false
 
 For more info, see
-$ awirix config info -k extensions.safe_mode
+$ %[3]s config info -k %[4]s
 `,
 				ext.String(),
 				ext.Passport().Programs,
+				app.Name,
+				key.ExtensionsSafeMode,
 			)
 			return nil
 		}
