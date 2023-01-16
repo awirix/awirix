@@ -29,7 +29,7 @@ func newModel(options *Options) *model {
 	m.component.extensionSelect = m.newList("Extensions", "extension", "extensions", &hour)
 	m.component.searchResults = m.newList("Search Results", "media", "media", nil)
 	m.component.searchInput = newTextInput("Search...")
-	m.component.searchInput = newTextInput("Format: author/repository")
+	m.component.extensionAddInput = newTextInput("Format: author/repository")
 	m.component.actionSelect = m.newList("️Actions", "action", "actions", nil)
 	m.component.mediaInfo = viewport.New(0, 0)
 	m.component.help = help.New()

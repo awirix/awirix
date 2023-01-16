@@ -179,6 +179,7 @@ func (m *model) getCurrentStateHandler() *handler {
 				return m.renderLines(
 					m.styles.title.Render("Add"),
 					"Install a new extension",
+					"NOT IMPLEMENTED",
 					m.component.extensionAddInput.View(),
 				)
 			},
