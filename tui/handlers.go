@@ -5,10 +5,12 @@ import (
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
+	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/spf13/viper"
 )
 
 func (m *model) handleWrapper(cmd tea.Cmd) tea.Cmd {
@@ -21,6 +23,23 @@ func (m *model) handleWrapper(cmd tea.Cmd) tea.Cmd {
 func (m *model) handleLoadExtension(ext *extension.Extension) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Loading extension"
+
+		if viper.GetBool(key.ExtensionsSafeMode) && len(ext.Passport().Programs) > 0 {
+			m.errorChan <- fmt.Errorf(
+				`%s depends on external programs, which are disabled in safe mode.
+These programs are: %s
+
+You can disable safe mode by running
+$ awirix config set -k extensions.safe_mode -v false
+
+For more info, see
+$ awirix config info -k extensions.safe_mode
+`,
+				ext.String(),
+				ext.Passport().Programs,
+			)
+			return nil
+		}
 
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)

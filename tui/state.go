@@ -171,6 +171,19 @@ func (m *model) getCurrentStateHandler() *handler {
 			Back:     defaultBack,
 			SoftQuit: true,
 		},
+
+		stateExtensionAdd: {
+			Update: m.updateExtensionAdd,
+			View: func() string {
+				// TODO
+				return m.renderLines(
+					m.styles.title.Render("Add"),
+					"Install a new extension",
+					m.component.extensionAddInput.View(),
+				)
+			},
+			Back: defaultBack,
+		},
 	}[m.current.state]
 
 	if !ok {
