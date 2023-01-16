@@ -11,15 +11,15 @@ import (
 	"sort"
 	"strconv"
 
-	levenshtein "github.com/ka-weihe/fast-levenshtein"
-	"github.com/samber/lo"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/config"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/icon"
 	"github.com/awirix/awirix/where"
+	levenshtein "github.com/ka-weihe/fast-levenshtein"
+	"github.com/samber/lo"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // errUnknownKey will generate error for key that was not found and will provide a hint
@@ -53,6 +53,7 @@ var configCmd = &cobra.Command{
 func init() {
 	configCmd.AddCommand(configInfoCmd)
 	configInfoCmd.Flags().StringP("key", "k", "", "The key to get the value for")
+	configInfoCmd.Flags().BoolP("markdown", "m", false, "Output in markdown format")
 	_ = configInfoCmd.RegisterFlagCompletionFunc("key", completionConfigKeys)
 }
 
@@ -62,8 +63,9 @@ var configInfoCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		var (
-			key    = lo.Must(cmd.Flags().GetString("key"))
-			fields = lo.Values(config.Default)
+			key      = lo.Must(cmd.Flags().GetString("key"))
+			markdown = lo.Must(cmd.Flags().GetBool("markdown"))
+			fields   = lo.Values(config.Default)
 		)
 
 		if key != "" {
@@ -79,7 +81,11 @@ var configInfoCmd = &cobra.Command{
 		})
 
 		for i, field := range fields {
-			fmt.Println(field.Pretty())
+			if markdown {
+				fmt.Println(field.Markdown())
+			} else {
+				fmt.Println(field.Pretty())
+			}
 
 			if i < len(fields)-1 {
 				fmt.Println()

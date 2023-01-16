@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"github.com/samber/lo"
-	"github.com/spf13/viper"
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/style"
+	"github.com/pelletier/go-toml"
+	"github.com/samber/lo"
+	"github.com/spf13/viper"
 	"reflect"
 	"strconv"
 	"strings"
@@ -74,6 +75,39 @@ func (f *Field) Pretty() string {
 	lo.Must0(prettyTemplate.Execute(&b, f))
 
 	return b.String()
+}
+
+func (f *Field) Markdown() string {
+	var b strings.Builder
+	t := toml.NewEncoder(&b)
+
+	var (
+		parts    = strings.Split(f.Key, ".")
+		key      = parts[len(parts)-1]
+		sections = parts[:len(parts)-1]
+	)
+
+	var toEncode any
+	if len(sections) == 0 {
+		toEncode = map[string]any{key: f.DefaultValue}
+	} else {
+		toEncode = map[string]any{strings.Join(sections, "."): map[string]any{key: f.DefaultValue}}
+	}
+
+	t.Indentation("")
+	_ = t.Encode(toEncode)
+
+	// encoded string already has newlines on both ends
+	example := fmt.Sprintf("```toml%s```", b.String())
+	env := fmt.Sprintf("```bash\nexport %s=\"%v\"\n```", f.Env(), f.DefaultValue)
+
+	return fmt.Sprintf(`## %s
+
+%s
+
+%s
+
+%s`, f.Key, example, env, f.Description)
 }
 
 func (f *Field) Env() string {

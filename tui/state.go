@@ -75,7 +75,12 @@ func (m *model) getCurrentStateHandler() *handler {
 		stateError: {
 			Update: m.updateError,
 			View: func() string {
-				err := m.current.error.Error()
+				var err string
+				if m.current.error == nil {
+					err = "Unknown error occurred... something went wrong!"
+				} else {
+					err = m.current.error.Error()
+				}
 				err = strings.TrimSpace(err)
 				return m.renderLines(
 					m.styles.titleError.Render("️Error"),
