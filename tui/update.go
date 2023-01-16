@@ -173,6 +173,16 @@ func (m *model) updateExtensionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.current.extensionToRemove = ext
 			return m, m.pushState(stateExtensionRemove)
+		case key.Matches(msg, m.keyMap.Info):
+			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
+			if !ok {
+				goto end
+			}
+
+			return m, tea.Batch(
+				m.pushState(stateLoading),
+				m.handleExtensionInfo(ext),
+			)
 		case key.Matches(msg, m.keyMap.Confirm):
 			ext, ok := listGetSelectedItem[*extension.Extension](thisList).Get()
 			if !ok {

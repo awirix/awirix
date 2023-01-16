@@ -3,10 +3,12 @@ package cmd
 import (
 	"fmt"
 	"github.com/awirix/awirix/extensions"
+	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/luadoc"
 	"github.com/awirix/awirix/luautil"
 	"github.com/awirix/lua"
 	"github.com/samber/lo"
+	"github.com/spf13/viper"
 	"os/exec"
 	"strings"
 )
@@ -111,6 +113,10 @@ func Lib() *luadoc.Lib {
 
 func newCommand(L *lua.LState) int {
 	command := L.CheckString(1)
+
+	if viper.GetBool(key.ExtensionsSafeMode) {
+		L.RaiseError("failed to create %q command: command execution is disabled in safe mode", command)
+	}
 
 	programs := L.Context().Value("extension").(extensions.ExtensionContainer).Passport().Programs
 

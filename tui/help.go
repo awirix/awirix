@@ -15,10 +15,12 @@ func (k *KeyMap) ShortHelp() []key.Binding {
 	case stateError:
 		return l(k.Quit)
 	case stateExtensionSelect:
-		return l(k.Confirm, k.ExtensionRemove, k.Favorite)
+		return l(k.Confirm, k.ExtensionRemove, k.Favorite, k.Info)
 	case stateSearch:
 		return l(k.Confirm)
-	case stateSearchResults, stateLayer, stateActionSelect:
+	case stateSearchResults, stateLayer:
+		return l(k.Select, k.Confirm, k.Reverse, k.Info)
+	case stateActionSelect:
 		return l(k.Select, k.Confirm, k.Reverse)
 	case stateMediaInfo:
 		return l(k.Quit)

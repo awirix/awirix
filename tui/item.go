@@ -78,10 +78,6 @@ func (l *lItem) description() string {
 	switch item := l.internal.(type) {
 	case *extension.Extension:
 		var b strings.Builder
-		if item.Passport().NSFW {
-			b.WriteString(style.Fg(color.Red)("NSFW"))
-			b.WriteRune(' ')
-		}
 
 		about := item.Passport().About
 		if about == "" {
@@ -89,6 +85,12 @@ func (l *lItem) description() string {
 		}
 
 		b.WriteString(about)
+
+		if item.Passport().NSFW {
+			b.WriteRune(' ')
+			b.WriteString(style.Fg(color.Red)("NSFW"))
+		}
+
 		return b.String()
 	case *scraper.Media:
 		description := item.Description()

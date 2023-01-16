@@ -137,6 +137,16 @@ func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
 	})
 }
 
+func (m *model) handleExtensionInfo(ext *extension.Extension) tea.Cmd {
+	return m.handleWrapper(func() tea.Msg {
+		// reuse media info
+		info := ext.Passport().InfoMarkdown()
+		m.text.mediaInfoName = ext.String()
+		m.current.mediaInfo = info
+		return msgMediaInfoDone{}
+	})
+}
+
 func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Removing extension " + style.Fg(color.Yellow)(ext.String())

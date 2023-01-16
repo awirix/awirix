@@ -10,8 +10,10 @@ import (
 	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/version"
 	"github.com/enescakir/emoji"
+	"github.com/mvdan/xurls"
 	"github.com/samber/lo"
 	"io"
+	"net/url"
 	"strings"
 	"text/template"
 )
@@ -26,8 +28,7 @@ type Passport struct {
 	NSFW       bool               `json:"nsfw"`
 	Tags       []string           `json:"tags,omitempty"`
 	Repository *github.Repository `json:"repository,omitempty"`
-	//Requirements Requirements       `json:"requirements,omitempty"`
-	Programs []string `json:"programs,omitempty"`
+	Programs   []string           `json:"programs,omitempty"`
 }
 
 var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
@@ -58,6 +59,57 @@ func (p *Passport) Info() string {
 	var b strings.Builder
 
 	lo.Must0(passportTemplate.Execute(&b, p))
+
+	return strings.TrimSpace(b.String())
+}
+
+func (p *Passport) InfoMarkdown() string {
+	tmpl := template.Must(template.New("passport").Funcs(map[string]any{
+		"code": func(code string) string {
+			return fmt.Sprintf("`%s`", code)
+		},
+		"format_urls": func(s string) string {
+			return xurls.Relaxed.ReplaceAllStringFunc(s, func(rawURL string) string {
+				if !strings.HasPrefix(rawURL, "https://") || !strings.HasPrefix(rawURL, "http://") {
+					rawURL = "https://" + rawURL
+				}
+
+				u, err := url.Parse(rawURL)
+				if err != nil {
+					return fmt.Sprintf("[%[1]s](%[1]s)", rawURL)
+				}
+
+				return fmt.Sprintf("[%s](%s)", u.Hostname(), u.String())
+			})
+		},
+	}).Parse(`
+{{- "##" }} {{ .Name }} {{ .Version.String }}
+
+ID {{ code .ID }}
+
+{{ if .NSFW }}This extension is marked as NSFW{{ end }}
+
+Primary language is **{{ .Language.Name }}**
+
+{{ if .Programs }}Programs required{{ end }}
+{{ range $program := .Programs }}
+- {{ $program }}
+{{ end }}
+
+{{ if .Repository }}[GitHub Repository]({{ .Repository.URL }}){{ end }}
+
+### About
+
+{{ if .Tags }}**Tags**{{ end }}
+{{ range $tag := .Tags }}
+- {{ $tag }}
+{{ end }}
+
+> {{ format_urls .About }}
+`))
+
+	var b strings.Builder
+	lo.Must0(tmpl.Execute(&b, p))
 
 	return strings.TrimSpace(b.String())
 }

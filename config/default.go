@@ -58,7 +58,7 @@ panic, fatal, error, warn, info, debug, trace`,
 		true,
 		`Enable safe mode for extensions.
 If enabled, system commands will be disabled
-and the extension will be unable to access the filesystem.`,
+and the extension will be unable to access the filesystem outside of API methods.`,
 	},
 	{
 		key.ExtensionsNewInitGitRepo,
