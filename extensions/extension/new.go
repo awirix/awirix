@@ -23,7 +23,6 @@ import (
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
 	"os"
-	"os/user"
 	"path/filepath"
 	"strings"
 )
@@ -55,17 +54,6 @@ func (e *Extension) SetContext(ctx context.Context) {
 }
 
 func GenerateInteractive() (*Extension, error) {
-	usr, err := user.Current()
-	if err != nil {
-		return nil, err
-	}
-
-	username := usr.Username
-
-	if err != nil {
-		return nil, err
-	}
-
 	answers := struct {
 		Preset   string
 		Name     string
@@ -75,7 +63,7 @@ func GenerateInteractive() (*Extension, error) {
 		Language string
 	}{}
 
-	err = survey.Ask([]*survey.Question{
+	err := survey.Ask([]*survey.Question{
 		{
 			Name: "name",
 			Prompt: &survey.Input{
@@ -181,7 +169,7 @@ func GenerateInteractive() (*Extension, error) {
 		NSFW:     answers.Nsfw,
 	}
 
-	path := filepath.Join(where.Extensions(), username, filename.Sanitize(p.ID))
+	path := filepath.Join(where.Extensions(), filename.Sanitize(p.ID))
 
 	exists, err := filesystem.Api().Exists(path)
 	if err != nil {

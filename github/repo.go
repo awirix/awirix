@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/google/go-github/v48/github"
-	"github.com/awirix/awirix/option"
+	"github.com/samber/mo"
 	"net/http"
 )
 
@@ -13,8 +13,8 @@ type Repository struct {
 	Name   string `json:"name" jsonschema:"required,description=The name of the repository"`
 	Branch string `json:"branch,omitempty" jsonschema:"description=The branch of the repository,default=main"`
 
-	repo  *option.Option[*github.Repository]
-	files *option.Option[[]*File]
+	repo  mo.Option[*github.Repository]
+	files mo.Option[[]*File]
 }
 
 func (r *Repository) URL() string {
@@ -60,7 +60,7 @@ func (r *Repository) Files() ([]*File, error) {
 		files[i] = r.newFile(entry.GetPath(), entry.GetSHA())
 	}
 
-	r.files = option.Some(files)
+	r.files = mo.Some(files)
 	return files, nil
 }
 
@@ -86,7 +86,7 @@ func (r *Repository) Setup() error {
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	r.repo = option.Some(repo)
+	r.repo = mo.Some(repo)
 
 	if r.Branch == "" {
 		r.Branch = repo.GetMasterBranch()

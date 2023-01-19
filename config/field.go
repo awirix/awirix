@@ -92,12 +92,6 @@ func (f *Field) Markdown() string {
 		toEncode = map[string]any{section: toEncode}
 	}
 
-	//if len(sections) == 0 {
-	//	toEncode = map[string]any{key: f.DefaultValue}
-	//} else {
-	//	toEncode = map[string]any{strings.Join(sections, "."): map[string]any{key: f.DefaultValue}}
-	//}
-
 	t.Indentation("")
 	_ = t.Encode(toEncode)
 

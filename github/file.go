@@ -3,7 +3,7 @@ package github
 import (
 	"context"
 	"fmt"
-	"github.com/awirix/awirix/option"
+	"github.com/samber/mo"
 	"net/http"
 )
 
@@ -11,7 +11,7 @@ type File struct {
 	Repository *Repository
 	Path       string
 	SHA        string
-	contents   *option.Option[[]byte]
+	contents   mo.Option[[]byte]
 }
 
 func (f *File) URL() string {
@@ -37,7 +37,7 @@ func (f *File) Setup() error {
 		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
-	f.contents = option.Some(contents)
+	f.contents = mo.Some(contents)
 	return nil
 }
 

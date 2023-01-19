@@ -1,6 +1,6 @@
 package stack
 
-import "github.com/awirix/awirix/option"
+import "github.com/samber/mo"
 
 type (
 	Stack[T any] struct {
@@ -23,23 +23,23 @@ func (s *Stack[T]) Len() int {
 }
 
 // Peek view the top item on the stack
-func (s *Stack[T]) Peek() *option.Option[T] {
+func (s *Stack[T]) Peek() mo.Option[T] {
 	if s.length == 0 {
-		return option.None[T]()
+		return mo.None[T]()
 	}
-	return option.Some(s.top.value)
+	return mo.Some(s.top.value)
 }
 
 // Pop the top item of the stack and return it
-func (s *Stack[T]) Pop() *option.Option[T] {
+func (s *Stack[T]) Pop() mo.Option[T] {
 	if s.length == 0 {
-		return option.None[T]()
+		return mo.None[T]()
 	}
 
 	n := s.top
 	s.top = n.prev
 	s.length--
-	return option.Some(n.value)
+	return mo.Some(n.value)
 }
 
 // Push a value onto the top of the stack

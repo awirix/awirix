@@ -5,15 +5,15 @@ import (
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/log"
-	"github.com/awirix/awirix/option"
 	"github.com/awirix/awirix/where"
+	"github.com/samber/mo"
 	"path/filepath"
 )
 
-var installed = option.None[[]*extension.Extension]()
+var installed = mo.None[[]*extension.Extension]()
 
 func ResetInstalledCache() {
-	installed = option.None[[]*extension.Extension]()
+	installed = mo.None[[]*extension.Extension]()
 }
 
 func Installed() ([]*extension.Extension, error) {
@@ -30,34 +30,22 @@ func Installed() ([]*extension.Extension, error) {
 
 	extensions := make([]*extension.Extension, 0)
 
-	for _, owner := range dir {
-		if !owner.IsDir() {
+	for _, ext := range dir {
+		if !ext.IsDir() {
 			continue
 		}
 
-		path := filepath.Join(path, owner.Name())
-		dir, err := filesystem.Api().ReadDir(path)
+		path := filepath.Join(path, ext.Name())
+		ext, err := extension.New(path)
 		if err != nil {
-			return nil, err
+			log.Errorf("failed to load extension at '%s': %s", path, err)
+			continue
 		}
 
-		for _, d := range dir {
-			if !d.IsDir() {
-				continue
-			}
-
-			extensionPath := filepath.Join(path, d.Name())
-			ext, err := extension.New(extensionPath)
-			if err != nil {
-				log.Errorf("failed to load extension at '%s': %s", extensionPath, err)
-				continue
-			}
-
-			extensions = append(extensions, ext)
-		}
+		extensions = append(extensions, ext)
 	}
 
-	installed = option.Some(extensions)
+	installed = mo.Some(extensions)
 	return extensions, nil
 }
 

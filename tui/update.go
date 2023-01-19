@@ -91,7 +91,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.resize(m.current.dimensions.terminalWidth, m.current.dimensions.terminalHeight)
 		return m, m.pushState(stateMediaInfo)
 	case msgExtensionRemoved:
-		return m, tea.Sequentially(
+		return m, tea.Sequence(
 			m.pushState(stateExtensionSelect),
 			m.component.extensionSelect.NewStatusMessage(fmt.Sprintf(
 				"Removed %s",
@@ -110,6 +110,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) updateError(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// TODO: copy to clipboard
 	return m, nil
 }
 

@@ -179,7 +179,7 @@ func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
 			return nil
 		}
 
-		return tea.Sequentially(
+		return tea.Sequence(
 			m.handleExtensionsReset(),
 			func() tea.Msg {
 				return msgExtensionRemoved(ext)

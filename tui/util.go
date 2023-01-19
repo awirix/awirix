@@ -6,7 +6,6 @@ import (
 	"github.com/awirix/awirix/extensions/manager"
 	configKey "github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/log"
-	"github.com/awirix/awirix/option"
 	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -15,6 +14,7 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	zone "github.com/lrstanley/bubblezone"
 	"github.com/samber/lo"
+	"github.com/samber/mo"
 	"github.com/spf13/viper"
 	"golang.org/x/exp/slices"
 	"strings"
@@ -135,16 +135,16 @@ func listHandleMouseMsg(msg tea.MouseMsg, lst *list.Model) {
 	}
 }
 
-func listGetSelectedItem[T any](lst *list.Model) *option.Option[T] {
+func listGetSelectedItem[T any](lst *list.Model) mo.Option[T] {
 	item, ok := lst.SelectedItem().(*lItem)
 	if !ok {
-		return option.None[T]()
+		return mo.None[T]()
 	}
 
 	internal, ok := item.Internal().(T)
 	if !ok {
-		return option.None[T]()
+		return mo.None[T]()
 	}
 
-	return option.Some(internal)
+	return mo.Some(internal)
 }

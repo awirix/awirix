@@ -79,14 +79,14 @@ var xLsCmd = &cobra.Command{
 }
 
 func init() {
-	xCmd.AddCommand(xUninstallCmd)
+	xCmd.AddCommand(xRemoveCmd)
 
-	xUninstallCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
+	xRemoveCmd.Flags().StringP("id", "i", "", "id of the extension to remove")
 }
 
-var xUninstallCmd = &cobra.Command{
-	Use:   "del",
-	Short: "Uninstall an extension",
+var xRemoveCmd = &cobra.Command{
+	Use:   "rm",
+	Short: "Remove an extension",
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		extensions, err := manager.Installed()
@@ -191,11 +191,6 @@ var xSelCmd = &cobra.Command{
 
 func init() {
 	xCmd.AddCommand(xAddCmd)
-
-	xAddCmd.Flags().BoolP("yes", "y", false, "skip install confirmation")
-	xAddCmd.Flags().BoolP("force", "f", false, "skip passport validation")
-
-	xAddCmd.MarkFlagsMutuallyExclusive("yes", "force")
 }
 
 var xAddCmd = &cobra.Command{
@@ -208,17 +203,13 @@ var xAddCmd = &cobra.Command{
 
 		var url string
 
-		if text.IsURL(arg) {
+		if text.IsURLStrict(arg) {
 			url = arg
 		} else if matched, _ := regexp.MatchString(`^[\w-]+/[\w-]+$`, arg); matched {
 			url = fmt.Sprintf("https://github.com/%s", arg)
 		}
 
-		ext, err := manager.Add(&manager.AddOptions{
-			URL:          url,
-			SkipConfirm:  lo.Must(cmd.Flags().GetBool("yes")),
-			SkipValidate: lo.Must(cmd.Flags().GetBool("force")),
-		})
+		ext, err := manager.Add2(url, &manager.AddOptions{})
 		handleErr(err)
 
 		fmt.Printf("%s Successfully installed %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()))

@@ -72,6 +72,18 @@ type Signature struct {
 	SignerUserId                                            *string
 	IsPrimaryId                                             *bool
 
+	// TrustLevel and TrustAmount can be set by the signer to assert that 
+	// the key is not only valid but also trustworthy at the specified 
+	// level. 
+	// See RFC 4880, section 5.2.3.13 for details. 
+	TrustLevel TrustLevel
+	TrustAmount TrustAmount
+
+	// TrustRegularExpression can be used in conjunction with trust Signature
+	// packets to limit the scope of the trust that is extended. 
+	// See RFC 4880, section 5.2.3.14 for details.
+	TrustRegularExpression *string
+
 	// PolicyURI can be set to the URI of a document that describes the
 	// policy under which the signature was issued. See RFC 4880, section
 	// 5.2.3.20 for details.
@@ -221,6 +233,8 @@ type signatureSubpacketType uint8
 const (
 	creationTimeSubpacket        signatureSubpacketType = 2
 	signatureExpirationSubpacket signatureSubpacketType = 3
+	trustSubpacket               signatureSubpacketType = 5
+	regularExpressionSubpacket   signatureSubpacketType = 6
 	keyExpirationSubpacket       signatureSubpacketType = 9
 	prefSymmetricAlgosSubpacket  signatureSubpacketType = 11
 	issuerSubpacket              signatureSubpacketType = 16
@@ -301,6 +315,19 @@ func parseSignatureSubpacket(sig *Signature, subpacket []byte, isHashed bool) (r
 		}
 		sig.SigLifetimeSecs = new(uint32)
 		*sig.SigLifetimeSecs = binary.BigEndian.Uint32(subpacket)
+	case trustSubpacket:
+		// Trust level and amount, section 5.2.3.13
+		sig.TrustLevel = TrustLevel(subpacket[0])
+		sig.TrustAmount = TrustAmount(subpacket[1])
+	case regularExpressionSubpacket:
+		// Trust regular expression, section 5.2.3.14
+		// RFC specifies the string should be null-terminated; remove a null byte from the end
+		if subpacket[len(subpacket)-1] != 0x00 {
+			err = errors.StructuralError("expected regular expression to be null-terminated")
+			return
+		}
+		trustRegularExpression := string(subpacket[:len(subpacket)-1])
+		sig.TrustRegularExpression = &trustRegularExpression
 	case keyExpirationSubpacket:
 		// Key expiration time, section 5.2.3.6
 		if !isHashed {
@@ -900,6 +927,15 @@ func (sig *Signature) buildSubpackets(issuer PublicKey) (subpackets []outputSubp
 
 	if features != 0x00 {
 		subpackets = append(subpackets, outputSubpacket{true, featuresSubpacket, false, []byte{features}})
+	}
+
+	if sig.TrustLevel != 0 {
+		subpackets = append(subpackets, outputSubpacket{true, trustSubpacket, true, []byte{byte(sig.TrustLevel), byte(sig.TrustAmount)}})
+	}
+
+	if sig.TrustRegularExpression != nil {
+		// RFC specifies the string should be null-terminated; add a null byte to the end
+		subpackets = append(subpackets, outputSubpacket{true, regularExpressionSubpacket, true, []byte(*sig.TrustRegularExpression + "\000")})
 	}
 
 	if sig.KeyLifetimeSecs != nil && *sig.KeyLifetimeSecs != 0 {

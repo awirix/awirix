@@ -13,16 +13,33 @@ import (
 	"github.com/awirix/awirix/where"
 	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
+	"github.com/pkg/errors"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
+)
+
+var (
+	ErrInvalidURL          = errAdd(fmt.Errorf("invalid URL"))
+	ErrRepoPassportMissing = errAdd(fmt.Errorf("repository does not contain a %s", filename.Passport))
+	ErrRepoInvalidPassport = errAdd(fmt.Errorf("repository does not contain a valid %s", filename.Passport))
+	ErrExtensionInstalled  = errAdd(fmt.Errorf("extension is already installed"))
+)
+
+var (
+	githubURLRegex = regexp.MustCompile(`^https?://github.com/(?P<owner>[^/]+)/(?P<name>[^/]+)(?:\.git)?$`)
 )
 
 type AddOptions struct {
 	URL          string
 	SkipConfirm  bool
 	SkipValidate bool
+}
+
+func errAdd(err error) error {
+	return errors.Wrap(err, "add")
 }
 
 func confirm(msg string) (bool, error) {
@@ -36,8 +53,71 @@ func confirm(msg string) (bool, error) {
 	return confirm, err
 }
 
+func Add2(url string, options *AddOptions) (*extension.Extension, error) {
+	url = strings.TrimSuffix(url, ".git")
+	if !githubURLRegex.MatchString(url) {
+		return nil, ErrInvalidURL
+	}
+
+	if options == nil {
+		options = &AddOptions{}
+	}
+
+	groups := text.RegexpGroups(githubURLRegex, url)
+	owner, name := groups["owner"], groups["name"]
+
+	repo := github.Repository{Owner: owner, Name: name}
+	err := repo.Setup()
+	if err != nil {
+		return nil, errAdd(err)
+	}
+
+	file, err := repo.GetFile(filename.Passport)
+	if err != nil {
+		return nil, ErrRepoPassportMissing
+	}
+
+	data, err := file.Contents()
+	if err != nil {
+		return nil, err
+	}
+
+	thePassport, err := passport.New(bytes.NewBuffer(data))
+	if err != nil {
+		return nil, ErrRepoInvalidPassport
+	}
+
+	// TODO: add confirmation
+	path := filepath.Join(where.Extensions(), thePassport.ID)
+
+	exists, err := filesystem.Api().Exists(path)
+	if err != nil {
+		return nil, errAdd(err)
+	}
+
+	if exists {
+		return nil, ErrExtensionInstalled
+	}
+
+	if exists {
+
+	}
+
+	_, err = git.PlainClone(path, false, &git.CloneOptions{
+		URL:          url,
+		Depth:        1,
+		SingleBranch: true,
+	})
+
+	if err != nil {
+		return nil, errAdd(err)
+	}
+
+	return extension.New(path)
+}
+
 func Add(options *AddOptions) (*extension.Extension, error) {
-	if !text.IsURL(options.URL) {
+	if !text.IsURLStrict(options.URL) {
 		return nil, fmt.Errorf("invalid URL")
 	}
 
