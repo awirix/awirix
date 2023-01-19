@@ -11,6 +11,7 @@ import (
 	"github.com/awirix/awirix/version"
 	"github.com/enescakir/emoji"
 	"github.com/mvdan/xurls"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"io"
 	"net/url"
@@ -25,10 +26,15 @@ type Passport struct {
 	About      string             `json:"about"`
 	Version    *version.Version   `json:"version"`
 	Language   *language.Language `json:"language"`
+	Authors    []string           `json:"authors"`
 	NSFW       bool               `json:"nsfw"`
 	Tags       []string           `json:"tags,omitempty"`
 	Repository *github.Repository `json:"repository,omitempty"`
 	Programs   []string           `json:"programs,omitempty"`
+}
+
+func errPassport(err error) error {
+	return errors.Wrap(err, "passport")
 }
 
 var passportTemplate = lo.Must(template.New("passport").Funcs(template.FuncMap{
@@ -116,11 +122,11 @@ Primary language is **{{ .Language.Name }}**
 
 func (p *Passport) Validate() error {
 	if p.ID == "" {
-		return fmt.Errorf("passport: id is empty")
+		return errPassport(fmt.Errorf("id is empty"))
 	}
 
 	if p.Name == "" {
-		return fmt.Errorf("passport: name is empty")
+		return errPassport(fmt.Errorf("name is empty"))
 	}
 
 	if p.Repository != nil {
@@ -129,7 +135,7 @@ func (p *Passport) Validate() error {
 			{"owner", p.Repository.Owner},
 		} {
 			if t.B == "" {
-				return fmt.Errorf("missing required field in repo: %s", t.A)
+				return errPassport(fmt.Errorf("missing required field in repo: %s", t.A))
 			}
 		}
 	}

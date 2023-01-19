@@ -58,7 +58,7 @@ func (l *lItem) Title() string {
 		}
 
 		if viper.GetBool(key.TUIShowExtensionAuthor) {
-			title += " " + style.Faint(fmt.Sprintf("by %s", internal.Author()))
+			title += " " + style.Faint(fmt.Sprintf("by %s", internal.Passport().Authors))
 		}
 	case *scraper.Media:
 		if internal.HasInfo() {

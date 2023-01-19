@@ -33,30 +33,6 @@ func Lib() *luadoc.Lib {
 					},
 				},
 			},
-			{
-				Name:        "closest",
-				Description: "Find string with highest similarity from strings list",
-				Value:       closest,
-				Params: []*luadoc.Param{
-					{
-						Name:        "s",
-						Description: "String to compare with",
-						Type:        luadoc.String,
-					},
-					{
-						Name:        "strings",
-						Description: "List of strings to compare with",
-						Type:        luadoc.List(luadoc.String),
-					},
-				},
-				Returns: []*luadoc.Param{
-					{
-						Name:        "closest",
-						Description: "String with highest similarity",
-						Type:        luadoc.String,
-					},
-				},
-			},
 		},
 	}
 }
@@ -66,31 +42,6 @@ func distance(L *lua.LState) int {
 	s2 := L.CheckString(2)
 
 	L.Push(lua.LNumber(levenshtein.Distance(s1, s2)))
-
-	return 1
-}
-
-func closest(L *lua.LState) int {
-	s := L.CheckString(1)
-	strings := L.CheckTable(2)
-
-	var (
-		closest  string
-		distance int
-	)
-
-	strings.ForEach(func(key, value lua.LValue) {
-		s2 := value.String()
-
-		d := levenshtein.Distance(s, s2)
-
-		if closest == "" || d < distance {
-			closest = s2
-			distance = d
-		}
-	})
-
-	L.Push(lua.LString(closest))
 
 	return 1
 }

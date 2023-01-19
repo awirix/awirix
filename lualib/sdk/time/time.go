@@ -8,8 +8,7 @@ import (
 )
 
 const (
-	timeTypeName     = "time"
-	durationTypeName = "duration"
+	timeTypeName = "time"
 )
 
 func Lib() *luadoc.Lib {

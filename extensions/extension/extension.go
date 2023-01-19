@@ -12,7 +12,9 @@ import (
 	"github.com/awirix/awirix/where"
 	"github.com/awirix/lua"
 	"github.com/enescakir/emoji"
+	"github.com/samber/lo"
 	"github.com/spf13/viper"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -124,10 +126,6 @@ func (e *Extension) String() string {
 	//return e.Passport().Icon.String() + " " + e.Passport().Name
 }
 
-func (e *Extension) Author() string {
-	return filepath.Base(filepath.Dir(e.Path()))
-}
-
 func (e *Extension) Passport() *passport.Passport {
 	return e.passport
 }
@@ -146,4 +144,10 @@ func (e *Extension) Path() string {
 
 func (e *Extension) Downloads() string {
 	return filepath.Join(where.Downloads(), e.Passport().ID)
+}
+
+func (e *Extension) Cache() string {
+	path := filepath.Join(e.Path(), ".cache")
+	lo.Must0(filesystem.Api().MkdirAll(path, os.ModePerm))
+	return path
 }

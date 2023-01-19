@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/awirix/awirix/cache"
 	"github.com/awirix/awirix/luadoc"
 	lua "github.com/awirix/lua"
 	"net/http"
@@ -483,7 +482,7 @@ func defaultClientGet(L *lua.LState) int {
 	// error can not occur here
 	req, _ := http.NewRequest("GET", url, nil)
 
-	if res, ok := cache.HTTP.Get(req); ok {
+	if res, ok := cacheGet(L, req); ok {
 		pushResponse(L, res)
 		return 1
 	}
@@ -496,7 +495,7 @@ func defaultClientGet(L *lua.LState) int {
 	}
 
 	if doCache {
-		_ = cache.HTTP.Set(req, res)
+		_ = cacheSet(L, req, res)
 	}
 
 	pushResponse(L, res)

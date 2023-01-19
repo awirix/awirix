@@ -4,36 +4,32 @@ import (
 	"bufio"
 	"bytes"
 	"errors"
-	"github.com/metafates/gache"
 	"github.com/awirix/awirix/filesystem"
-	"github.com/awirix/awirix/where"
+	"github.com/metafates/gache"
 	"net/http"
 	"net/http/httputil"
-	"path/filepath"
 	"time"
 )
 
 var ErrCacheTooLarge = errors.New("cache too large")
 
-var HTTP *httpCache
-
-func init() {
+func NewHTTPCache(path string) *HTTPCache {
 	cache := gache.New[map[string][]byte](&gache.Options{
-		Path:       filepath.Join(where.Cache(), "http.json"),
+		Path:       path,
 		Lifetime:   time.Hour * 5,
 		FileSystem: &filesystem.GacheFs{},
 	})
 
-	HTTP = &httpCache{
+	return &HTTPCache{
 		cache: cache,
 	}
 }
 
-type httpCache struct {
+type HTTPCache struct {
 	cache *gache.Cache[map[string][]byte]
 }
 
-func (h *httpCache) Get(r *http.Request) (*http.Response, bool) {
+func (h *HTTPCache) Get(r *http.Request) (*http.Response, bool) {
 	data, expired, err := h.cache.Get()
 	if err != nil {
 		return nil, false
@@ -65,7 +61,7 @@ func (h *httpCache) Get(r *http.Request) (*http.Response, bool) {
 	return response, true
 }
 
-func (h *httpCache) Set(r *http.Request, res *http.Response) error {
+func (h *HTTPCache) Set(r *http.Request, res *http.Response) error {
 	if res.ContentLength > 1024*1024 {
 		return ErrCacheTooLarge
 	}

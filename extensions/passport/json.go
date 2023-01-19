@@ -9,10 +9,6 @@ import (
 	"strings"
 )
 
-func errPassport(err error) error {
-	return errors.Wrap(err, "passport")
-}
-
 func (p *Passport) UnmarshalJSON(data []byte) error {
 	type Alias Passport
 	aux := &struct {

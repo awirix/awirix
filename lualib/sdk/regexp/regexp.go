@@ -20,10 +20,10 @@ func Lib(L *lua.LState) *luadoc.Lib {
 		Description: "Compiled regular expression",
 		Methods: []*luadoc.Method{
 			{
-				Name: "find",
+				Name: "find_submatch",
 				Description: `Returns a slice of strings holding the text of the leftmost match of the regular
 expression in s and the matches, if any, of its subexpressions. A return value of empty table indicates no match.`,
-				Value: regexpFind,
+				Value: regexpFindSubmatch,
 				Params: []*luadoc.Param{
 					{
 						Name:        "text",
@@ -59,10 +59,10 @@ expression in s and the matches, if any, of its subexpressions. A return value o
 				},
 			},
 			{
-				Name: "replace",
+				Name: "replace_all",
 				Description: `Returns a copy of text, replacing matches of the regexp with the replacement string.
 Inside replacement, $ signs are interpreted as in expand, so for instance $1 represents the text of the first submatch.`,
-				Value: regexpReplace,
+				Value: regexpReplaceAll,
 				Params: []*luadoc.Param{
 					{
 						Name:        "text",
@@ -118,6 +118,43 @@ Inside replacement, $ signs are interpreted as in expand, so for instance $1 rep
 						Name:        "groups",
 						Description: "A table of all capture groups",
 						Type:        luadoc.Table,
+					},
+				},
+			},
+			{
+				Name:        "replace_all_func",
+				Description: "Returns a copy of text, replacing matches of the regexp with the replacement function.",
+				Value:       regexpReplaceAllFunc,
+				Params: []*luadoc.Param{
+					{
+						Name:        "text",
+						Description: "A string to replace matches in",
+						Type:        luadoc.String,
+					},
+					{
+						Name:        "replacer",
+						Description: "A function to replace matches with",
+						Type: luadoc.Func{
+							Params: []*luadoc.Param{
+								{
+									Name: "match",
+									Type: luadoc.String,
+								},
+							},
+							Returns: []*luadoc.Param{
+								{
+									Name: "replaced",
+									Type: luadoc.String,
+								},
+							},
+						}.AsType(),
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "replaced",
+						Description: "The result of the replacement",
+						Type:        luadoc.String,
 					},
 				},
 			},

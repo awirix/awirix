@@ -87,12 +87,16 @@ func (f *Field) Markdown() string {
 		sections = parts[:len(parts)-1]
 	)
 
-	var toEncode any
-	if len(sections) == 0 {
-		toEncode = map[string]any{key: f.DefaultValue}
-	} else {
-		toEncode = map[string]any{strings.Join(sections, "."): map[string]any{key: f.DefaultValue}}
+	var toEncode any = map[string]any{key: f.DefaultValue}
+	for _, section := range lo.Reverse(sections) {
+		toEncode = map[string]any{section: toEncode}
 	}
+
+	//if len(sections) == 0 {
+	//	toEncode = map[string]any{key: f.DefaultValue}
+	//} else {
+	//	toEncode = map[string]any{strings.Join(sections, "."): map[string]any{key: f.DefaultValue}}
+	//}
 
 	t.Indentation("")
 	_ = t.Encode(toEncode)
@@ -100,6 +104,7 @@ func (f *Field) Markdown() string {
 	// encoded string already has newlines on both ends
 	example := fmt.Sprintf("```toml%s```", b.String())
 	env := fmt.Sprintf("```bash\nexport %s=\"%v\"\n```", f.Env(), f.DefaultValue)
+	cmd := fmt.Sprintf("```bash\n%s config set -k %s -v \"%v\"\n```", app.Name, f.Key, f.DefaultValue)
 
 	return fmt.Sprintf(`## %s
 
@@ -107,7 +112,9 @@ func (f *Field) Markdown() string {
 
 %s
 
-%s`, f.Key, example, env, f.Description)
+%s
+
+%s`, f.Key, example, env, cmd, f.Description)
 }
 
 func (f *Field) Env() string {

@@ -62,39 +62,12 @@ var xLsCmd = &cobra.Command{
 		extensions, err := manager.Installed()
 		handleErr(err)
 
-		var (
-			byAuthor = make(map[string][]*extension.Extension)
-			authors  = make(map[string]any, 0)
-		)
-
-		for _, ext := range extensions {
-			byAuthor[ext.Author()] = append(byAuthor[ext.Author()], ext)
-			authors[ext.Author()] = nil
-		}
-
-		printForAuthor := func(author string) {
-			fmt.Println(
-				style.
-					New().
-					Foreground(color.Yellow).
-					Bold(true).
-					Render(author),
+		for _, e := range extensions {
+			fmt.Printf(
+				"%s %s\n",
+				style.Fg(color.Purple)(e.Passport().Name),
+				style.Bold(e.Passport().Version.String()),
 			)
-
-			for _, e := range byAuthor[author] {
-				fmt.Printf(
-					"%s %s\n",
-					style.Fg(color.Purple)(e.Passport().Name),
-					style.Bold(e.Passport().Version.String()),
-				)
-			}
-		}
-
-		for author, _ := range authors {
-			if _, ok := byAuthor[author]; ok {
-				printForAuthor(author)
-				fmt.Println()
-			}
 		}
 
 		fmt.Printf(

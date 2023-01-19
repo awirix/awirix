@@ -23,7 +23,7 @@ func checkRegexp(L *lua.LState, n int) *regexp.Regexp {
 	return nil
 }
 
-func regexpFind(L *lua.LState) int {
+func regexpFindSubmatch(L *lua.LState) int {
 	re := checkRegexp(L, 1)
 	text := L.CheckString(2)
 	matches := re.FindStringSubmatch(text)
@@ -43,7 +43,7 @@ func regexpMatch(L *lua.LState) int {
 	return 1
 }
 
-func regexpReplace(L *lua.LState) int {
+func regexpReplaceAll(L *lua.LState) int {
 	re := checkRegexp(L, 1)
 	text := L.CheckString(2)
 	replacement := L.CheckString(3)
@@ -83,5 +83,21 @@ func regexpGroups(L *lua.LState) int {
 	}
 
 	L.Push(tbl)
+	return 1
+}
+
+func regexpReplaceAllFunc(L *lua.LState) int {
+	re := checkRegexp(L, 1)
+	text := L.CheckString(2)
+	replacer := L.CheckFunction(3)
+
+	result := re.ReplaceAllStringFunc(text, func(match string) string {
+		L.Push(replacer)
+		L.Push(lua.LString(match))
+		L.Call(1, 1)
+		return L.CheckString(-1)
+	})
+
+	L.Push(lua.LString(result))
 	return 1
 }

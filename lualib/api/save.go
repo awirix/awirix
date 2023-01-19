@@ -8,7 +8,7 @@ import (
 )
 
 func save(L *lua.LState) int {
-	ext := L.Context().Value("extension").(extensions.ExtensionContainer)
+	ext := L.Context().Value("extension").(extensions.ExtensionWrapper)
 	data := L.CheckString(1)
 	path := L.CheckString(2)
 

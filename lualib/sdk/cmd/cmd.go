@@ -118,7 +118,7 @@ func newCommand(L *lua.LState) int {
 		L.RaiseError("failed to create %q command: command execution is disabled in safe mode", command)
 	}
 
-	programs := L.Context().Value("extension").(extensions.ExtensionContainer).Passport().Programs
+	programs := L.Context().Value("extension").(extensions.ExtensionWrapper).Passport().Programs
 
 	if !lo.Contains(programs, command) {
 		L.RaiseError("command `%s` is not allowed because it is not in the list of allowed programs %s in the extension's passport", command, programs)

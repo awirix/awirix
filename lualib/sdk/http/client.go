@@ -1,7 +1,6 @@
 package http
 
 import (
-	"github.com/awirix/awirix/cache"
 	"github.com/awirix/lua"
 	"net/http"
 	"sync"
@@ -37,7 +36,7 @@ func clientSend(L *lua.LState) int {
 	req := checkRequest(L, 2)
 	doCache := L.OptBool(3, false)
 
-	if res, ok := cache.HTTP.Get(req); ok {
+	if res, ok := cacheGet(L, req); ok {
 		pushResponse(L, res)
 		return 1
 	}
@@ -50,7 +49,7 @@ func clientSend(L *lua.LState) int {
 	}
 
 	if doCache {
-		_ = cache.HTTP.Set(req, res)
+		cacheSet(L, req, res)
 	}
 
 	pushResponse(L, res)
@@ -99,7 +98,7 @@ func clientSendBatch(L *lua.LState) int {
 			}
 
 			var response *http.Response
-			if res, ok := cache.HTTP.Get(req); ok {
+			if res, ok := cacheGet(L, req); ok {
 				response = res
 			} else {
 				response, err = client.Do(req)
@@ -108,7 +107,7 @@ func clientSendBatch(L *lua.LState) int {
 				}
 
 				if doCache {
-					_ = cache.HTTP.Set(req, response)
+					_ = cacheSet(L, req, response)
 				}
 			}
 
