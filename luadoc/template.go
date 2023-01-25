@@ -84,6 +84,9 @@ local {{ $class.Name }} = {}
 
 {{ range $method := $class.Methods }}
 {{ doc $method.Description }}
+{{- range $generic := $method.Generics }}
+{{ doc "@generic" }} {{ $generic }}
+{{- end }}
 {{- range $param := $method.Params }}
 {{ doc "@param" }} {{ $param.Name }} {{ $param.Type }}{{ if $param.Optional }}?{{ end }} {{ $param.Description }}
 {{- end }}
@@ -96,6 +99,9 @@ function {{ $class.Name }}:{{ $method.Name }}({{ join (params $method.Params) ",
 
 {{ range $func := .Funcs }}
 {{ doc $func.Description }}
+{{- range $generic := $func.Generics }}
+{{ doc "@generic" }} {{ $generic }}
+{{- end }}
 {{- range $param := $func.Params }}
 {{ doc "@param" }} {{ $param.Name }} {{ $param.Type }}{{ if $param.Optional }}?{{ end }} {{ $param.Description }}
 {{- end }}

@@ -46,13 +46,13 @@ func Lib() *luadoc.Lib {
 				Value:       openData,
 				Params: []*luadoc.Param{
 					{
-						Name:        "data",
-						Description: "The data to save.",
+						Name:        "ext",
+						Description: "The extension that shows mimetype of the data",
 						Type:        luadoc.String,
 					},
 					{
-						Name:        "ext",
-						Description: "The extension of the file to save.",
+						Name:        "data",
+						Description: "The data to save.",
 						Type:        luadoc.String,
 					},
 					{

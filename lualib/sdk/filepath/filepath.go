@@ -17,9 +17,9 @@ func Lib() *luadoc.Lib {
 				Value:       join,
 				Params: []*luadoc.Param{
 					{
-						Name:        "elems",
+						Name:        "...",
 						Description: "Path elements to join.",
-						Type:        luadoc.List(luadoc.String),
+						Type:        luadoc.String,
 					},
 				},
 				Returns: []*luadoc.Param{
@@ -178,13 +178,12 @@ func Lib() *luadoc.Lib {
 }
 
 func join(L *lua.LState) int {
-	var path string
-	table := L.CheckTable(1)
-	for i := 1; i <= table.Len(); i++ {
-		path = filepath.Join(path, table.RawGetInt(i).String())
+	var segments []string
+	for i := 1; i <= L.GetTop(); i++ {
+		segments = append(segments, L.CheckString(i))
 	}
 
-	L.Push(lua.LString(path))
+	L.Push(lua.LString(filepath.Join(segments...)))
 	return 1
 }
 

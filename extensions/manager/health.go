@@ -10,50 +10,45 @@ import (
 )
 
 func Health(report io.Writer) {
+	var newline = []byte{0x0a}
 	path := where.Extensions()
 
 	dir, err := filesystem.Api().ReadDir(path)
 	if err != nil {
 		log.WriteErrorf(report, "failed to read extensions directory: %s", err)
-		report.Write([]byte{0x0a})
+		report.Write(newline)
 		return
 	}
 
 	idMap := make(map[string]struct{})
 
-	for _, owner := range dir {
-		if !owner.IsDir() {
+	var errOccurred bool
+	for _, f := range dir {
+		if !f.IsDir() {
 			continue
 		}
 
-		path := filepath.Join(path, owner.Name())
-		dir, err := filesystem.Api().ReadDir(path)
+		path := filepath.Join(path, f.Name())
+		ext, err := extension.New(path)
 		if err != nil {
-			log.WriteErrorf(report, "failed to read extensions directory: %s", err)
-			report.Write([]byte{0x0a})
+			errOccurred = true
+			log.WriteErrorf(report, "failed to load extension at %q: %s", path, err)
+			report.Write(newline)
 			continue
 		}
 
-		for _, d := range dir {
-			if !d.IsDir() {
-				continue
-			}
-
-			extensionPath := filepath.Join(path, d.Name())
-			ext, err := extension.New(extensionPath)
-			if err != nil {
-				log.WriteErrorf(report, "failed to load extension at '%s': %s", extensionPath, err)
-				report.Write([]byte{0x0a})
-				continue
-			}
-
-			if _, ok := idMap[ext.Passport().ID]; ok {
-				log.WriteErrorf(report, "duplicate extension ID '%s' found", ext.Passport().ID)
-				report.Write([]byte{0x0a})
-				continue
-			}
-
-			idMap[ext.Passport().ID] = struct{}{}
+		id := ext.Passport().ID
+		if _, ok := idMap[id]; ok {
+			errOccurred = true
+			log.WriteErrorf(report, "extension %q is installed multiple times", id)
+			report.Write(newline)
 		}
+
+		idMap[id] = struct{}{}
+	}
+
+	if !errOccurred {
+		log.WriteSuccessf(report, "Everything is OK\n")
+		report.Write(newline)
 	}
 }

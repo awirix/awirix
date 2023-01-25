@@ -20,6 +20,7 @@ type Func struct {
 	Name        string
 	Description string
 	Value       lua.LGFunction
+	Generics    []string
 	Params      []*Param
 	Returns     []*Param
 }

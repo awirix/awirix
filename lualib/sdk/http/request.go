@@ -4,6 +4,7 @@ import (
 	lua "github.com/awirix/lua"
 	"io"
 	"net/http"
+	url2 "net/url"
 	"strings"
 )
 
@@ -36,7 +37,7 @@ func newRequest(L *lua.LState) int {
 		reqBody = strings.NewReader(body)
 	}
 
-	request, err := http.NewRequest(method, url, reqBody)
+	request, err := http.NewRequestWithContext(L.Context(), method, url, reqBody)
 	if err != nil {
 		L.Push(lua.LNil)
 		L.Push(lua.LString(err.Error()))
@@ -65,5 +66,58 @@ func requestSetBasicAuth(L *lua.LState) int {
 	username := L.CheckString(2)
 	password := L.CheckString(3)
 	request.SetBasicAuth(username, password)
+	return 0
+}
+
+func requestGetMethod(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	L.Push(lua.LString(request.Method))
+	return 1
+}
+
+func requestGetURL(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	L.Push(lua.LString(request.URL.String()))
+	return 1
+}
+
+func requestGetBody(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	L.Push(lua.LString(body))
+	return 1
+}
+
+func requestSetMethod(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	method := L.CheckString(2)
+	request.Method = method
+	return 0
+}
+
+func requestSetURL(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	rawUrl := L.CheckString(2)
+	url, err := url2.Parse(rawUrl)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	request.URL = url
+	return 0
+}
+
+func requestSetBody(L *lua.LState) int {
+	request := checkRequest(L, 1)
+	body := L.CheckString(2)
+	request.Body = io.NopCloser(strings.NewReader(body))
 	return 0
 }

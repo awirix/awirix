@@ -9,51 +9,60 @@ import (
 )
 
 func Lib() *luadoc.Lib {
-	predicate := &luadoc.Param{
-		Name:        "predicate",
-		Description: "Predicate function",
-		Type: luadoc.Func{
-			Params: []*luadoc.Param{
-				{
-					Name:        "value",
-					Description: "Value to check",
-					Type:        luadoc.Any,
+	const (
+		T = "T"
+		G = "G"
+	)
+
+	predicate := func(t string) *luadoc.Param {
+		return &luadoc.Param{
+			Name:        "predicate",
+			Description: "Predicate function",
+			Type: luadoc.Func{
+				Params: []*luadoc.Param{
+					{
+						Name:        "value",
+						Description: "Value to check",
+						Type:        luadoc.Any,
+					},
 				},
-			},
-			Returns: []*luadoc.Param{
-				{
-					Name:        "result",
-					Description: "Result of predicate",
-					Type:        luadoc.Boolean,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "result",
+						Description: "Result of predicate",
+						Type:        luadoc.Boolean,
+					},
 				},
-			},
-		}.AsType(),
+			}.AsType(),
+		}
 	}
 
-	predicateWithIndex := &luadoc.Param{
-		Name:        "predicate",
-		Description: "Predicate function",
-		Type: luadoc.Func{
-			Params: []*luadoc.Param{
-				{
-					Name:        "value",
-					Description: "Value to check",
-					Type:        luadoc.Any,
+	predicateWithIndex := func(t string) *luadoc.Param {
+		return &luadoc.Param{
+			Name:        "predicate",
+			Description: "Predicate function",
+			Type: luadoc.Func{
+				Params: []*luadoc.Param{
+					{
+						Name:        "value",
+						Description: "Value to check",
+						Type:        luadoc.Any,
+					},
+					{
+						Name:        "index",
+						Description: "Index of value",
+						Type:        luadoc.Number,
+					},
 				},
-				{
-					Name:        "index",
-					Description: "Index of value",
-					Type:        luadoc.Number,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "result",
+						Description: "Result of predicate",
+						Type:        luadoc.Boolean,
+					},
 				},
-			},
-			Returns: []*luadoc.Param{
-				{
-					Name:        "result",
-					Description: "Result of predicate",
-					Type:        luadoc.Boolean,
-				},
-			},
-		}.AsType(),
+			}.AsType(),
+		}
 	}
 
 	return &luadoc.Lib{
@@ -64,11 +73,12 @@ func Lib() *luadoc.Lib {
 				Name:        "chunk",
 				Description: "Split list into chunks",
 				Value:       chunk,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to split",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "size",
@@ -81,7 +91,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "chunks",
 						Description: "List of chunks",
-						Type:        luadoc.List(luadoc.List(luadoc.Any)),
+						Type:        luadoc.List(luadoc.List(T)),
 					},
 				},
 			},
@@ -89,11 +99,12 @@ func Lib() *luadoc.Lib {
 				Name:        "drop",
 				Description: "Drop n elements from the beginning list",
 				Value:       drop,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to drop from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "n",
@@ -105,7 +116,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "dropped",
 						Description: "List of dropped elements",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 			},
@@ -113,11 +124,12 @@ func Lib() *luadoc.Lib {
 				Name:        "drop_right",
 				Description: "Drop n elements from the end of list",
 				Value:       dropRight,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to drop from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "n",
@@ -129,7 +141,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "dropped",
 						Description: "List of dropped elements",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 			},
@@ -137,45 +149,48 @@ func Lib() *luadoc.Lib {
 				Name:        "drop_while",
 				Description: "Drop elements from the beginning of list while predicate is true",
 				Value:       dropWhile,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to drop from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 			},
 			{
 				Name:        "drop_right_while",
 				Description: "Drop elements from the end of list while predicate is true",
 				Value:       dropRightWhile,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to drop from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 			},
 			{
 				Name:        "filter",
 				Description: "Filter list by predicate",
 				Value:       filter,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to filter",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicateWithIndex,
+					predicateWithIndex(T),
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "filtered",
 						Description: "List of filtered elements",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 			},
@@ -183,19 +198,20 @@ func Lib() *luadoc.Lib {
 				Name:        "find",
 				Description: "Find first element in list that satisfies predicate.",
 				Value:       find,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to search",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "element",
 						Description: "First element that satisfies predicate",
-						Type:        luadoc.Any,
+						Type:        T,
 					},
 					{
 						Name:        "ok",
@@ -208,13 +224,14 @@ func Lib() *luadoc.Lib {
 				Name:        "find_index",
 				Description: "Find index of first element in list that satisfies predicate.",
 				Value:       findIndex,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to search",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 				Returns: []*luadoc.Param{
 					{
@@ -233,13 +250,14 @@ func Lib() *luadoc.Lib {
 				Name:        "find_last_index",
 				Description: "Find index of last element in list that satisfies predicate.",
 				Value:       findLastIndex,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to search",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 				Returns: []*luadoc.Param{
 					{
@@ -258,18 +276,19 @@ func Lib() *luadoc.Lib {
 				Name:        "head",
 				Description: "Get first element of list",
 				Value:       head,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get first element from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "element",
 						Description: "First element of list",
-						Type:        luadoc.Any,
+						Type:        T,
 						Optional:    true,
 					},
 				},
@@ -278,18 +297,19 @@ func Lib() *luadoc.Lib {
 				Name:        "tail",
 				Description: "Get all elements of list except first",
 				Value:       tail,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get tail from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "tail",
 						Description: "List of all elements except first",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 						Optional:    true,
 					},
 				},
@@ -298,18 +318,19 @@ func Lib() *luadoc.Lib {
 				Name:        "last",
 				Description: "Get last element of list",
 				Value:       last,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get last element from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "element",
 						Description: "Last element of list",
-						Type:        luadoc.Any,
+						Type:        T,
 						Optional:    true,
 					},
 				},
@@ -318,18 +339,19 @@ func Lib() *luadoc.Lib {
 				Name:        "init",
 				Description: "Get all elements of list except last",
 				Value:       initial,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get initial from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "initial",
 						Description: "List of all elements except last",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 						Optional:    true,
 					},
 				},
@@ -338,11 +360,12 @@ func Lib() *luadoc.Lib {
 				Name:        "take",
 				Description: "Get first n elements of list",
 				Value:       take,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get elements from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "n",
@@ -354,7 +377,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "elements",
 						Description: "First n elements of list",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 						Optional:    true,
 					},
 				},
@@ -363,11 +386,12 @@ func Lib() *luadoc.Lib {
 				Name:        "drop",
 				Description: "Get all elements of list except first n",
 				Value:       drop,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get elements from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "n",
@@ -379,7 +403,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "elements",
 						Description: "All elements of list except first n",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 						Optional:    true,
 					},
 				},
@@ -388,19 +412,20 @@ func Lib() *luadoc.Lib {
 				Name:        "drop_while",
 				Description: "Drop elements from list while predicate is true",
 				Value:       dropWhile,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get elements from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "elements",
 						Description: "Elements of list after predicate is false",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 						Optional:    true,
 					},
 				},
@@ -409,19 +434,20 @@ func Lib() *luadoc.Lib {
 				Name:        "take_while",
 				Description: "Take elements from list while predicate is true",
 				Value:       takeWhile,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get elements from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "elements",
 						Description: "Elements of list before predicate is false",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 						Optional:    true,
 					},
 				},
@@ -430,18 +456,19 @@ func Lib() *luadoc.Lib {
 				Name:        "reverse",
 				Description: "Reverse list",
 				Value:       reverse,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to reverse",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "reversed",
 						Description: "Reversed list",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 			},
@@ -449,11 +476,12 @@ func Lib() *luadoc.Lib {
 				Name:        "slice",
 				Description: "Get slice of list",
 				Value:       slice,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to get slice from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "start",
@@ -467,16 +495,24 @@ func Lib() *luadoc.Lib {
 						Optional:    true,
 					},
 				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "slice",
+						Description: "Slice of list",
+						Type:        luadoc.List(T),
+					},
+				},
 			},
 			{
 				Name:        "sorted",
 				Description: "Returns a sorted list",
 				Value:       sorted,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to sort",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "cmp",
@@ -485,11 +521,11 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "a",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "b",
-									Type: luadoc.Any,
+									Type: T,
 								},
 							},
 							Returns: []*luadoc.Param{
@@ -505,60 +541,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "sorted",
 						Description: "Sorted list",
-						Type:        luadoc.List(luadoc.Any),
-					},
-				},
-			},
-			{
-				Name:        "zip2",
-				Description: "Zips two lists together",
-				Value:       zip2,
-				Params: []*luadoc.Param{
-					{
-						Name:        "list1",
-						Description: "First list to zip",
-						Type:        luadoc.List(luadoc.Any),
-					},
-					{
-						Name:        "list2",
-						Description: "Second list to zip",
-						Type:        luadoc.List(luadoc.Any),
-					},
-				},
-				Returns: []*luadoc.Param{
-					{
-						Name:        "zipped",
-						Description: "Zipped list",
-						Type:        luadoc.List(luadoc.List(luadoc.Any)),
-					},
-				},
-			},
-			{
-				Name:        "zip3",
-				Description: "Zips three lists together",
-				Value:       zip3,
-				Params: []*luadoc.Param{
-					{
-						Name:        "list1",
-						Description: "First list to zip",
-						Type:        luadoc.List(luadoc.Any),
-					},
-					{
-						Name:        "list2",
-						Description: "Second list to zip",
-						Type:        luadoc.List(luadoc.Any),
-					},
-					{
-						Name:        "list3",
-						Description: "Third list to zip",
-						Type:        luadoc.List(luadoc.Any),
-					},
-				},
-				Returns: []*luadoc.Param{
-					{
-						Name:        "zipped",
-						Description: "Zipped list",
-						Type:        luadoc.List(luadoc.List(luadoc.Any)),
+						Type:        luadoc.List(T),
 					},
 				},
 			},
@@ -566,11 +549,12 @@ func Lib() *luadoc.Lib {
 				Name:        "map",
 				Description: "Maps a function over a list",
 				Value:       map_,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to map over",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -579,7 +563,7 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "value",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "index",
@@ -589,7 +573,7 @@ func Lib() *luadoc.Lib {
 							Returns: []*luadoc.Param{
 								{
 									Name: "result",
-									Type: luadoc.Any,
+									Type: T,
 								},
 							},
 						}.AsType(),
@@ -600,11 +584,12 @@ func Lib() *luadoc.Lib {
 				Name:        "for_each",
 				Description: "Calls a function for each element in a list",
 				Value:       forEach,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to iterate over",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -614,11 +599,12 @@ func Lib() *luadoc.Lib {
 								{
 									Name:        "value",
 									Description: "Value of the element",
-									Type:        luadoc.Any,
+									Type:        T,
 								},
 								{
 									Name:        "index",
 									Description: "Index of the element in the list",
+									Type:        luadoc.Number,
 								},
 							},
 						}.AsType(),
@@ -629,13 +615,14 @@ func Lib() *luadoc.Lib {
 				Name:        "contains_by",
 				Description: "Checks if a list contains a value using predicate",
 				Value:       containsBy,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to check",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
-					predicate,
+					predicate(T),
 				},
 				Returns: []*luadoc.Param{
 					{
@@ -649,11 +636,12 @@ func Lib() *luadoc.Lib {
 				Name:        "reduce",
 				Description: "Reduces a list to a single value",
 				Value:       reduce,
+				Generics:    []string{T, G},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to reduce",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -662,21 +650,21 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "accumulator",
-									Type: luadoc.Any,
+									Type: G,
 								},
 								{
 									Name: "value",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "initial",
-									Type: luadoc.Any,
+									Type: G,
 								},
 							},
 							Returns: []*luadoc.Param{
 								{
 									Name: "result",
-									Type: luadoc.Any,
+									Type: G,
 								},
 							},
 						}.AsType(),
@@ -686,7 +674,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "result",
 						Description: "Result of the reduction",
-						Type:        luadoc.Any,
+						Type:        G,
 					},
 				},
 			},
@@ -694,11 +682,12 @@ func Lib() *luadoc.Lib {
 				Name:        "reduce_right",
 				Description: "Reduces a list to a single value",
 				Value:       reduceRight,
+				Generics:    []string{T, G},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to reduce",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -707,21 +696,21 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "accumulator",
-									Type: luadoc.Any,
+									Type: G,
 								},
 								{
 									Name: "value",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "initial",
-									Type: luadoc.Any,
+									Type: G,
 								},
 							},
 							Returns: []*luadoc.Param{
 								{
 									Name: "result",
-									Type: luadoc.Any,
+									Type: G,
 								},
 							},
 						}.AsType(),
@@ -731,7 +720,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "result",
 						Description: "Result of the reduction",
-						Type:        luadoc.Any,
+						Type:        G,
 					},
 				},
 			},
@@ -739,11 +728,12 @@ func Lib() *luadoc.Lib {
 				Name:        "reject",
 				Description: "Rejects all elements that match a predicate",
 				Value:       reject,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to reject from",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -752,7 +742,7 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "value",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "index",
@@ -772,7 +762,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "result",
 						Description: "List of rejected elements",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 				},
 			},
@@ -780,18 +770,19 @@ func Lib() *luadoc.Lib {
 				Name:        "id",
 				Description: "Returns the first argument",
 				Value:       id,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "value",
 						Description: "Value to return",
-						Type:        luadoc.Any,
+						Type:        T,
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "result",
 						Description: "The first argument",
-						Type:        luadoc.Any,
+						Type:        T,
 					},
 				},
 			},
@@ -799,11 +790,12 @@ func Lib() *luadoc.Lib {
 				Name:        "min_by",
 				Description: "Returns the minimum value of a list, based on a function",
 				Value:       minBy,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to find the minimum value of",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -812,11 +804,11 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "a",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "b",
-									Type: luadoc.Any,
+									Type: T,
 								},
 							},
 							Returns: []*luadoc.Param{
@@ -832,7 +824,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "result",
 						Description: "The minimum value",
-						Type:        luadoc.Any,
+						Type:        T,
 					},
 				},
 			},
@@ -840,11 +832,12 @@ func Lib() *luadoc.Lib {
 				Name:        "max_by",
 				Description: "Returns the maximum value of a list, based on a function",
 				Value:       maxBy,
+				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
 						Name:        "list",
 						Description: "List to find the maximum value of",
-						Type:        luadoc.List(luadoc.Any),
+						Type:        luadoc.List(T),
 					},
 					{
 						Name:        "func",
@@ -853,11 +846,11 @@ func Lib() *luadoc.Lib {
 							Params: []*luadoc.Param{
 								{
 									Name: "a",
-									Type: luadoc.Any,
+									Type: T,
 								},
 								{
 									Name: "b",
-									Type: luadoc.Any,
+									Type: T,
 								},
 							},
 							Returns: []*luadoc.Param{
@@ -873,7 +866,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "result",
 						Description: "The maximum value",
-						Type:        luadoc.Any,
+						Type:        T,
 					},
 				},
 			},
@@ -1142,25 +1135,6 @@ func sorted(L *lua.LState) int {
 
 	sorted, _ := luautil.ToLValue(L, list)
 	L.Push(sorted)
-	return 1
-}
-
-func zip2(L *lua.LState) int {
-	list1 := checkList(L, 1)
-	list2 := checkList(L, 2)
-
-	zipped, _ := luautil.ToLValue(L, lo.Zip2(list1, list2))
-	L.Push(zipped)
-	return 1
-}
-
-func zip3(L *lua.LState) int {
-	list1 := checkList(L, 1)
-	list2 := checkList(L, 2)
-	list3 := checkList(L, 3)
-
-	zipped, _ := luautil.ToLValue(L, lo.Zip3(list1, list2, list3))
-	L.Push(zipped)
 	return 1
 }
 

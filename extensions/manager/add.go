@@ -116,6 +116,7 @@ func Add2(url string, options *AddOptions) (*extension.Extension, error) {
 	return extension.New(path)
 }
 
+// TODO: remove
 func Add(options *AddOptions) (*extension.Extension, error) {
 	if !text.IsURLStrict(options.URL) {
 		return nil, fmt.Errorf("invalid URL")

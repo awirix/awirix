@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/samber/lo"
 	"github.com/awirix/awirix/cmd"
 	"github.com/awirix/awirix/config"
 	"github.com/awirix/awirix/log"
+	"github.com/samber/lo"
 )
 
 func init() {

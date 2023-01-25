@@ -10,6 +10,17 @@ import (
 const httpTypeName = "http"
 
 func Lib() *luadoc.Lib {
+	httpMethods := luadoc.Enum(
+		http.MethodGet,
+		http.MethodPost,
+		http.MethodDelete,
+		http.MethodPut,
+		http.MethodPatch,
+		http.MethodConnect,
+		http.MethodHead,
+		http.MethodOptions,
+	)
+
 	classCookie := &luadoc.Class{
 		Name:        cookieTypeName,
 		Description: "A Cookie represents an HTTP cookie as sent in the Set-Cookie header of an HTTP response or the Cookie header of an HTTP request.",
@@ -261,6 +272,91 @@ func Lib() *luadoc.Lib {
 					},
 				},
 			},
+			{
+				Name:        "set_method",
+				Description: "Sets the method to the request.",
+				Value:       requestSetMethod,
+				Params: []*luadoc.Param{
+					{
+						Name:        "method",
+						Description: "The method to set.",
+						Type:        httpMethods,
+					},
+				},
+			},
+			{
+				Name:        "get_method",
+				Description: "Gets the method of the request.",
+				Value:       requestGetMethod,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "method",
+						Description: "The method of the request.",
+						Type:        httpMethods,
+					},
+				},
+			},
+			{
+				Name:        "set_url",
+				Description: "Sets the URL to the request.",
+				Value:       requestSetURL,
+				Params: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "The URL to set.",
+						Type:        luadoc.String,
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "The URL of the request.",
+						Type:        luadoc.String,
+					},
+					{
+						Name:        "err",
+						Description: "An error if any.",
+						Type:        luadoc.String,
+						Optional:    true,
+					},
+				},
+			},
+			{
+				Name:        "get_url",
+				Description: "Gets the URL of the request.",
+				Value:       requestGetURL,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "The URL of the request.",
+						Type:        luadoc.String,
+					},
+				},
+			},
+			{
+				Name:        "set_body",
+				Description: "Sets the body to the request.",
+				Value:       requestSetBody,
+				Params: []*luadoc.Param{
+					{
+						Name:        "body",
+						Description: "The body to set.",
+						Type:        luadoc.String,
+					},
+				},
+			},
+			{
+				Name:        "get_body",
+				Description: "Gets the body of the request.",
+				Value:       requestGetBody,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "body",
+						Description: "The body of the request.",
+						Type:        luadoc.String,
+					},
+				},
+			},
 		},
 	}
 
@@ -412,7 +508,16 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "method",
 						Description: "The method of the request.",
-						Type:        luadoc.String,
+						Type: luadoc.Enum(
+							http.MethodGet,
+							http.MethodPost,
+							http.MethodDelete,
+							http.MethodPut,
+							http.MethodPatch,
+							http.MethodConnect,
+							http.MethodHead,
+							http.MethodOptions,
+						),
 					},
 					{
 						Name:        "url",
