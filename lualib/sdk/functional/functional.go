@@ -6,12 +6,14 @@ import (
 	"github.com/awirix/lua"
 	"github.com/samber/lo"
 	"golang.org/x/exp/slices"
+	"sync"
 )
 
 func Lib() *luadoc.Lib {
 	const (
 		T = "T"
 		G = "G"
+		Q = "Q"
 	)
 
 	predicate := func(t string) *luadoc.Param {
@@ -23,13 +25,13 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "value",
 						Description: "Value to check",
-						Type:        luadoc.Any,
+						Type:        t,
 					},
 				},
 				Returns: []*luadoc.Param{
 					{
 						Name:        "result",
-						Description: "Result of predicate",
+						Description: "Result of the predicate",
 						Type:        luadoc.Boolean,
 					},
 				},
@@ -46,7 +48,7 @@ func Lib() *luadoc.Lib {
 					{
 						Name:        "value",
 						Description: "Value to check",
-						Type:        luadoc.Any,
+						Type:        t,
 					},
 					{
 						Name:        "index",
@@ -57,7 +59,7 @@ func Lib() *luadoc.Lib {
 				Returns: []*luadoc.Param{
 					{
 						Name:        "result",
-						Description: "Result of predicate",
+						Description: "Result of the predicate",
 						Type:        luadoc.Boolean,
 					},
 				},
@@ -504,9 +506,9 @@ func Lib() *luadoc.Lib {
 				},
 			},
 			{
-				Name:        "sorted",
+				Name:        "sort",
 				Description: "Returns a sorted list",
-				Value:       sorted,
+				Value:       sort,
 				Generics:    []string{T},
 				Params: []*luadoc.Param{
 					{
@@ -547,36 +549,85 @@ func Lib() *luadoc.Lib {
 			},
 			{
 				Name:        "map",
-				Description: "Maps a function over a list",
+				Description: "Maps a function over a table values",
 				Value:       map_,
-				Generics:    []string{T},
+				Generics:    []string{T, G, Q},
 				Params: []*luadoc.Param{
 					{
-						Name:        "list",
-						Description: "List to map over",
-						Type:        luadoc.List(T),
+						Name:        "table",
+						Description: "Table to map over",
+						Type:        luadoc.Map(T, G),
 					},
 					{
 						Name:        "func",
-						Description: "Function to map",
+						Description: "Mapping function",
 						Type: luadoc.Func{
 							Params: []*luadoc.Param{
 								{
 									Name: "value",
-									Type: T,
+									Type: G,
 								},
 								{
-									Name: "index",
-									Type: luadoc.Number,
+									Name: "key",
+									Type: T,
 								},
 							},
 							Returns: []*luadoc.Param{
 								{
 									Name: "result",
-									Type: T,
+									Type: Q,
 								},
 							},
 						}.AsType(),
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "mapped",
+						Description: "Mapped list",
+						Type:        luadoc.Map(T, Q),
+					},
+				},
+			},
+			{
+				Name:        "map_async",
+				Description: "Maps a function over a table values asynchronously",
+				Value:       mapAsync,
+				Generics:    []string{T, G, Q},
+				Params: []*luadoc.Param{
+					{
+						Name:        "table",
+						Description: "Table to map values over",
+						Type:        luadoc.Map(T, G),
+					},
+					{
+						Name:        "func",
+						Description: "Mapping function. Takes a value of each key",
+						Type: luadoc.Func{
+							Params: []*luadoc.Param{
+								{
+									Name: "value",
+									Type: G,
+								},
+								{
+									Name: "key",
+									Type: T,
+								},
+							},
+							Returns: []*luadoc.Param{
+								{
+									Name: "result",
+									Type: Q,
+								},
+							},
+						}.AsType(),
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "mapped",
+						Description: "Mapped table",
+						Type:        luadoc.Map(T, Q),
 					},
 				},
 			},
@@ -735,28 +786,7 @@ func Lib() *luadoc.Lib {
 						Description: "List to reject from",
 						Type:        luadoc.List(T),
 					},
-					{
-						Name:        "func",
-						Description: "Predicate to reject with",
-						Type: luadoc.Func{
-							Params: []*luadoc.Param{
-								{
-									Name: "value",
-									Type: T,
-								},
-								{
-									Name: "index",
-									Type: luadoc.Number,
-								},
-							},
-							Returns: []*luadoc.Param{
-								{
-									Name: "result",
-									Type: luadoc.Boolean,
-								},
-							},
-						}.AsType(),
-					},
+					predicateWithIndex(T),
 				},
 				Returns: []*luadoc.Param{
 					{
@@ -1113,7 +1143,7 @@ func slice(L *lua.LState) int {
 	return 1
 }
 
-func sorted(L *lua.LState) int {
+func sort(L *lua.LState) int {
 	lessThan := L.NewFunction(func(L *lua.LState) int {
 		a := L.CheckInt(1)
 		b := L.CheckInt(2)
@@ -1139,16 +1169,50 @@ func sorted(L *lua.LState) int {
 }
 
 func map_(L *lua.LState) int {
-	list := checkList(L, 1)
+	table := L.CheckTable(1)
 	fn := L.CheckFunction(2)
 
-	mapped, _ := luautil.ToLValue(L, lo.Map(list, func(v lua.LValue, i int) lua.LValue {
+	mapped := L.NewTable()
+
+	table.ForEach(func(key lua.LValue, value lua.LValue) {
 		L.Push(fn)
-		L.Push(v)
-		L.Push(lua.LNumber(i))
+		L.Push(value)
+		L.Push(key)
 		L.Call(2, 1)
-		return L.Get(-1)
-	}))
+		mapped.RawSet(key, L.Get(-1))
+	})
+
+	L.Push(mapped)
+	return 1
+}
+
+func mapAsync(L *lua.LState) int {
+	mapped := L.CheckTable(1)
+	fn := L.CheckFunction(2)
+
+	var m = make(map[lua.LValue]lua.LValue)
+	mapped.ForEach(func(key lua.LValue, value lua.LValue) {
+		m[key] = value
+	})
+
+	mapped = L.NewTable()
+
+	var wg sync.WaitGroup
+	wg.Add(len(m))
+
+	for k, v := range m {
+		go func(k, v lua.LValue) {
+			defer wg.Done()
+			L.Push(fn)
+			L.Push(v)
+			L.Push(k)
+			L.Call(2, 1)
+			mapped.RawSet(k, L.Get(-1))
+		}(k, v)
+	}
+
+	wg.Wait()
+
 	L.Push(mapped)
 	return 1
 }

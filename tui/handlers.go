@@ -125,7 +125,7 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 
 func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
-		m.text.status = "Performing " + style.Fg(color.Yellow)(action.String()) + " action"
+		m.text.status = "Performing " + style.Fg(color.Yellow)(action.String())
 
 		var media = make([]*scraper.Media, 0)
 		for item := range m.selectedMedia {

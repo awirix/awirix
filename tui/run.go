@@ -1,24 +1,28 @@
 package tui
 
 import (
+	"github.com/awirix/awirix/key"
 	tea "github.com/charmbracelet/bubbletea"
 	zone "github.com/lrstanley/bubblezone"
+	"github.com/spf13/viper"
 )
 
 func Run(options *Options) error {
 	m := newModel(options)
 
-	var program *tea.Program
-
 	zone.NewGlobal()
 	defer zone.Close()
 
-	if options.AltScreen {
-		program = tea.NewProgram(m, tea.WithAltScreen(), tea.WithMouseCellMotion())
-	} else {
-		program = tea.NewProgram(m, tea.WithMouseCellMotion())
+	var programOptions = make([]tea.ProgramOption, 0)
+
+	if viper.GetBool(key.TUIClickable) {
+		programOptions = append(programOptions, tea.WithMouseCellMotion())
 	}
 
-	_, err := program.Run()
+	if options.AltScreen {
+		programOptions = append(programOptions, tea.WithAltScreen())
+	}
+
+	_, err := tea.NewProgram(m, programOptions...).Run()
 	return err
 }

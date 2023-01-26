@@ -4,6 +4,8 @@ import (
 	"github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/awirix/lua"
+	"github.com/cixtor/readability"
+	"strings"
 )
 
 const selectionTypeName = documentTypeName + "_selection"
@@ -320,5 +322,31 @@ func selectionMarkdown(L *lua.LState) int {
 	converter := md.NewConverter("", true, nil)
 
 	L.Push(lua.LString(converter.Convert(selection)))
+	return 1
+}
+
+func selectionMarkdownSmart(L *lua.LState) int {
+	selection := checkSelection(L, 1)
+
+	html, err := selection.Html()
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	article, err := readability.New().Parse(strings.NewReader(html), "https://example.com")
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	document := goquery.NewDocumentFromNode(article.Node)
+
+	converter := md.NewConverter("", true, nil)
+	markdown := converter.Convert(document.Selection)
+
+	L.Push(lua.LString(markdown))
 	return 1
 }

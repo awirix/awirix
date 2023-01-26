@@ -12,7 +12,7 @@ github.com/JohannesKaufmann/html-to-markdown/escape
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/internal/socket
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/ProtonMail/go-crypto v0.0.0-20230117203413-a47887b8f098
+# github.com/ProtonMail/go-crypto v0.0.0-20230124153114-0acdc8ae009b
 ## explicit; go 1.13
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
@@ -105,12 +105,14 @@ github.com/aymerick/douceur/parser
 # github.com/briandowns/spinner v1.20.0
 ## explicit; go 1.14
 github.com/briandowns/spinner
-# github.com/charmbracelet/bubbles v0.14.0
+# github.com/charmbracelet/bubbles v0.15.0
 ## explicit; go 1.13
+github.com/charmbracelet/bubbles/cursor
 github.com/charmbracelet/bubbles/help
 github.com/charmbracelet/bubbles/key
 github.com/charmbracelet/bubbles/list
 github.com/charmbracelet/bubbles/paginator
+github.com/charmbracelet/bubbles/runeutil
 github.com/charmbracelet/bubbles/spinner
 github.com/charmbracelet/bubbles/textinput
 github.com/charmbracelet/bubbles/viewport
@@ -124,6 +126,9 @@ github.com/charmbracelet/glamour/ansi
 # github.com/charmbracelet/lipgloss v0.6.0
 ## explicit; go 1.15
 github.com/charmbracelet/lipgloss
+# github.com/cixtor/readability v1.0.0
+## explicit
+github.com/cixtor/readability
 # github.com/cloudflare/circl v1.3.1
 ## explicit; go 1.17
 github.com/cloudflare/circl/dh/x25519
@@ -156,8 +161,8 @@ github.com/emirpasic/gods/utils
 # github.com/enescakir/emoji v1.0.0
 ## explicit; go 1.13
 github.com/enescakir/emoji
-# github.com/fatih/color v1.13.0
-## explicit; go 1.13
+# github.com/fatih/color v1.14.1
+## explicit; go 1.17
 github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.6.0
 ## explicit; go 1.16
@@ -408,7 +413,7 @@ github.com/spf13/jwalterweatherman
 # github.com/spf13/pflag v1.0.5
 ## explicit; go 1.12
 github.com/spf13/pflag
-# github.com/spf13/viper v1.14.0
+# github.com/spf13/viper v1.15.0
 ## explicit; go 1.17
 github.com/spf13/viper
 github.com/spf13/viper/internal/encoding
@@ -449,6 +454,7 @@ golang.org/x/crypto/chacha20
 golang.org/x/crypto/curve25519
 golang.org/x/crypto/curve25519/internal/field
 golang.org/x/crypto/ed25519
+golang.org/x/crypto/hkdf
 golang.org/x/crypto/internal/alias
 golang.org/x/crypto/internal/poly1305
 golang.org/x/crypto/openpgp
@@ -462,7 +468,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20230118134722-a68e582fa157
+# golang.org/x/exp v0.0.0-20230125214544-b3c2aaf6208d
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
