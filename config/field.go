@@ -2,15 +2,16 @@ package config
 
 import (
 	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
+	"text/template"
+
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/style"
 	"github.com/pelletier/go-toml"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
-	"reflect"
-	"strconv"
-	"strings"
-	"text/template"
 
 	"github.com/awirix/awirix/color"
 )

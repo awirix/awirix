@@ -26,6 +26,7 @@ func (e *Extension) initState(debug bool) {
 		lua.OpenMath,
 		lua.OpenPackage,
 		lua.OpenIo,
+		lua.OpenCoroutine,
 	}
 
 	luaOptions := &lua.Options{
