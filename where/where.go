@@ -9,6 +9,11 @@ import (
 	"path/filepath"
 )
 
+func Home() string {
+	home, _ := lo.TryOr(os.UserHomeDir, ".")
+	return home
+}
+
 // Config path
 // Will create the directory if it doesn't exist
 func Config() string {
@@ -17,7 +22,8 @@ func Config() string {
 	if customDir, present := os.LookupEnv(EnvConfigPath); present {
 		path = customDir
 	} else {
-		path = filepath.Join(lo.Must(os.UserConfigDir()), app.Name)
+		osConfigDir, _ := lo.TryOr(os.UserConfigDir, filepath.Join(Home(), "config"))
+		path = filepath.Join(osConfigDir, app.Name)
 	}
 
 	return mkdir(path)
@@ -37,10 +43,7 @@ func Logs() string {
 // Cache path
 // Will create the directory if it doesn't exist
 func Cache() string {
-	osCacheDir, err := os.UserCacheDir()
-	if err != nil {
-		osCacheDir = "."
-	}
+	osCacheDir, _ := lo.TryOr(os.UserCacheDir, filepath.Join(Config(), "cache"))
 
 	cacheDir := filepath.Join(osCacheDir, app.Name)
 	return mkdir(cacheDir)

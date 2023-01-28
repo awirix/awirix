@@ -12,14 +12,23 @@ import (
 	"strings"
 )
 
+func init() {
+	rootCmd.Flags().BoolP("version", "v", false, "version for "+app.Name)
+}
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     strings.ToLower(app.Name),
-	Short:   "Multimedia Metascraper",
-	Long:    app.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
-	Version: app.Version.String(),
-	Args:    cobra.NoArgs,
+	Use:   strings.ToLower(app.Name),
+	Short: "Multimedia Metascraper",
+	Long:  app.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
+	//Version: app.Version.String(),
+	Args: cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
+		if version, _ := cmd.Flags().GetBool("version"); version {
+			versionCmd.Run(versionCmd, args)
+			return
+		}
+
 		err := tui.Run(&tui.Options{AltScreen: true})
 		handleErr(err)
 	},
@@ -27,13 +36,15 @@ var rootCmd = &cobra.Command{
 
 func Execute() {
 	cc.Init(&cc.Config{
-		RootCmd:       rootCmd,
-		Headings:      cc.HiCyan + cc.Bold + cc.Underline,
-		Commands:      cc.HiYellow + cc.Bold,
-		Example:       cc.Italic,
-		ExecName:      cc.Bold,
-		Flags:         cc.Bold,
-		FlagsDataType: cc.Italic + cc.HiBlue,
+		RootCmd:         rootCmd,
+		Headings:        cc.HiCyan + cc.Bold + cc.Underline,
+		Commands:        cc.HiYellow + cc.Bold,
+		Example:         cc.Italic,
+		ExecName:        cc.Bold,
+		Flags:           cc.Bold,
+		FlagsDataType:   cc.Italic + cc.HiBlue,
+		NoExtraNewlines: true,
+		NoBottomNewline: true,
 	})
 
 	// Clears temp files on each run.
