@@ -18,7 +18,8 @@ func mkdir(path string) string {
 }
 
 func ExpandPath(path string) string {
-	if strings.HasPrefix(path, "~/") {
+	const prefix = "~" + string(os.PathSeparator)
+	if strings.HasPrefix(path, prefix) {
 		home, err := os.UserHomeDir()
 		if err != nil {
 			panic(fmt.Errorf("cannot expand path %s: %w", path, err))
