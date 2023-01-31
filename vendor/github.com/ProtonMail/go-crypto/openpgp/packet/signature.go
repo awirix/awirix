@@ -17,8 +17,8 @@ import (
 	"github.com/ProtonMail/go-crypto/openpgp/ecdsa"
 	"github.com/ProtonMail/go-crypto/openpgp/eddsa"
 	"github.com/ProtonMail/go-crypto/openpgp/errors"
+	"github.com/ProtonMail/go-crypto/openpgp/internal/algorithm"
 	"github.com/ProtonMail/go-crypto/openpgp/internal/encoding"
-	"github.com/ProtonMail/go-crypto/openpgp/s2k"
 )
 
 const (
@@ -71,6 +71,7 @@ type Signature struct {
 	IssuerFingerprint                                       []byte
 	SignerUserId                                            *string
 	IsPrimaryId                                             *bool
+	Notations                                               []*Notation
 
 	// TrustLevel and TrustAmount can be set by the signer to assert that 
 	// the key is not only valid but also trustworthy at the specified 
@@ -138,7 +139,13 @@ func (sig *Signature) parse(r io.Reader) (err error) {
 	}
 
 	var ok bool
-	sig.Hash, ok = s2k.HashIdToHash(buf[2])
+
+	if sig.Version < 5 {
+		sig.Hash, ok = algorithm.HashIdToHashWithSha1(buf[2])
+	} else {
+		sig.Hash, ok = algorithm.HashIdToHash(buf[2])
+	}
+
 	if !ok {
 		return errors.UnsupportedError("hash function " + strconv.Itoa(int(buf[2])))
 	}
@@ -149,7 +156,11 @@ func (sig *Signature) parse(r io.Reader) (err error) {
 	if err != nil {
 		return
 	}
-	sig.buildHashSuffix(hashedSubpackets)
+	err = sig.buildHashSuffix(hashedSubpackets)
+	if err != nil {
+		return
+	}
+
 	err = parseSignatureSubpackets(sig, hashedSubpackets, true)
 	if err != nil {
 		return
@@ -238,6 +249,7 @@ const (
 	keyExpirationSubpacket       signatureSubpacketType = 9
 	prefSymmetricAlgosSubpacket  signatureSubpacketType = 11
 	issuerSubpacket              signatureSubpacketType = 16
+	notationDataSubpacket        signatureSubpacketType = 20
 	prefHashAlgosSubpacket       signatureSubpacketType = 21
 	prefCompressionSubpacket     signatureSubpacketType = 22
 	primaryUserIdSubpacket       signatureSubpacketType = 25
@@ -357,6 +369,31 @@ func parseSignatureSubpacket(sig *Signature, subpacket []byte, isHashed bool) (r
 		}
 		sig.IssuerKeyId = new(uint64)
 		*sig.IssuerKeyId = binary.BigEndian.Uint64(subpacket)
+	case notationDataSubpacket:
+		// Notation data, section 5.2.3.16
+		if !isHashed {
+			return
+		}
+		if len(subpacket) < 8 {
+			err = errors.StructuralError("notation data subpacket with bad length")
+			return
+		}
+
+		nameLength := uint32(subpacket[4])<<8 | uint32(subpacket[5])
+		valueLength := uint32(subpacket[6])<<8 | uint32(subpacket[7])
+		if len(subpacket) != int(nameLength) + int(valueLength) + 8 {
+			err = errors.StructuralError("notation data subpacket with bad length")
+			return
+		}
+
+		notation := Notation{
+			IsHumanReadable: (subpacket[0] & 0x80) == 0x80,
+			Name: string(subpacket[8: (nameLength + 8)]),
+			Value: subpacket[(nameLength + 8) : (valueLength + nameLength + 8)],
+			IsCritical: isCritical,
+		}
+
+		sig.Notations = append(sig.Notations, &notation)
 	case prefHashAlgosSubpacket:
 		// Preferred hash algorithms, section 5.2.3.8
 		if !isHashed {
@@ -597,7 +634,15 @@ func (sig *Signature) SigExpired(currentTime time.Time) bool {
 
 // buildHashSuffix constructs the HashSuffix member of sig in preparation for signing.
 func (sig *Signature) buildHashSuffix(hashedSubpackets []byte) (err error) {
-	hash, ok := s2k.HashToHashId(sig.Hash)
+	var hashId byte
+	var ok bool
+
+	if sig.Version < 5 {
+		hashId, ok = algorithm.HashToHashIdWithSha1(sig.Hash)
+	} else {
+		hashId, ok = algorithm.HashToHashId(sig.Hash)
+	}
+
 	if !ok {
 		sig.HashSuffix = nil
 		return errors.InvalidArgumentError("hash cannot be represented in OpenPGP: " + strconv.Itoa(int(sig.Hash)))
@@ -607,7 +652,7 @@ func (sig *Signature) buildHashSuffix(hashedSubpackets []byte) (err error) {
 		uint8(sig.Version),
 		uint8(sig.SigType),
 		uint8(sig.PubKeyAlgo),
-		uint8(hash),
+		uint8(hashId),
 		uint8(len(hashedSubpackets) >> 8),
 		uint8(len(hashedSubpackets)),
 	})
@@ -918,6 +963,17 @@ func (sig *Signature) buildSubpackets(issuer PublicKey) (subpackets []outputSubp
 			flags |= KeyFlagGroupKey
 		}
 		subpackets = append(subpackets, outputSubpacket{true, keyFlagsSubpacket, false, []byte{flags}})
+	}
+
+	for _, notation := range sig.Notations {
+		subpackets = append(
+			subpackets,
+			outputSubpacket{
+				true,
+				notationDataSubpacket,
+				notation.IsCritical,
+				notation.getData(),
+			})
 	}
 
 	// The following subpackets may only appear in self-signatures.

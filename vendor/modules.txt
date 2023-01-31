@@ -12,7 +12,7 @@ github.com/JohannesKaufmann/html-to-markdown/escape
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/internal/socket
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/ProtonMail/go-crypto v0.0.0-20230124153114-0acdc8ae009b
+# github.com/ProtonMail/go-crypto v0.0.0-20230131185108-34c1fc3058f4
 ## explicit; go 1.13
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
@@ -129,7 +129,7 @@ github.com/charmbracelet/lipgloss
 # github.com/cixtor/readability v1.0.0
 ## explicit
 github.com/cixtor/readability
-# github.com/cloudflare/circl v1.3.1
+# github.com/cloudflare/circl v1.3.2
 ## explicit; go 1.17
 github.com/cloudflare/circl/dh/x25519
 github.com/cloudflare/circl/dh/x448
@@ -305,7 +305,7 @@ github.com/metafates/gache
 # github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 ## explicit
 github.com/mgutz/ansi
-# github.com/microcosm-cc/bluemonday v1.0.21
+# github.com/microcosm-cc/bluemonday v1.0.22
 ## explicit; go 1.19
 github.com/microcosm-cc/bluemonday
 github.com/microcosm-cc/bluemonday/css
@@ -384,7 +384,7 @@ github.com/sahilm/fuzzy
 # github.com/samber/lo v1.37.0
 ## explicit; go 1.18
 github.com/samber/lo
-# github.com/samber/mo v1.7.0
+# github.com/samber/mo v1.8.0
 ## explicit; go 1.18
 github.com/samber/mo
 # github.com/sergi/go-diff v1.3.1
@@ -468,7 +468,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20230125214544-b3c2aaf6208d
+# golang.org/x/exp v0.0.0-20230131160201-f062dba9d201
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
