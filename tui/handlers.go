@@ -127,16 +127,18 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Performing " + style.Fg(color.Yellow)(action.String())
 
-		var media = make([]*scraper.Media, 0)
+		var medias = make([]*scraper.Media, 0)
 		for item := range m.selectedMedia {
-			media = append(media, item.Internal().(*scraper.Media))
+			medias = append(medias, item.Internal().(*scraper.Media))
 		}
 
-		err := action.Call(media)
-		if err != nil {
-			m.errorChan <- err
-			return nil
-			//return msgError(err)
+		for _, media := range medias {
+			err := action.Call(media)
+			if err != nil {
+				m.errorChan <- err
+				return nil
+				//return msgError(err)
+			}
 		}
 
 		return msgActionDone(action)

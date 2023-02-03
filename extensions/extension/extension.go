@@ -2,6 +2,10 @@ package extension
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
 	"github.com/awirix/awirix/filesystem"
@@ -12,12 +16,18 @@ import (
 	"github.com/awirix/awirix/where"
 	"github.com/awirix/lua"
 	"github.com/enescakir/emoji"
+	"github.com/pkg/errors"
 	"github.com/samber/lo"
 	"github.com/spf13/viper"
-	"os"
-	"path/filepath"
-	"strings"
 )
+
+func errExtension(err error) error {
+	return errors.Wrap(err, "extension")
+}
+
+func errMissing(name string) error {
+	return errExtension(fmt.Errorf("%s is missing", name))
+}
 
 type Extension struct {
 	path     string
@@ -28,26 +38,26 @@ type Extension struct {
 }
 
 func (e *Extension) loadPassport() error {
-	path := filepath.Join(e.Path(), filename.Passport)
+	path := filepath.Join(e.Path(), filename.PassportJSON)
 
 	exists, err := filesystem.Api().Exists(path)
 	if err != nil {
-		return err
+		return errExtension(err)
 	}
 
 	if !exists {
-		return fmt.Errorf("%s is missing", filename.Passport)
+		return errMissing(filename.PassportJSON)
 	}
 
 	file, err := filesystem.Api().Open(path)
 	if err != nil {
-		return err
+		return errExtension(err)
 	}
 	defer file.Close()
 
 	thePassport, err := passport.New(file)
 	if err != nil {
-		return err
+		return errExtension(err)
 	}
 
 	e.passport = thePassport
@@ -57,15 +67,25 @@ func (e *Extension) loadPassport() error {
 func (e *Extension) LoadScraper(debug bool) error {
 	e.initState(debug)
 
-	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Scraper))
+	path := filepath.Join(e.Path(), filename.MainLua)
+	exists, err := filesystem.Api().Exists(path)
 	if err != nil {
-		return err
+		return errExtension(err)
+	}
+
+	if !exists {
+		return errMissing(filename.MainLua)
+	}
+
+	file, err := filesystem.Api().Open(path)
+	if err != nil {
+		return errExtension(err)
 	}
 	defer file.Close()
 
 	theScraper, err := scraper.New(e.state, file)
 	if err != nil {
-		return err
+		return errExtension(err)
 	}
 
 	theScraper.SetExtensionContext(&scraper.Context{
@@ -83,7 +103,17 @@ func (e *Extension) LoadScraper(debug bool) error {
 func (e *Extension) LoadTester(debug bool) error {
 	e.initState(debug)
 
-	file, err := filesystem.Api().Open(filepath.Join(e.Path(), filename.Tester))
+	path := filepath.Join(e.Path(), filename.TestLua)
+	exists, err := filesystem.Api().Exists(path)
+	if err != nil {
+		return errExtension(err)
+	}
+
+	if !exists {
+		return errMissing(filename.TestLua)
+	}
+
+	file, err := filesystem.Api().Open(path)
 	if err != nil {
 		return err
 	}

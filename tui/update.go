@@ -5,10 +5,8 @@ import (
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
-	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
-	"github.com/awirix/awirix/text"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/spinner"
@@ -417,27 +415,6 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 			action, ok := listGetSelectedItem[*scraper.Action](thisList).Get()
 			if !ok {
 				goto end
-			}
-
-			if !action.InBounds(len(m.selectedMedia)) {
-				var noun scraper.Noun
-				if m.current.layer != nil {
-					noun = m.current.layer.Noun
-				} else {
-					noun = m.current.extension.Scraper().Search().Noun
-				}
-
-				var s strings.Builder
-				_, _ = log.WriteErrorf(
-					&s,
-					"%q supports %s %s, %s were selected",
-					action.String(),
-					action.BoundsString(),
-					noun.Plural(),
-					text.Quantify(len(m.selectedMedia), "was", "were"),
-				)
-
-				return m, thisList.NewStatusMessage(s.String())
 			}
 
 			return m, tea.Batch(

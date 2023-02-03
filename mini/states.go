@@ -129,12 +129,12 @@ func stateDoAction(s *state) error {
 		actions = append(actions, action.String())
 	}
 
-	action, err := selectOne[*scraper.Action]("What do you want to do?", s.Extension.Scraper().Actions(), func(s *scraper.Action) string { return s.String() })
+	action, err := selectOne("What do you want to do?", s.Extension.Scraper().Actions(), func(s *scraper.Action) string { return s.String() })
 	if err != nil {
 		return err
 	}
 
-	err = action.Call([]*scraper.Media{s.LastSelectedMedia})
+	err = action.Call(s.LastSelectedMedia)
 	if err != nil {
 		return err
 	}

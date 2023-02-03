@@ -23,8 +23,8 @@ import (
 
 var (
 	ErrInvalidURL          = errAdd(fmt.Errorf("invalid URL"))
-	ErrRepoPassportMissing = errAdd(fmt.Errorf("repository does not contain a %s", filename.Passport))
-	ErrRepoInvalidPassport = errAdd(fmt.Errorf("repository does not contain a valid %s", filename.Passport))
+	ErrRepoPassportMissing = errAdd(fmt.Errorf("repository does not contain a %s", filename.PassportJSON))
+	ErrRepoInvalidPassport = errAdd(fmt.Errorf("repository does not contain a valid %s", filename.PassportJSON))
 	ErrExtensionInstalled  = errAdd(fmt.Errorf("extension is already installed"))
 )
 
@@ -72,7 +72,7 @@ func Add2(url string, options *AddOptions) (*extension.Extension, error) {
 		return nil, errAdd(err)
 	}
 
-	file, err := repo.GetFile(filename.Passport)
+	file, err := repo.GetFile(filename.PassportJSON)
 	if err != nil {
 		return nil, ErrRepoPassportMissing
 	}
@@ -156,19 +156,19 @@ func Add(options *AddOptions) (*extension.Extension, error) {
 			return nil, err
 		}
 
-		progress("Searching for " + filename.Passport)
-		file, err := repo.GetFile(filename.Passport)
+		progress("Searching for " + filename.PassportJSON)
+		file, err := repo.GetFile(filename.PassportJSON)
 		if err != nil {
-			return nil, fmt.Errorf("repository does not contain a %s", filename.Passport)
+			return nil, fmt.Errorf("repository does not contain a %s", filename.PassportJSON)
 		}
 
-		progress("Reading " + filename.Passport)
+		progress("Reading " + filename.PassportJSON)
 		data, err := file.Contents()
 		if err != nil {
 			return nil, err
 		}
 
-		progress("Parsing " + filename.Passport)
+		progress("Parsing " + filename.PassportJSON)
 		thePassport, err := passport.New(bytes.NewBuffer(data))
 		if err != nil {
 			return nil, fmt.Errorf("repository does not contain a valid passport: %s", err)

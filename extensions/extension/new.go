@@ -224,7 +224,7 @@ func GenerateInteractive() (*Extension, error) {
 		return nil, err
 	}
 
-	tree[filename.Passport] = &buffer
+	tree[filename.PassportJSON] = &buffer
 
 	for name, contents := range tree {
 		err = filesystem.Api().WriteFile(filepath.Join(path, name), contents.Bytes(), os.ModePerm)
