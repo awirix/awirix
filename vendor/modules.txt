@@ -12,7 +12,7 @@ github.com/JohannesKaufmann/html-to-markdown/escape
 github.com/Microsoft/go-winio
 github.com/Microsoft/go-winio/internal/socket
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/ProtonMail/go-crypto v0.0.0-20230131185108-34c1fc3058f4
+# github.com/ProtonMail/go-crypto v0.0.0-20230201104953-d1d05f4e2bfb
 ## explicit; go 1.13
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
@@ -92,7 +92,7 @@ github.com/awirix/lua
 github.com/awirix/lua/ast
 github.com/awirix/lua/parse
 github.com/awirix/lua/pm
-# github.com/awirix/templates v0.8.2
+# github.com/awirix/templates v0.9.0
 ## explicit; go 1.19
 github.com/awirix/templates
 # github.com/aymanbagabas/go-osc52 v1.2.1
@@ -102,7 +102,7 @@ github.com/aymanbagabas/go-osc52
 ## explicit
 github.com/aymerick/douceur/css
 github.com/aymerick/douceur/parser
-# github.com/briandowns/spinner v1.20.0
+# github.com/briandowns/spinner v1.21.0
 ## explicit; go 1.14
 github.com/briandowns/spinner
 # github.com/charmbracelet/bubbles v0.15.0
@@ -430,7 +430,7 @@ github.com/subosito/gotenv
 # github.com/xanzy/ssh-agent v0.3.3
 ## explicit; go 1.16
 github.com/xanzy/ssh-agent
-# github.com/yuin/goldmark v1.5.3
+# github.com/yuin/goldmark v1.5.4
 ## explicit; go 1.18
 github.com/yuin/goldmark
 github.com/yuin/goldmark/ast
@@ -468,7 +468,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20230131160201-f062dba9d201
+# golang.org/x/exp v0.0.0-20230202163644-54bba9f4231b
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
