@@ -21,8 +21,7 @@ var rootCmd = &cobra.Command{
 	Use:   strings.ToLower(app.Name),
 	Short: "Multimedia Metascraper",
 	Long:  app.AsciiArt + "\nWatch anime, movies and TV shows from any source in one place.",
-	//Version: app.Version.String(),
-	Args: cobra.NoArgs,
+	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		if version, _ := cmd.Flags().GetBool("version"); version {
 			versionCmd.Run(versionCmd, args)
@@ -48,7 +47,7 @@ func Execute() {
 	})
 
 	// Clears temp files on each run.
-	// It should not affect startup time since it's being run as goroutine.
+	// It should not affect startup time since it's being run as a separate goroutine.
 	go func() {
 		_ = filesystem.Api().RemoveAll(where.Temp())
 	}()

@@ -1,17 +1,23 @@
 package config
 
 import (
-	"github.com/spf13/viper"
+	"strings"
+
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/where"
-	"strings"
+	"github.com/pkg/errors"
+	"github.com/spf13/viper"
 )
 
 var (
 	EnvKeyReplacer = strings.NewReplacer(".", "_")
 	Format         = "toml"
 )
+
+func errConfig(err error) error {
+	return errors.Wrap(err, "config")
+}
 
 func Init() error {
 	viper.SetConfigName(app.Name)
@@ -31,6 +37,6 @@ func Init() error {
 		// Use defaults then
 		return nil
 	default:
-		return err
+		return errConfig(err)
 	}
 }

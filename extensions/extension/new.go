@@ -32,7 +32,7 @@ func New(path string) (*Extension, error) {
 		var err error
 		path, err = filepath.Abs(path)
 		if err != nil {
-			return nil, err
+			return nil, errExtension(err)
 		}
 	}
 
@@ -43,7 +43,7 @@ func New(path string) (*Extension, error) {
 	// extensions must have valid passports
 	err := ext.loadPassport()
 	if err != nil {
-		return nil, err
+		return nil, errExtension(err)
 	}
 
 	return ext, nil
@@ -173,7 +173,7 @@ func GenerateInteractive() (*Extension, error) {
 
 	exists, err := filesystem.Api().Exists(path)
 	if err != nil {
-		return nil, err
+		return nil, errExtension(err)
 	}
 
 	if exists {
@@ -183,7 +183,7 @@ func GenerateInteractive() (*Extension, error) {
 			Default: false,
 		}, &overwrite)
 		if err != nil {
-			return nil, err
+			return nil, errExtension(err)
 		}
 
 		if !overwrite {
@@ -192,13 +192,13 @@ func GenerateInteractive() (*Extension, error) {
 
 		err = filesystem.Api().RemoveAll(path)
 		if err != nil {
-			return nil, err
+			return nil, errExtension(err)
 		}
 	}
 
 	err = filesystem.Api().MkdirAll(path, os.ModePerm)
 	if err != nil {
-		return nil, err
+		return nil, errExtension(err)
 	}
 
 	var buffer bytes.Buffer
@@ -206,12 +206,12 @@ func GenerateInteractive() (*Extension, error) {
 	encoder.SetIndent("", "  ")
 	err = encoder.Encode(p)
 	if err != nil {
-		return nil, err
+		return nil, errExtension(err)
 	}
 
 	preset, err := templates.PresetString(answers.Preset)
 	if err != nil {
-		return nil, err
+		return nil, errExtension(err)
 	}
 
 	tree, err := templates.Get(preset, templates.Info{
@@ -221,7 +221,7 @@ func GenerateInteractive() (*Extension, error) {
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, errExtension(err)
 	}
 
 	tree[filename.PassportJSON] = &buffer
@@ -229,7 +229,7 @@ func GenerateInteractive() (*Extension, error) {
 	for name, contents := range tree {
 		err = filesystem.Api().WriteFile(filepath.Join(path, name), contents.Bytes(), os.ModePerm)
 		if err != nil {
-			return nil, err
+			return nil, errExtension(err)
 		}
 	}
 
