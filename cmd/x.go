@@ -209,7 +209,7 @@ var xAddCmd = &cobra.Command{
 			url = fmt.Sprintf("https://github.com/%s", arg)
 		}
 
-		ext, err := manager.Add2(url, &manager.AddOptions{})
+		ext, err := manager.Add(url, &manager.AddOptions{})
 		handleErr(err)
 
 		fmt.Printf("%s Successfully installed %s\n", style.Fg(color.Green)(icon.Check), style.Fg(color.Purple)(ext.String()))
@@ -218,7 +218,7 @@ var xAddCmd = &cobra.Command{
 
 func init() {
 	xCmd.AddCommand(xUpCmd)
-	xCmd.Flags().BoolP("verbose", "v", false, "print skipped extensions")
+	xUpCmd.Flags().BoolP("verbose", "v", false, "print skipped extensions")
 }
 
 var xUpCmd = &cobra.Command{

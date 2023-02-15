@@ -3,10 +3,16 @@ package github
 import (
 	"context"
 	"fmt"
-	"github.com/google/go-github/v48/github"
-	"github.com/samber/mo"
 	"net/http"
+
+	"github.com/google/go-github/v48/github"
+	"github.com/pkg/errors"
+	"github.com/samber/mo"
 )
+
+func errRepo(err error) error {
+	return errors.Wrap(err, "repo")
+}
 
 type Repository struct {
 	Owner  string `json:"owner" jsonschema:"required,description=The owner of the repository"`
@@ -24,7 +30,7 @@ func (r *Repository) URL() string {
 func (r *Repository) GetFile(path string) (*File, error) {
 	files, err := r.Files()
 	if err != nil {
-		return nil, err
+		return nil, errRepo(err)
 	}
 
 	for _, file := range files {
@@ -33,7 +39,7 @@ func (r *Repository) GetFile(path string) (*File, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("file not found: %s", path)
+	return nil, errRepo(fmt.Errorf("file not found: %s", path))
 }
 
 func (r *Repository) Files() ([]*File, error) {
@@ -43,16 +49,16 @@ func (r *Repository) Files() ([]*File, error) {
 
 	err := r.Setup()
 	if err != nil {
-		return nil, err
+		return nil, errRepo(err)
 	}
 
 	tree, resp, err := client.Git.GetTree(context.Background(), r.Owner, r.Name, r.Branch, false)
 	if err != nil {
-		return nil, err
+		return nil, errRepo(err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, errRepo(fmt.Errorf("unexpected status code: %d", resp.StatusCode))
 	}
 
 	files := make([]*File, len(tree.Entries))
@@ -79,11 +85,11 @@ func (r *Repository) Setup() error {
 
 	repo, resp, err := client.Repositories.Get(context.Background(), r.Owner, r.Name)
 	if err != nil {
-		return err
+		return errRepo(err)
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return errRepo(fmt.Errorf("unexpected status code: %d", resp.StatusCode))
 	}
 
 	r.repo = mo.Some(repo)

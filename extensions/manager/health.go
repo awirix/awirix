@@ -48,7 +48,7 @@ func Health(report io.Writer) {
 	}
 
 	if !errOccurred {
-		log.WriteSuccessf(report, "Everything is OK\n")
+		log.WriteSuccessf(report, "Everything is OK")
 		report.Write(newline)
 	}
 }

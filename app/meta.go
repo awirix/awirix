@@ -3,7 +3,8 @@ package app
 import "github.com/awirix/awirix/version"
 
 const (
-	Name = "awirix"
+	Name   = "awirix"
+	Prefix = Name + "_"
 )
 
 var (

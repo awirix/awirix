@@ -169,7 +169,7 @@ func GenerateInteractive() (*Extension, error) {
 		NSFW:     answers.Nsfw,
 	}
 
-	path := filepath.Join(where.Extensions(), filename.Sanitize(p.ID))
+	path := filepath.Join(where.Extensions(), app.Prefix+filename.Sanitize(p.ID))
 
 	exists, err := filesystem.Api().Exists(path)
 	if err != nil {

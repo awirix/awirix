@@ -3,7 +3,12 @@ package manager
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
+	"regexp"
+	"strings"
+
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
@@ -11,21 +16,16 @@ import (
 	"github.com/awirix/awirix/github"
 	"github.com/awirix/awirix/text"
 	"github.com/awirix/awirix/where"
-	"github.com/briandowns/spinner"
 	"github.com/go-git/go-git/v5"
 	"github.com/pkg/errors"
-	"os"
-	"path/filepath"
-	"regexp"
-	"strings"
-	"time"
 )
 
 var (
-	ErrInvalidURL          = errAdd(fmt.Errorf("invalid URL"))
-	ErrRepoPassportMissing = errAdd(fmt.Errorf("repository does not contain a %s", filename.PassportJSON))
-	ErrRepoInvalidPassport = errAdd(fmt.Errorf("repository does not contain a valid %s", filename.PassportJSON))
-	ErrExtensionInstalled  = errAdd(fmt.Errorf("extension is already installed"))
+	ErrInvalidURL            = errAdd(fmt.Errorf("invalid URL"))
+	ErrRepoPassportMissing   = errAdd(fmt.Errorf("repository does not contain a %s", filename.PassportJSON))
+	ErrRepoInvalidPassport   = errAdd(fmt.Errorf("repository does not contain a valid %s", filename.PassportJSON))
+	ErrExtensionInstalled    = errAdd(fmt.Errorf("extension is already installed"))
+	ErrRepoNamePrefixMissing = errAdd(fmt.Errorf("missing '%s' prefix in the repo name", app.Prefix))
 )
 
 var (
@@ -53,18 +53,22 @@ func confirm(msg string) (bool, error) {
 	return confirm, err
 }
 
-func Add2(url string, options *AddOptions) (*extension.Extension, error) {
+func Add(url string, options *AddOptions) (*extension.Extension, error) {
+	if options == nil {
+		options = &AddOptions{}
+	}
+
 	url = strings.TrimSuffix(url, ".git")
 	if !githubURLRegex.MatchString(url) {
 		return nil, ErrInvalidURL
 	}
 
-	if options == nil {
-		options = &AddOptions{}
-	}
-
 	groups := text.RegexpGroups(githubURLRegex, url)
 	owner, name := groups["owner"], groups["name"]
+
+	if !strings.HasPrefix(name, app.Prefix) {
+		return nil, ErrRepoNamePrefixMissing
+	}
 
 	repo := github.Repository{Owner: owner, Name: name}
 	err := repo.Setup()
@@ -114,102 +118,4 @@ func Add2(url string, options *AddOptions) (*extension.Extension, error) {
 	}
 
 	return extension.New(path)
-}
-
-// TODO: remove
-func Add(options *AddOptions) (*extension.Extension, error) {
-	if !text.IsURLStrict(options.URL) {
-		return nil, fmt.Errorf("invalid URL")
-	}
-
-	trimmed := strings.TrimSuffix(options.URL, ".git")
-	repoName := filepath.Base(trimmed)
-	repoOwner := filepath.Base(filepath.Dir(trimmed))
-
-	path := filepath.Join(where.Extensions(), filename.Sanitize(repoOwner), filename.Sanitize(repoName))
-
-	if exists, err := filesystem.Api().Exists(path); err != nil {
-		return nil, err
-	} else if exists {
-		return nil, fmt.Errorf("extension already installed: %s/%s", repoOwner, repoName)
-	}
-
-	s := spinner.New(spinner.CharSets[11], 100*time.Millisecond, spinner.WithWriter(os.Stderr), spinner.WithHiddenCursor(true), spinner.WithColor("cyan"))
-	progress := func(text string) {
-		s.Suffix = " " + text
-	}
-
-	progress(" Preparing...")
-	s.Start()
-	defer s.Stop()
-
-	if !options.SkipValidate {
-		repo := github.Repository{
-			Owner: repoOwner,
-			Name:  repoName,
-		}
-
-		progress("Getting repository information...")
-
-		err := repo.Setup()
-		if err != nil {
-			return nil, err
-		}
-
-		progress("Searching for " + filename.PassportJSON)
-		file, err := repo.GetFile(filename.PassportJSON)
-		if err != nil {
-			return nil, fmt.Errorf("repository does not contain a %s", filename.PassportJSON)
-		}
-
-		progress("Reading " + filename.PassportJSON)
-		data, err := file.Contents()
-		if err != nil {
-			return nil, err
-		}
-
-		progress("Parsing " + filename.PassportJSON)
-		thePassport, err := passport.New(bytes.NewBuffer(data))
-		if err != nil {
-			return nil, fmt.Errorf("repository does not contain a valid passport: %s", err)
-		}
-
-		if !options.SkipConfirm {
-			s.Stop()
-
-			fmt.Println(thePassport.Info())
-			fmt.Println()
-
-			yes, err := confirm("Install?")
-
-			if err != nil {
-				return nil, err
-			}
-
-			if !yes {
-				return nil, fmt.Errorf("installation cancelled")
-			}
-		}
-
-		s.Start()
-	}
-
-	progress("Cloning repository...")
-	_, err := git.PlainClone(path, false, &git.CloneOptions{
-		URL:   options.URL,
-		Depth: 1,
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	s.Stop()
-
-	ext, err := extension.New(path)
-	if err != nil {
-		return nil, err
-	}
-
-	return ext, nil
 }
