@@ -56,6 +56,7 @@ func (m *model) newList(title, singular, plural string, statusMessageLifetime *t
 	}
 
 	l.SetStatusBarItemName(singular, plural)
+	l.Styles.NoItems = m.styles.nonListGlobal.Copy().Foreground(color.Yellow)
 	l.AdditionalShortHelpKeys = func() []key.Binding {
 		return m.keyMap.ShortHelp()
 	}

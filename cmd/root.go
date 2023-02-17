@@ -56,14 +56,16 @@ func Execute() {
 }
 
 func handleErr(err error) {
-	if err != nil {
-		msg := strings.TrimSpace(err.Error())
-		msg = strings.Trim(msg, "\n")
-
-		log.Error(msg)
-		_, _ = log.WriteErrorf(os.Stderr, msg)
-		_, _ = os.Stderr.Write([]byte("\n"))
-
-		os.Exit(1)
+	if err == nil {
+		return
 	}
+
+	msg := strings.TrimSpace(err.Error())
+	msg = strings.Trim(msg, "\n")
+
+	log.Error(msg)
+	_, _ = log.WriteErrorf(os.Stderr, msg)
+	_, _ = os.Stderr.Write([]byte("\n"))
+
+	os.Exit(1)
 }

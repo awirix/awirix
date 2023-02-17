@@ -7,8 +7,14 @@ import (
 	"github.com/awirix/libopen/open"
 	lua "github.com/awirix/lua"
 	"github.com/spf13/viper"
-	"runtime"
 )
+
+// videoPlayers the default video players that support streaming via url
+var videoPlayers = [...]string{
+	"iina", // macOS only
+	"mpv",
+	"vlc",
+}
 
 func watch(L *lua.LState) int {
 	url := L.CheckString(1)
@@ -23,15 +29,7 @@ func watch(L *lua.LState) int {
 		return 0
 	}
 
-	var players = make([]string, 0)
-
-	if runtime.GOOS == "darwin" {
-		players = append(players, "iina")
-	}
-
-	players = append(players, "mpv", "vlc")
-
-	for _, player := range players {
+	for _, player := range videoPlayers {
 		if !executil.ProgramInPath(player) {
 			continue
 		}
