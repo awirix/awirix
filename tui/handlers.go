@@ -47,9 +47,7 @@ $ %[3]s config info -k %[4]s
 		if !ext.IsScraperLoaded() {
 			err := ext.LoadScraper(false)
 			if err != nil {
-				m.errorChan <- err
-				return nil
-				//return msgError(err)
+				return msgError(err)
 			}
 		}
 
@@ -80,7 +78,7 @@ $ %[3]s config info -k %[4]s
 
 		// it returns tea cmd it's just nil if we don't have any filter applied,
 		// so we can safely ignore it here
-		listSetItems[*scraper.Action](ext.Scraper().Actions(), &m.component.actionSelect)
+		listSetItems(ext.Scraper().Actions(), &m.component.actionSelect)
 
 		return msgExtensionLoaded(ext)
 	})
@@ -94,9 +92,7 @@ func (m *model) handleSearch(query string) tea.Cmd {
 		media, err := search.Call(query)
 
 		if err != nil {
-			m.errorChan <- err
-			return nil
-			//return msgError(err)
+			return msgError(err)
 		}
 
 		return msgSearchDone(media)
@@ -114,9 +110,7 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 		layerMedia, err := layer.Call(media)
 
 		if err != nil {
-			m.errorChan <- err
-			return nil
-			//return msgError(err)
+			return msgError(err)
 		}
 
 		return msgLayerDone(layerMedia)
@@ -135,9 +129,7 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 		for _, media := range medias {
 			err := action.Call(media)
 			if err != nil {
-				m.errorChan <- err
-				return nil
-				//return msgError(err)
+				return msgError(err)
 			}
 		}
 
@@ -150,9 +142,7 @@ func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
 		m.text.status = "Loading info for " + style.Fg(color.Yellow)(media.String())
 		info, err := media.Info()
 		if err != nil {
-			m.errorChan <- err
-			return nil
-			//return msgError(err)
+			return msgError(err)
 		}
 
 		m.text.mediaInfoName = media.String()
@@ -177,8 +167,7 @@ func (m *model) handleExtensionRemove(ext *extension.Extension) tea.Cmd {
 
 		err := manager.Remove(ext)
 		if err != nil {
-			m.errorChan <- err
-			return nil
+			return msgError(err)
 		}
 
 		return tea.Sequence(
@@ -195,8 +184,7 @@ func (m *model) handleExtensionsReset() tea.Cmd {
 		manager.ResetInstalledCache()
 		extensions, err := manager.Installed()
 		if err != nil {
-			m.errorChan <- err
-			return nil
+			return msgError(err)
 		}
 
 		m.extensions = extensions
