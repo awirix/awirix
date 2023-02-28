@@ -32,10 +32,10 @@ github.com/ProtonMail/go-crypto/openpgp/internal/ecc
 github.com/ProtonMail/go-crypto/openpgp/internal/encoding
 github.com/ProtonMail/go-crypto/openpgp/packet
 github.com/ProtonMail/go-crypto/openpgp/s2k
-# github.com/PuerkitoBio/goquery v1.8.0
+# github.com/PuerkitoBio/goquery v1.8.1
 ## explicit; go 1.13
 github.com/PuerkitoBio/goquery
-# github.com/acomagu/bufpipe v1.0.3
+# github.com/acomagu/bufpipe v1.0.4
 ## explicit; go 1.12
 github.com/acomagu/bufpipe
 # github.com/alecthomas/chroma v0.10.0
@@ -95,15 +95,15 @@ github.com/awirix/lua/pm
 # github.com/awirix/templates v0.9.0
 ## explicit; go 1.19
 github.com/awirix/templates
-# github.com/aymanbagabas/go-osc52 v1.2.1
+# github.com/aymanbagabas/go-osc52 v1.2.2
 ## explicit; go 1.16
 github.com/aymanbagabas/go-osc52
 # github.com/aymerick/douceur v0.2.0
 ## explicit
 github.com/aymerick/douceur/css
 github.com/aymerick/douceur/parser
-# github.com/briandowns/spinner v1.21.0
-## explicit; go 1.14
+# github.com/briandowns/spinner v1.22.0
+## explicit; go 1.17
 github.com/briandowns/spinner
 # github.com/charmbracelet/bubbles v0.15.0
 ## explicit; go 1.13
@@ -146,7 +146,7 @@ github.com/cloudflare/circl/sign/ed448
 # github.com/containerd/console v1.0.3
 ## explicit; go 1.13
 github.com/containerd/console
-# github.com/dlclark/regexp2 v1.8.0
+# github.com/dlclark/regexp2 v1.8.1
 ## explicit; go 1.13
 github.com/dlclark/regexp2
 github.com/dlclark/regexp2/syntax
@@ -358,15 +358,16 @@ github.com/pelletier/go-toml/v2/internal/characters
 github.com/pelletier/go-toml/v2/internal/danger
 github.com/pelletier/go-toml/v2/internal/tracker
 github.com/pelletier/go-toml/v2/unstable
-# github.com/pjbgf/sha1cd v0.2.3
-## explicit; go 1.15
+# github.com/pjbgf/sha1cd v0.3.0
+## explicit; go 1.19
 github.com/pjbgf/sha1cd
 github.com/pjbgf/sha1cd/cgo
+github.com/pjbgf/sha1cd/internal
 github.com/pjbgf/sha1cd/ubc
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
-# github.com/rivo/uniseg v0.4.3
+# github.com/rivo/uniseg v0.4.4
 ## explicit; go 1.18
 github.com/rivo/uniseg
 # github.com/robertkrimen/otto v0.2.1
@@ -396,7 +397,7 @@ github.com/sirupsen/logrus
 # github.com/skeema/knownhosts v1.1.0
 ## explicit; go 1.17
 github.com/skeema/knownhosts
-# github.com/spf13/afero v1.9.3
+# github.com/spf13/afero v1.9.4
 ## explicit; go 1.16
 github.com/spf13/afero
 github.com/spf13/afero/internal/common
@@ -468,7 +469,7 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20230213192124-5e25df0256eb
+# golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
 ## explicit; go 1.18
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
