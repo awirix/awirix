@@ -12,20 +12,20 @@ You can take a look at the extension's scraper template to get a brief idea what
 
 --- Table that have a string field named `title` used for string representation
 --- with optional `description` for a brief description.
---- @alias Media { title: string, description: string?, [any]: any }
+--- @alias Media { title: string, description: string?, info: (fun(self: Media): string)?, [any]: any }
 
 --- Searches for the media
---- @alias Search { title: string?, subtitle: string?, placholder: string?, handler: fun(query: string, ctx: Context): Media[], noun: Noun? }
+--- @alias Search { title: string?, subtitle: string?, placholder: string?, handler: (fun(query: string, ctx: Context): Media[]), noun: Noun? }
 
 --- Each layer returns a list of sub-media for the given one.
 --- For example, you can search for a show, then selected show will be passed to the first layer that's responsible for returning show's seasons.
 --- After that, the selected season will be passed to the second layer that would return season's episodes.
---- @alias Layer { title: string, handler: fun(media: Media?, ctx: Context): Media[], noun: Noun? }[]
+--- @alias Layer { title: string, handler: (fun(media: Media?, ctx: Context): Media[]), noun: Noun? }[]
 
 
 --- Actions are further actions that can be performed on the selected media.
---- Something like 'Stream' or 'Download'
---- @alias Action { title: string, handler: fun(media: Media[], ctx: Context), description: string?, max: number? }
+--- Something like *stream* or *download*
+--- @alias Action { title: string, handler: fun(media: Media, ctx: Context), description: string? }
 
 --- Context that is passed to the handler functions to report progress and errors.
 --- @alias Context { progress: fun(message: string), error: fun(message: string) }
@@ -33,10 +33,13 @@ You can take a look at the extension's scraper template to get a brief idea what
 local M = {}
 
 --- This step may be omitted if this extension does not provide searching functionality.
---- Might be the case if it is dedicated to the single show/movie/book/...
+--- Might be the case if it is dedicated to a single show, movie, book, etc.
 --- @type Search
 M.search = {
-   handler = function(query, ctx) return {} end
+   handler = function(query, ctx)
+      ctx.error('Not implemented')
+      return {}
+   end
 }
 
 --- Layers may be omitted (nil or 0 length) if this extension does not provide such functionality (e.g. just search and watch, no seasons, no episodes).
@@ -45,7 +48,10 @@ M.search = {
 M.layers = {
    {
       title = 'Layer',
-      handler = function(media, ctx) return {} end
+      handler = function(media, ctx)
+         ctx.error('Not implemented')
+         return {}
+      end
    }
 }
 
@@ -53,15 +59,14 @@ M.layers = {
 --- @type Action[]
 M.actions = {
    {
-      title = 'Stream',
-      max = 1,
-      handler = function (medias, ctx)
+      title = 'Search',
+      handler = function(media, ctx)
          ctx.error('Not implemented')
       end
    },
    {
       title = 'Download',
-      handler = function (medias, ctx)
+      handler = function(media, ctx)
          ctx.error('Not implemented')
       end
    }

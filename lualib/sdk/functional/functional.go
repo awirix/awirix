@@ -708,8 +708,8 @@ func Lib() *luadoc.Lib {
 									Type: T,
 								},
 								{
-									Name: "initial",
-									Type: G,
+									Name: "index",
+									Type: luadoc.Number,
 								},
 							},
 							Returns: []*luadoc.Param{
@@ -719,6 +719,11 @@ func Lib() *luadoc.Lib {
 								},
 							},
 						}.AsType(),
+					},
+					{
+						Name:        "inital",
+						Description: "An initial value",
+						Type:        G,
 					},
 				},
 				Returns: []*luadoc.Param{
@@ -754,8 +759,8 @@ func Lib() *luadoc.Lib {
 									Type: T,
 								},
 								{
-									Name: "initial",
-									Type: G,
+									Name: "index",
+									Type: luadoc.Number,
 								},
 							},
 							Returns: []*luadoc.Param{
@@ -765,6 +770,11 @@ func Lib() *luadoc.Lib {
 								},
 							},
 						}.AsType(),
+					},
+					{
+						Name:        "initial",
+						Description: "An initial value",
+						Type:        G,
 					},
 				},
 				Returns: []*luadoc.Param{
@@ -1251,7 +1261,7 @@ func reduce(L *lua.LState) int {
 	fn := L.CheckFunction(2)
 	initial := L.CheckAny(3)
 
-	r := lo.Reduce[lua.LValue, lua.LValue](list, func(acc lua.LValue, v lua.LValue, i int) lua.LValue {
+	r := lo.Reduce(list, func(acc lua.LValue, v lua.LValue, i int) lua.LValue {
 		L.Push(fn)
 		L.Push(acc)
 		L.Push(v)
@@ -1269,7 +1279,7 @@ func reduceRight(L *lua.LState) int {
 	fn := L.CheckFunction(2)
 	initial := L.CheckAny(3)
 
-	r := lo.ReduceRight[lua.LValue, lua.LValue](list, func(acc lua.LValue, v lua.LValue, i int) lua.LValue {
+	r := lo.ReduceRight(list, func(acc lua.LValue, v lua.LValue, i int) lua.LValue {
 		L.Push(fn)
 		L.Push(acc)
 		L.Push(v)
