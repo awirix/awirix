@@ -23,14 +23,15 @@ import (
 
 	"github.com/pdfcpu/pdfcpu/pkg/log"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 )
 
 // Collect creates a custom PDF page sequence for selected pages of rs and writes the result to w.
-func Collect(rs io.ReadSeeker, w io.Writer, selectedPages []string, conf *pdfcpu.Configuration) error {
+func Collect(rs io.ReadSeeker, w io.Writer, selectedPages []string, conf *model.Configuration) error {
 	if conf == nil {
-		conf = pdfcpu.NewDefaultConfiguration()
+		conf = model.NewDefaultConfiguration()
 	}
-	conf.Cmd = pdfcpu.COLLECT
+	conf.Cmd = model.COLLECT
 
 	fromStart := time.Now()
 	ctx, _, _, _, err := readValidateAndOptimize(rs, conf, fromStart)
@@ -47,12 +48,12 @@ func Collect(rs io.ReadSeeker, w io.Writer, selectedPages []string, conf *pdfcpu
 		return err
 	}
 
-	ctxDest, err := ctx.ExtractPages(pages, true)
+	ctxDest, err := pdfcpu.ExtractPages(ctx, pages, true)
 	if err != nil {
 		return err
 	}
 
-	if conf.ValidationMode != pdfcpu.ValidationNone {
+	if conf.ValidationMode != model.ValidationNone {
 		if err = ValidateContext(ctxDest); err != nil {
 			return err
 		}
@@ -62,12 +63,7 @@ func Collect(rs io.ReadSeeker, w io.Writer, selectedPages []string, conf *pdfcpu
 }
 
 // CollectFile creates a custom PDF page sequence for inFile and writes the result to outFile.
-func CollectFile(inFile, outFile string, selectedPages []string, conf *pdfcpu.Configuration) (err error) {
-	var f1, f2 *os.File
-
-	if f1, err = os.Open(inFile); err != nil {
-		return err
-	}
+func CollectFile(inFile, outFile string, selectedPages []string, conf *model.Configuration) (err error) {
 
 	tmpFile := inFile + ".tmp"
 	if outFile != "" && inFile != outFile {
@@ -76,7 +72,15 @@ func CollectFile(inFile, outFile string, selectedPages []string, conf *pdfcpu.Co
 	} else {
 		log.CLI.Printf("writing %s...\n", inFile)
 	}
+
+	var f1, f2 *os.File
+
+	if f1, err = os.Open(inFile); err != nil {
+		return err
+	}
+
 	if f2, err = os.Create(tmpFile); err != nil {
+		f1.Close()
 		return err
 	}
 
@@ -84,7 +88,9 @@ func CollectFile(inFile, outFile string, selectedPages []string, conf *pdfcpu.Co
 		if err != nil {
 			f2.Close()
 			f1.Close()
-			os.Remove(tmpFile)
+			if outFile == "" || inFile == outFile {
+				os.Remove(tmpFile)
+			}
 			return
 		}
 		if err = f2.Close(); err != nil {
@@ -94,9 +100,7 @@ func CollectFile(inFile, outFile string, selectedPages []string, conf *pdfcpu.Co
 			return
 		}
 		if outFile == "" || inFile == outFile {
-			if err = os.Rename(tmpFile, inFile); err != nil {
-				return
-			}
+			err = os.Rename(tmpFile, inFile)
 		}
 	}()
 

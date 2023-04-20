@@ -18,15 +18,11 @@ func handlePanic() {
 	}
 }
 
-func init() {
+func main() {
 	defer handlePanic()
 
 	lo.Must0(config.Init())
 	lo.Must0(log.Init())
-}
-
-func main() {
-	defer handlePanic()
 
 	cmd.Execute()
 }

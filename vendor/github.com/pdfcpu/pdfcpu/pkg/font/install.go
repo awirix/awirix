@@ -230,14 +230,14 @@ func (t table) parsePostScriptTable(fd *ttf) error {
 	return nil
 }
 
-func printUnicodeRange(off int, r uint32) {
-	for i := 0; i < 64; i++ {
-		if r&1 > 0 {
-			fmt.Printf("bit %d: on\n", off+i)
-		}
-		r >>= 1
-	}
-}
+// func printUnicodeRange(off int, r uint32) {
+// 	for i := 0; i < 32; i++ {
+// 		if r&1 > 0 {
+// 			fmt.Printf("bit %d: on\n", off+i)
+// 		}
+// 		r >>= 1
+// 	}
+// }
 
 func (t table) parseWindowsMetricsTable(fd *ttf) error {
 	// table "OS/2"
@@ -274,11 +274,15 @@ func (t table) parseWindowsMetricsTable(fd *ttf) error {
 	fd.Descent = fd.toPDFGlyphSpace(int(sTypoDescender))
 
 	// sCapHeight: This field was defined in version 2 of the OS/2 table.
-	sCapHeight := int16(0)
+	// sCapHeight = int16(0)
 	if version >= 2 {
-		sCapHeight = t.int16(88)
+		sCapHeight := t.int16(88)
+		fd.CapHeight = fd.toPDFGlyphSpace(int(sCapHeight))
+	} else {
+		// TODO the value may be set equal to the top of the unscaled and unhinted glyph bounding box
+		// of the glyph encoded at U+0048 (LATIN CAPITAL LETTER H).
+		fd.CapHeight = fd.Ascent
 	}
-	fd.CapHeight = fd.toPDFGlyphSpace(int(sCapHeight))
 
 	fsSelection := t.uint16(62)
 	fd.Bold = fsSelection&0x40 > 0
@@ -337,11 +341,8 @@ func (t table) parseHorizontalHeaderTable(fd *ttf) error {
 		fd.Descent = fd.toPDFGlyphSpace(int(descent))
 	}
 
-	lineGap := t.int16(8)
+	//lineGap := t.int16(8)
 	//fmt.Printf("lineGap: %d\n", lineGap)
-	if fd.CapHeight == 0 {
-		fd.CapHeight = fd.toPDFGlyphSpace(int(lineGap))
-	}
 
 	//advanceWidthMax := t.uint16(10)
 	//fmt.Printf("advanceWidthMax: %d\n", advanceWidthMax)
@@ -477,6 +478,9 @@ func (t table) parseCharToGlyphMappingTable(fd *ttf) error {
 		enc = t.uint16(off + 2)
 		o := t.uint32(off + 4)
 		f = t.uint16(int(o))
+		if f == 14 {
+			continue
+		}
 		l := uint32(t.uint16(int(o) + 2))
 		if f >= 8 {
 			l = t.uint32(int(o) + 4)
@@ -646,6 +650,7 @@ func readGob(fileName string, fd *ttf) error {
 
 func installTrueTypeRep(fontDir, fontName string, header []byte, tables map[string]*table) error {
 	fd := ttf{}
+	//fmt.Println(fontName)
 	for _, v := range []string{"head", "OS/2", "post", "name", "hhea", "maxp", "hmtx", "cmap"} {
 		if err := parse(tables, v, &fd); err != nil {
 			return err

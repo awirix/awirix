@@ -23,14 +23,15 @@ import (
 
 	"github.com/pdfcpu/pdfcpu/pkg/log"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 	"github.com/pkg/errors"
 )
 
 // Optimize reads a PDF stream from rs and writes the optimized PDF stream to w.
-func Optimize(rs io.ReadSeeker, w io.Writer, conf *pdfcpu.Configuration) error {
+func Optimize(rs io.ReadSeeker, w io.Writer, conf *model.Configuration) error {
 	if conf == nil {
-		conf = pdfcpu.NewDefaultConfiguration()
-		conf.Cmd = pdfcpu.OPTIMIZE
+		conf = model.NewDefaultConfiguration()
+		conf.Cmd = model.OPTIMIZE
 	}
 
 	fromStart := time.Now()
@@ -65,7 +66,7 @@ func Optimize(rs io.ReadSeeker, w io.Writer, conf *pdfcpu.Configuration) error {
 // OptimizeFile reads inFile and writes the optimized PDF to outFile.
 // If outFile is not provided then inFile gets overwritten
 // which leads to the same result as when inFile equals outFile.
-func OptimizeFile(inFile, outFile string, conf *pdfcpu.Configuration) (err error) {
+func OptimizeFile(inFile, outFile string, conf *model.Configuration) (err error) {
 	var f1, f2 *os.File
 
 	if f1, err = os.Open(inFile); err != nil {
@@ -88,7 +89,9 @@ func OptimizeFile(inFile, outFile string, conf *pdfcpu.Configuration) (err error
 		if err != nil {
 			f2.Close()
 			f1.Close()
-			os.Remove(tmpFile)
+			if outFile == "" || inFile == outFile {
+				os.Remove(tmpFile)
+			}
 			return
 		}
 		if err = f2.Close(); err != nil {
@@ -98,9 +101,7 @@ func OptimizeFile(inFile, outFile string, conf *pdfcpu.Configuration) (err error
 			return
 		}
 		if outFile == "" || inFile == outFile {
-			if err = os.Rename(tmpFile, inFile); err != nil {
-				return
-			}
+			err = os.Rename(tmpFile, inFile)
 		}
 	}()
 

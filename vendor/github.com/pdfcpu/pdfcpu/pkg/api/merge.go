@@ -23,59 +23,81 @@ import (
 
 	"github.com/pdfcpu/pdfcpu/pkg/log"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 	"github.com/pkg/errors"
 )
 
 // appendTo appends inFile to ctxDest's page tree.
-func appendTo(rs io.ReadSeeker, ctxDest *pdfcpu.Context) error {
+func appendTo(rs io.ReadSeeker, ctxDest *model.Context) error {
 	ctxSource, _, _, err := readAndValidate(rs, ctxDest.Configuration, time.Now())
 	if err != nil {
 		return err
 	}
 
-	// Merge the source context into the dest context.
+	// Merge source context into dest context.
 	return pdfcpu.MergeXRefTables(ctxSource, ctxDest)
 }
 
-// ReadSeekerCloser combines io.ReadSeeker and io.Closer
-type ReadSeekerCloser interface {
-	io.ReadSeeker
-	io.Closer
-}
+func Merge(destFile string, inFiles []string, w io.Writer, conf *model.Configuration) error {
 
-// Merge merges a sequence of PDF streams and writes the result to w.
-func Merge(rsc []io.ReadSeeker, w io.Writer, conf *pdfcpu.Configuration) error {
-	if rsc == nil {
-		return errors.New("pdfcpu: Merge: Please provide rsc")
-	}
 	if w == nil {
 		return errors.New("pdfcpu: Merge: Please provide w")
 	}
-	if conf == nil {
-		conf = pdfcpu.NewDefaultConfiguration()
-	}
-	conf.Cmd = pdfcpu.MERGECREATE
 
-	ctxDest, _, _, err := readAndValidate(rsc[0], conf, time.Now())
+	if conf == nil {
+		conf = model.NewDefaultConfiguration()
+	}
+	conf.Cmd = model.MERGECREATE
+
+	if destFile != "" {
+		conf.Cmd = model.MERGEAPPEND
+	}
+	if destFile == "" {
+		destFile = inFiles[0]
+		inFiles = inFiles[1:]
+	}
+
+	f, err := os.Open(destFile)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	log.CLI.Println("merging into " + destFile)
+
+	ctxDest, _, _, err := readAndValidate(f, conf, time.Now())
 	if err != nil {
 		return err
 	}
 
 	ctxDest.EnsureVersionForWriting()
 
-	// Repeatedly merge files into fileDest's xref table.
-	for _, f := range rsc[1:] {
-		if err = appendTo(f, ctxDest); err != nil {
+	for _, fName := range inFiles {
+		if err := func() error {
+			f, err := os.Open(fName)
+			if err != nil {
+				return err
+			}
+			defer f.Close()
+
+			log.CLI.Println(fName)
+			if err = appendTo(f, ctxDest); err != nil {
+				return err
+			}
+
+			return nil
+
+		}(); err != nil {
 			return err
 		}
 	}
 
-	if err = OptimizeContext(ctxDest); err != nil {
+	if err := OptimizeContext(ctxDest); err != nil {
 		return err
 	}
 
-	if conf.ValidationMode != pdfcpu.ValidationNone {
-		if err = ValidateContext(ctxDest); err != nil {
+	if conf.ValidationMode != model.ValidationNone {
+		if err := ValidateContext(ctxDest); err != nil {
 			return err
 		}
 	}
@@ -83,117 +105,61 @@ func Merge(rsc []io.ReadSeeker, w io.Writer, conf *pdfcpu.Configuration) error {
 	return WriteContext(ctxDest, w)
 }
 
-// MergeCreateFile merges a sequence of inFiles and writes the result to outFile.
-// This operation corresponds to file concatenation in the order specified by inFiles.
-// The first entry of inFiles serves as the destination context where all remaining files get merged into.
-func MergeCreateFile(inFiles []string, outFile string, conf *pdfcpu.Configuration) error {
-	ff := []*os.File(nil)
-	for _, f := range inFiles {
-		log.CLI.Println(f)
-		f, err := os.Open(f)
-		if err != nil {
-			return err
-		}
-		ff = append(ff, f)
-	}
+func MergeCreateFile(inFiles []string, outFile string, conf *model.Configuration) (err error) {
+
 	f, err := os.Create(outFile)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		if err != nil {
-			f.Close()
-			for _, f := range ff {
-				f.Close()
-			}
-			return
-		}
-		if err = f.Close(); err != nil {
-			return
-		}
-		for _, f := range ff {
-			if err = f.Close(); err != nil {
-				return
-			}
+		cerr := f.Close()
+		if err == nil {
+			err = cerr
 		}
 	}()
 
-	rs := make([]io.ReadSeeker, len(ff))
-	for i, f := range ff {
-		rs[i] = f
-	}
-
 	log.CLI.Printf("writing %s...\n", outFile)
-	return Merge(rs, f, conf)
+	return Merge("", inFiles, f, conf)
 }
 
-func prepareReadSeekers(ff []*os.File) []io.ReadSeeker {
-	rss := make([]io.ReadSeeker, len(ff))
-	for i, f := range ff {
-		rss[i] = f
-	}
-	return rss
-}
+func MergeAppendFile(inFiles []string, outFile string, conf *model.Configuration) (err error) {
 
-// MergeAppendFile merges a sequence of inFiles and writes the result to outFile.
-// This operation corresponds to file concatenation in the order specified by inFiles.
-// If outFile already exists, inFiles will be appended.
-func MergeAppendFile(inFiles []string, outFile string, conf *pdfcpu.Configuration) (err error) {
-	var f1, f2 *os.File
 	tmpFile := outFile
+	overWrite := false
+	destFile := ""
+
 	if fileExists(outFile) {
-		if f1, err = os.Open(outFile); err != nil {
-			return err
-		}
+		overWrite = true
+		destFile = outFile
 		tmpFile += ".tmp"
 		log.CLI.Printf("appending to %s...\n", outFile)
 	} else {
 		log.CLI.Printf("writing %s...\n", outFile)
 	}
 
-	if f2, err = os.Create(tmpFile); err != nil {
+	f, err := os.Create(tmpFile)
+	if err != nil {
 		return err
-	}
-
-	ff := []*os.File(nil)
-	if f1 != nil {
-		ff = append(ff, f1)
-	}
-	for _, f := range inFiles {
-		log.CLI.Println(f)
-		f, err := os.Open(f)
-		if err != nil {
-			return err
-		}
-		ff = append(ff, f)
 	}
 
 	defer func() {
 		if err != nil {
-			f2.Close()
-			if f1 != nil {
-				os.Remove(tmpFile)
-			}
-			for _, f := range ff {
-				f.Close()
-			}
-			return
-		}
-		if err = f2.Close(); err != nil {
-			return
-		}
-		for _, f := range ff {
 			if err = f.Close(); err != nil {
 				return
 			}
-		}
-		if f1 != nil {
-			if err = os.Rename(tmpFile, outFile); err != nil {
-				return
+			if overWrite {
+				err = os.Remove(tmpFile)
 			}
+			return
+		}
+		if err = f.Close(); err != nil {
+			return
+		}
+		if overWrite {
+			err = os.Rename(tmpFile, outFile)
 		}
 	}()
 
-	return Merge(prepareReadSeekers(ff), f2, conf)
+	return Merge(destFile, inFiles, f, conf)
 }

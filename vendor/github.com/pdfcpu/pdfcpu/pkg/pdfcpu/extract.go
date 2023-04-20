@@ -23,12 +23,14 @@ import (
 
 	"github.com/pdfcpu/pdfcpu/pkg/filter"
 	"github.com/pdfcpu/pdfcpu/pkg/log"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 	"github.com/pkg/errors"
 )
 
 // ImageObjNrs returns all image dict objNrs for pageNr.
 // Requires an optimized context.
-func (ctx *Context) ImageObjNrs(pageNr int) []int {
+func ImageObjNrs(ctx *model.Context, pageNr int) []int {
 	// TODO Exclude SMask image objects.
 	objNrs := []int{}
 	for k, v := range ctx.Optimize.PageImages[pageNr-1] {
@@ -40,7 +42,7 @@ func (ctx *Context) ImageObjNrs(pageNr int) []int {
 }
 
 // StreamLength returns sd's stream length.
-func (ctx *Context) StreamLength(sd *StreamDict) (int64, error) {
+func StreamLength(ctx *model.Context, sd *types.StreamDict) (int64, error) {
 
 	val := sd.Int64Entry("Length")
 	if val != nil {
@@ -61,7 +63,7 @@ func (ctx *Context) StreamLength(sd *StreamDict) (int64, error) {
 }
 
 // ColorSpaceString returns a string representation for sd's colorspace.
-func (ctx *Context) ColorSpaceString(sd *StreamDict) (string, error) {
+func ColorSpaceString(ctx *model.Context, sd *types.StreamDict) (string, error) {
 	o, found := sd.Find("ColorSpace")
 	if !found {
 		return "", nil
@@ -74,61 +76,54 @@ func (ctx *Context) ColorSpaceString(sd *StreamDict) (string, error) {
 
 	switch cs := o.(type) {
 
-	case Name:
+	case types.Name:
 		return string(cs), nil
 
-	case Array:
-		return string(cs[0].(Name)), nil
+	case types.Array:
+		return string(cs[0].(types.Name)), nil
 	}
 
 	return "", nil
 }
 
-func colorSpaceNameComponents(cs Name) int {
+func colorSpaceNameComponents(cs types.Name) int {
 	switch cs {
 
-	case DeviceGrayCS:
+	case model.DeviceGrayCS:
 		return 1
 
-	case DeviceRGBCS:
+	case model.DeviceRGBCS:
 		return 3
 
-	case DeviceCMYKCS:
+	case model.DeviceCMYKCS:
 		return 4
 	}
 	return 0
 }
 
-// ColorSpaceComponents returns the corresponding number of used color components for sd's colorspace.
-func (xRefTable *XRefTable) ColorSpaceComponents(sd *StreamDict) (int, error) {
-	o, found := sd.Find("ColorSpace")
-	if !found {
-		return 0, nil
-	}
-
-	o, err := xRefTable.Dereference(o)
+func indexedColorSpaceComponents(xRefTable *model.XRefTable, cs types.Array) (int, error) {
+	baseCS, err := xRefTable.Dereference(cs[1])
 	if err != nil {
 		return 0, err
 	}
 
-	switch cs := o.(type) {
-
-	case Name:
+	switch cs := baseCS.(type) {
+	case types.Name:
 		return colorSpaceNameComponents(cs), nil
 
-	case Array:
-		switch cs[0].(Name) {
+	case types.Array:
+		switch cs[0].(types.Name) {
 
-		case CalGrayCS:
+		case model.CalGrayCS:
 			return 1, nil
 
-		case CalRGBCS:
+		case model.CalRGBCS:
 			return 3, nil
 
-		case LabCS:
+		case model.LabCS:
 			return 3, nil
 
-		case ICCBasedCS:
+		case model.ICCBasedCS:
 			iccProfileStream, _, err := xRefTable.DereferenceStreamDict(cs[1])
 			if err != nil {
 				return 0, err
@@ -140,66 +135,79 @@ func (xRefTable *XRefTable) ColorSpaceComponents(sd *StreamDict) (int, error) {
 			}
 			return i, nil
 
-		case SeparationCS:
+		case model.SeparationCS:
 			return 1, nil
 
-		case DeviceNCS:
-			return len(cs[1].(Array)), nil
-
-		case IndexedCS:
-			baseCS, err := xRefTable.Dereference(cs[1])
-			if err != nil {
-				return 0, err
-			}
-
-			switch cs := baseCS.(type) {
-			case Name:
-				return colorSpaceNameComponents(cs), nil
-
-			case Array:
-
-				switch cs[0].(Name) {
-
-				case CalGrayCS:
-					return 1, nil
-
-				case CalRGBCS:
-					return 3, nil
-
-				case LabCS:
-					return 3, nil
-
-				case ICCBasedCS:
-					iccProfileStream, _, err := xRefTable.DereferenceStreamDict(cs[1])
-					if err != nil {
-						return 0, err
-					}
-					n := iccProfileStream.IntEntry("N")
-					i := 0
-					if n != nil {
-						i = *n
-					}
-					return i, nil
-
-				case SeparationCS:
-					return 1, nil
-
-				case DeviceNCS:
-					return len(cs[1].(Array)), nil
-				}
-			}
+		case model.DeviceNCS:
+			return len(cs[1].(types.Array)), nil
 		}
 	}
 
 	return 0, nil
 }
 
-func (ctx *Context) imageStub(
-	sd *StreamDict,
+// ColorSpaceComponents returns the corresponding number of used color components for sd's colorspace.
+func ColorSpaceComponents(xRefTable *model.XRefTable, sd *types.StreamDict) (int, error) {
+	o, found := sd.Find("ColorSpace")
+	if !found {
+		return 0, nil
+	}
+
+	o, err := xRefTable.Dereference(o)
+	if err != nil {
+		return 0, err
+	}
+
+	switch cs := o.(type) {
+	case types.Name:
+		return colorSpaceNameComponents(cs), nil
+
+	case types.Array:
+		switch cs[0].(types.Name) {
+
+		case model.CalGrayCS:
+			return 1, nil
+
+		case model.CalRGBCS:
+			return 3, nil
+
+		case model.LabCS:
+			return 3, nil
+
+		case model.ICCBasedCS:
+			iccProfileStream, _, err := xRefTable.DereferenceStreamDict(cs[1])
+			if err != nil {
+				return 0, err
+			}
+			n := iccProfileStream.IntEntry("N")
+			i := 0
+			if n != nil {
+				i = *n
+			}
+			return i, nil
+
+		case model.SeparationCS:
+			return 1, nil
+
+		case model.DeviceNCS:
+			return len(cs[1].(types.Array)), nil
+
+		case model.IndexedCS:
+			return indexedColorSpaceComponents(xRefTable, cs)
+
+		}
+	}
+
+	return 0, nil
+}
+
+func imageStub(
+	ctx *model.Context,
+	sd *types.StreamDict,
 	resourceId, filters, lastFilter string,
-	decodeParms Dict,
+	decodeParms types.Dict,
 	thumb, imgMask bool,
-	objNr int) (*Image, error) {
+	objNr int) (*model.Image, error) {
 
 	w := sd.IntEntry("Width")
 	if w == nil {
@@ -211,12 +219,12 @@ func (ctx *Context) imageStub(
 		return nil, errors.Errorf("pdfcpu: missing image height obj#%d", objNr)
 	}
 
-	cs, err := ctx.ColorSpaceString(sd)
+	cs, err := ColorSpaceString(ctx, sd)
 	if err != nil {
 		return nil, err
 	}
 
-	comp, err := ctx.ColorSpaceComponents(sd)
+	comp, err := ColorSpaceComponents(ctx.XRefTable, sd)
 	if err != nil {
 		return nil, err
 	}
@@ -238,12 +246,17 @@ func (ctx *Context) imageStub(
 		sMask = true
 	}
 
+	var mask bool
+	if sm, _ := sd.Find("Mask"); sm != nil {
+		mask = true
+	}
+
 	var interpol bool
 	if b := sd.BooleanEntry("Interpolate"); b != nil && *b {
 		interpol = true
 	}
 
-	i, err := ctx.StreamLength(sd)
+	i, err := StreamLength(ctx, sd)
 	if err != nil {
 		return nil, err
 	}
@@ -253,27 +266,28 @@ func (ctx *Context) imageStub(
 		s = decodeParms.String()
 	}
 
-	img := &Image{
-		objNr:       objNr,
+	img := &model.Image{
+		ObjNr:       objNr,
 		Name:        resourceId,
-		thumb:       thumb,
-		imgMask:     imgMask,
-		sMask:       sMask,
-		width:       *w,
-		height:      *h,
-		cs:          cs,
-		comp:        comp,
-		bpc:         bpc,
-		interpol:    interpol,
-		size:        i,
-		filter:      filters,
-		decodeParms: s,
+		Thumb:       thumb,
+		IsImgMask:   imgMask,
+		HasImgMask:  mask,
+		HasSMask:    sMask,
+		Width:       *w,
+		Height:      *h,
+		Cs:          cs,
+		Comp:        comp,
+		Bpc:         bpc,
+		Interpol:    interpol,
+		Size:        i,
+		Filter:      filters,
+		DecodeParms: s,
 	}
 
 	return img, nil
 }
 
-func prepareExtractImage(sd *StreamDict) (string, string, Dict, bool) {
+func prepareExtractImage(sd *types.StreamDict) (string, string, types.Dict, bool) {
 	var imgMask bool
 	if im := sd.BooleanEntry("ImageMask"); im != nil && *im {
 		imgMask = true
@@ -282,7 +296,7 @@ func prepareExtractImage(sd *StreamDict) (string, string, Dict, bool) {
 	var (
 		filters    string
 		lastFilter string
-		d          Dict
+		d          types.Dict
 	)
 
 	fpl := sd.FilterPipeline
@@ -302,7 +316,7 @@ func prepareExtractImage(sd *StreamDict) (string, string, Dict, bool) {
 }
 
 // ExtractImage extracts an image from sd.
-func (ctx *Context) ExtractImage(sd *StreamDict, thumb bool, resourceId string, objNr int, stub bool) (*Image, error) {
+func ExtractImage(ctx *model.Context, sd *types.StreamDict, thumb bool, resourceId string, objNr int, stub bool) (*model.Image, error) {
 
 	if sd == nil {
 		return nil, nil
@@ -311,7 +325,7 @@ func (ctx *Context) ExtractImage(sd *StreamDict, thumb bool, resourceId string, 
 	filters, lastFilter, decodeParms, imgMask := prepareExtractImage(sd)
 
 	if stub {
-		return ctx.imageStub(sd, resourceId, filters, lastFilter, decodeParms, thumb, imgMask, objNr)
+		return imageStub(ctx, sd, resourceId, filters, lastFilter, decodeParms, thumb, imgMask, objNr)
 	}
 
 	if sd.FilterPipeline == nil {
@@ -336,20 +350,24 @@ func (ctx *Context) ExtractImage(sd *StreamDict, thumb bool, resourceId string, 
 	if lastFilter == filter.CCITTFax {
 		_, err := ctx.DereferenceDictEntry(sd.Dict, "ColorSpace")
 		if err != nil {
-			sd.InsertName("ColorSpace", DeviceGrayCS)
+			sd.InsertName("ColorSpace", model.DeviceGrayCS)
 		}
+	}
+
+	if lastFilter == filter.DCT {
+		comp, err := ColorSpaceComponents(ctx.XRefTable, sd)
+		if err != nil {
+			return nil, err
+		}
+		sd.CSComponents = comp
 	}
 
 	switch lastFilter {
 
-	case filter.DCT, filter.Flate, filter.CCITTFax, filter.RunLength:
-		// If color space is CMYK then write .tif else write .png
+	case filter.DCT, filter.JPX, filter.Flate, filter.CCITTFax, filter.RunLength:
 		if err := sd.Decode(); err != nil {
 			return nil, err
 		}
-
-	case filter.JPX:
-		//imageObj.Extension = "jpx"
 
 	default:
 		log.Debug.Printf("ExtractImage(%d): skip img, filter %s unsupported\n", objNr, filters)
@@ -361,11 +379,11 @@ func (ctx *Context) ExtractImage(sd *StreamDict, thumb bool, resourceId string, 
 		return nil, err
 	}
 
-	img := &Image{
+	img := &model.Image{
 		Reader:   r,
 		Name:     resourceId,
-		objNr:    objNr,
-		thumb:    thumb,
+		ObjNr:    objNr,
+		Thumb:    thumb,
 		FileType: t,
 	}
 
@@ -374,17 +392,17 @@ func (ctx *Context) ExtractImage(sd *StreamDict, thumb bool, resourceId string, 
 
 // ExtractPageImages extracts all images used by pageNr.
 // Optionally return stubs only.
-func (ctx *Context) ExtractPageImages(pageNr int, stub bool) ([]Image, error) {
-	ii := []Image{}
-	for _, objNr := range ctx.ImageObjNrs(pageNr) {
+func ExtractPageImages(ctx *model.Context, pageNr int, stub bool) (map[int]model.Image, error) {
+	m := map[int]model.Image{}
+	for _, objNr := range ImageObjNrs(ctx, pageNr) {
 		imageObj := ctx.Optimize.ImageObjects[objNr]
-		i, err := ctx.ExtractImage(imageObj.ImageDict, false, imageObj.ResourceNames[0], objNr, stub)
+		img, err := ExtractImage(ctx, imageObj.ImageDict, false, imageObj.ResourceNames[0], objNr, stub)
 		if err != nil {
 			return nil, err
 		}
-		if i != nil {
-			i.pageNr = pageNr
-			ii = append(ii, *i)
+		if img != nil {
+			img.PageNr = pageNr
+			m[objNr] = *img
 		}
 	}
 	// Extract thumbnail for pageNr
@@ -394,16 +412,16 @@ func (ctx *Context) ExtractPageImages(pageNr int, stub bool) ([]Image, error) {
 		if err != nil {
 			return nil, err
 		}
-		i, err := ctx.ExtractImage(sd, true, "", objNr, stub)
+		img, err := ExtractImage(ctx, sd, true, "", objNr, stub)
 		if err != nil {
 			return nil, err
 		}
-		if i != nil {
-			i.pageNr = pageNr
-			ii = append(ii, *i)
+		if img != nil {
+			img.PageNr = pageNr
+			m[objNr] = *img
 		}
 	}
-	return ii, nil
+	return m, nil
 }
 
 // Font is a Reader representing an embedded font.
@@ -415,7 +433,7 @@ type Font struct {
 
 // FontObjNrs returns all font dict objNrs for pageNr.
 // Requires an optimized context.
-func (ctx *Context) FontObjNrs(pageNr int) []int {
+func FontObjNrs(ctx *model.Context, pageNr int) []int {
 	objNrs := []int{}
 	for k, v := range ctx.Optimize.PageFonts[pageNr-1] {
 		if v {
@@ -425,9 +443,8 @@ func (ctx *Context) FontObjNrs(pageNr int) []int {
 	return objNrs
 }
 
-// ExtractFont extracts a font from font dict by objNr.
-func (ctx *Context) ExtractFont(objNr int) (*Font, error) {
-	fontObject := ctx.Optimize.FontObjects[objNr]
+// ExtractFont extracts a font from fontObject.
+func ExtractFont(ctx *model.Context, fontObject model.FontObject, objNr int) (*Font, error) {
 
 	// Only embedded fonts have binary data.
 	if !fontObject.Embedded() {
@@ -488,10 +505,26 @@ func (ctx *Context) ExtractFont(objNr int) (*Font, error) {
 }
 
 // ExtractPageFonts extracts all fonts used by pageNr.
-func (ctx *Context) ExtractPageFonts(pageNr int) ([]Font, error) {
+func ExtractPageFonts(ctx *model.Context, pageNr int) ([]Font, error) {
 	ff := []Font{}
-	for _, i := range ctx.FontObjNrs(pageNr) {
-		f, err := ctx.ExtractFont(i)
+	for _, i := range FontObjNrs(ctx, pageNr) {
+		fontObject := ctx.Optimize.FontObjects[i]
+		f, err := ExtractFont(ctx, *fontObject, i)
+		if err != nil {
+			return nil, err
+		}
+		if f != nil {
+			ff = append(ff, *f)
+		}
+	}
+	return ff, nil
+}
+
+// ExtractPageFonts extracts all form fonts.
+func ExtractFormFonts(ctx *model.Context) ([]Font, error) {
+	ff := []Font{}
+	for i, fontObject := range ctx.Optimize.FormFontObjects {
+		f, err := ExtractFont(ctx, *fontObject, i)
 		if err != nil {
 			return nil, err
 		}
@@ -503,13 +536,13 @@ func (ctx *Context) ExtractPageFonts(pageNr int) ([]Font, error) {
 }
 
 // ExtractPage extracts pageNr into a new single page context.
-func (ctx *Context) ExtractPage(pageNr int) (*Context, error) {
-	return ctx.ExtractPages([]int{pageNr}, false)
+func ExtractPage(ctx *model.Context, pageNr int) (*model.Context, error) {
+	return ExtractPages(ctx, []int{pageNr}, false)
 }
 
 // ExtractPages extracts pageNrs into a new single page context.
-func (ctx *Context) ExtractPages(pageNrs []int, usePgCache bool) (*Context, error) {
-	ctxDest, err := CreateContextWithXRefTable(nil, PaperSize["A4"])
+func ExtractPages(ctx *model.Context, pageNrs []int, usePgCache bool) (*model.Context, error) {
+	ctxDest, err := CreateContextWithXRefTable(nil, types.PaperSize["A4"])
 	if err != nil {
 		return nil, err
 	}
@@ -522,14 +555,14 @@ func (ctx *Context) ExtractPages(pageNrs []int, usePgCache bool) (*Context, erro
 }
 
 // ExtractPageContent extracts the consolidated page content stream for pageNr.
-func (ctx *Context) ExtractPageContent(pageNr int) (io.Reader, error) {
+func ExtractPageContent(ctx *model.Context, pageNr int) (io.Reader, error) {
 	consolidateRes := false
 	d, _, _, err := ctx.PageDict(pageNr, consolidateRes)
 	if err != nil {
 		return nil, err
 	}
 	bb, err := ctx.PageContent(d)
-	if err != nil && err != errNoContent {
+	if err != nil && err != model.ErrNoContent {
 		return nil, err
 	}
 	return bytes.NewReader(bb), nil
@@ -543,7 +576,7 @@ type Metadata struct {
 	ParentType  string // container dict type
 }
 
-func extractMetadataFromDict(ctx *Context, d Dict, parentObjNr int) (*Metadata, error) {
+func extractMetadataFromDict(ctx *model.Context, d types.Dict, parentObjNr int) (*Metadata, error) {
 	o, found := d.Find("Metadata")
 	if !found || o == nil {
 		return nil, nil
@@ -556,7 +589,7 @@ func extractMetadataFromDict(ctx *Context, d Dict, parentObjNr int) (*Metadata, 
 		return nil, nil
 	}
 	// Get metadata dict object number.
-	ir, _ := o.(IndirectRef)
+	ir, _ := o.(types.IndirectRef)
 	mdObjNr := ir.ObjectNumber.Value()
 	// Get container dict type.
 	dt := "unknown"
@@ -574,14 +607,14 @@ func extractMetadataFromDict(ctx *Context, d Dict, parentObjNr int) (*Metadata, 
 }
 
 // ExtractMetadata returns all metadata of ctx.
-func (ctx *Context) ExtractMetadata() ([]Metadata, error) {
+func ExtractMetadata(ctx *model.Context) ([]Metadata, error) {
 	mm := []Metadata{}
 	for k, v := range ctx.Table {
 		if v.Free || v.Compressed {
 			continue
 		}
 		switch d := v.Object.(type) {
-		case Dict:
+		case types.Dict:
 			md, err := extractMetadataFromDict(ctx, d, k)
 			if err != nil {
 				return nil, err
@@ -591,7 +624,7 @@ func (ctx *Context) ExtractMetadata() ([]Metadata, error) {
 			}
 			mm = append(mm, *md)
 
-		case StreamDict:
+		case types.StreamDict:
 			md, err := extractMetadataFromDict(ctx, d.Dict, k)
 			if err != nil {
 				return nil, err

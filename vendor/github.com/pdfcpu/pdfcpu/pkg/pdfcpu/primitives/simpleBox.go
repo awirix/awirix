@@ -20,10 +20,15 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/color"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/draw"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/matrix"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 	"github.com/pkg/errors"
 )
 
+// SimpleBox is a positioned rectangular region within content.
 type SimpleBox struct {
 	pdf       *PDF
 	content   *Content
@@ -32,14 +37,14 @@ type SimpleBox struct {
 	x, y      float64
 	Dx, Dy    float64
 	Anchor    string
-	anchor    pdfcpu.Anchor
+	anchor    types.Anchor
 	anchored  bool
 	Width     float64
 	Height    float64
 	Margin    *Margin
 	Border    *Border
 	FillColor string `json:"fillCol"`
-	fillCol   *pdfcpu.SimpleColor
+	fillCol   *color.SimpleColor
 	Rotation  float64 `json:"rot"`
 	Hide      bool
 }
@@ -57,7 +62,7 @@ func (sb *SimpleBox) validate() error {
 		if sb.Position[0] != 0 || sb.Position[1] != 0 {
 			return errors.New("pdfcpu: Please supply \"pos\" or \"anchor\"")
 		}
-		a, err := pdfcpu.ParseAnchor(sb.Anchor)
+		a, err := types.ParseAnchor(sb.Anchor)
 		if err != nil {
 			return err
 		}
@@ -139,11 +144,10 @@ func (sb *SimpleBox) mergeIn(sb0 *SimpleBox) {
 	}
 }
 
-func (sb *SimpleBox) render(p *pdfcpu.Page) error {
-	pdf := sb.content.page.pdf
+func (sb *SimpleBox) calcBorder() (float64, *color.SimpleColor, types.LineJoinStyle, error) {
 	bWidth := 0.
-	var bCol *pdfcpu.SimpleColor
-	bStyle := pdfcpu.LJMiter
+	var bCol *color.SimpleColor
+	bStyle := types.LJMiter
 	if sb.Border != nil {
 		b := sb.Border
 		if b.Name != "" && b.Name[0] == '$' {
@@ -151,7 +155,7 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 			bName := b.Name[1:]
 			b0 := sb.border(bName)
 			if b0 == nil {
-				return errors.Errorf("pdfcpu: unknown named border %s", bName)
+				return bWidth, bCol, bStyle, errors.Errorf("pdfcpu: unknown named border %s", bName)
 			}
 			b.mergeIn(b0)
 		}
@@ -163,7 +167,10 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 			bStyle = b.style
 		}
 	}
+	return bWidth, bCol, bStyle, nil
+}
 
+func (sb *SimpleBox) calcMargin() (float64, float64, float64, float64, error) {
 	mTop, mRight, mBottom, mLeft := 0., 0., 0., 0.
 	if sb.Margin != nil {
 		m := sb.Margin
@@ -172,11 +179,10 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 			mName := m.Name[1:]
 			m0 := sb.margin(mName)
 			if m0 == nil {
-				return errors.Errorf("pdfcpu: unknown named margin %s", mName)
+				return mTop, mRight, mBottom, mLeft, errors.Errorf("pdfcpu: unknown named margin %s", mName)
 			}
 			m.mergeIn(m0)
 		}
-
 		if m.Width > 0 {
 			mTop = m.Width
 			mRight = m.Width
@@ -189,7 +195,11 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 			mLeft = m.Left
 		}
 	}
+	return mTop, mRight, mBottom, mLeft, nil
+}
 
+func (sb *SimpleBox) calcTransform(mLeft, mBottom, mRight, mTop, bWidth float64) (matrix.Matrix, *types.Rectangle) {
+	pdf := sb.content.page.pdf
 	cBox := sb.content.Box()
 	r := sb.content.Box().CroppedCopy(0)
 	r.LL.X += mLeft
@@ -199,9 +209,9 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 
 	var x, y float64
 	if sb.anchored {
-		x, y = pdfcpu.AnchorPosition(sb.anchor, r, sb.Width, sb.Height)
+		x, y = types.AnchorPosition(sb.anchor, r, sb.Width, sb.Height)
 	} else {
-		x, y = pdfcpu.NormalizeCoord(sb.x, sb.y, cBox, pdf.origin, false)
+		x, y = types.NormalizeCoord(sb.x, sb.y, cBox, pdf.origin, false)
 		if y < 0 {
 			y = cBox.Center().Y - sb.Height/2 - r.LL.Y
 		} else if y > 0 {
@@ -214,7 +224,7 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 		}
 	}
 
-	dx, dy := pdfcpu.NormalizeOffset(sb.Dx, sb.Dy, pdf.origin)
+	dx, dy := types.NormalizeOffset(sb.Dx, sb.Dy, pdf.origin)
 	x += r.LL.X + dx
 	y += r.LL.Y + dy
 
@@ -230,32 +240,56 @@ func (sb *SimpleBox) render(p *pdfcpu.Page) error {
 		y = r.UR.Y - sb.Height
 	}
 
-	r = pdfcpu.RectForWidthAndHeight(x, y, sb.Width, sb.Height)
+	r = types.RectForWidthAndHeight(x, y, sb.Width, sb.Height)
 	r.LL.X += bWidth / 2
 	r.LL.Y += bWidth / 2
 	r.UR.X -= bWidth / 2
 	r.UR.Y -= bWidth / 2
 
-	sin := math.Sin(float64(sb.Rotation) * float64(pdfcpu.DegToRad))
-	cos := math.Cos(float64(sb.Rotation) * float64(pdfcpu.DegToRad))
+	sin := math.Sin(float64(sb.Rotation) * float64(matrix.DegToRad))
+	cos := math.Cos(float64(sb.Rotation) * float64(matrix.DegToRad))
 
 	dx = r.LL.X
 	dy = r.LL.Y
 	r.Translate(-r.LL.X, -r.LL.Y)
 
-	dx += sb.Dx + r.Width()/2 + sin*(r.Height()/2) - cos*r.Width()/2
-	dy += sb.Dy + r.Height()/2 - cos*(r.Height()/2) - sin*r.Width()/2
+	dx += r.Width()/2 + sin*(r.Height()/2) - cos*r.Width()/2
+	dy += r.Height()/2 - cos*(r.Height()/2) - sin*r.Width()/2
 
-	m := pdfcpu.CalcTransformMatrix(1, 1, sin, cos, dx, dy)
+	m := matrix.CalcTransformMatrix(1, 1, sin, cos, dx, dy)
+
+	return m, r
+}
+
+func (sb *SimpleBox) render(p *model.Page) error {
+
+	bWidth, bCol, bStyle, err := sb.calcBorder()
+	if err != nil {
+		return err
+	}
+
+	mTop, mRight, mBottom, mLeft, err := sb.calcMargin()
+	if err != nil {
+		return err
+	}
+
+	m, r := sb.calcTransform(mTop, mRight, mBottom, mLeft, bWidth)
+
 	fmt.Fprintf(p.Buf, "q %.2f %.2f %.2f %.2f %.2f %.2f cm ", m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1])
 
 	if sb.fillCol != nil {
-		pdfcpu.FillRect(p.Buf, r, bWidth, bCol, *sb.fillCol, &bStyle)
+		draw.FillRect(p.Buf, r, bWidth, bCol, *sb.fillCol, &bStyle)
+		if sb.pdf.Debug {
+			draw.DrawCircle(p.Buf, r.LL.X, r.LL.Y, 5, color.Black, &color.Red)
+		}
 		fmt.Fprint(p.Buf, "Q ")
 		return nil
 	}
 
-	pdfcpu.DrawRect(p.Buf, r, bWidth, bCol, &bStyle)
+	draw.DrawRect(p.Buf, r, bWidth, bCol, &bStyle)
+	if sb.pdf.Debug {
+		draw.DrawCircle(p.Buf, r.LL.X, r.LL.Y, 5, color.Black, &color.Red)
+	}
 	fmt.Fprint(p.Buf, "Q ")
 	return nil
 }

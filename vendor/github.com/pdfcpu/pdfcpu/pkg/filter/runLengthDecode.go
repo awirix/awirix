@@ -19,7 +19,6 @@ package filter
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
 )
 
 type runLengthDecode struct {
@@ -49,8 +48,6 @@ func (f runLengthDecode) decode(w io.ByteWriter, src []byte) {
 		}
 		i++
 	}
-
-	return
 }
 
 func (f runLengthDecode) encode(w io.ByteWriter, src []byte) {
@@ -74,7 +71,7 @@ func (f runLengthDecode) encode(w io.ByteWriter, src []byte) {
 			w.WriteByte(byte(257 - c))
 			w.WriteByte(b)
 			if i == len(src) {
-				w.WriteByte(0x80)
+				w.WriteByte(eod)
 				return
 			}
 			b = src[i]
@@ -94,7 +91,7 @@ func (f runLengthDecode) encode(w io.ByteWriter, src []byte) {
 				w.WriteByte(src[start+j])
 			}
 			if i == len(src) {
-				w.WriteByte(0x80)
+				w.WriteByte(eod)
 				return
 			}
 		} else {
@@ -115,27 +112,27 @@ func (f runLengthDecode) encode(w io.ByteWriter, src []byte) {
 // Encode implements encoding for a RunLengthDecode filter.
 func (f runLengthDecode) Encode(r io.Reader) (io.Reader, error) {
 
-	p, err := ioutil.ReadAll(r)
-	if err != nil {
+	var b1 bytes.Buffer
+	if _, err := io.Copy(&b1, r); err != nil {
 		return nil, err
 	}
 
-	var b bytes.Buffer
-	f.encode(&b, p)
+	var b2 bytes.Buffer
+	f.encode(&b2, b1.Bytes())
 
-	return &b, nil
+	return &b2, nil
 }
 
 // Decode implements decoding for an RunLengthDecode filter.
 func (f runLengthDecode) Decode(r io.Reader) (io.Reader, error) {
 
-	p, err := ioutil.ReadAll(r)
-	if err != nil {
+	var b1 bytes.Buffer
+	if _, err := io.Copy(&b1, r); err != nil {
 		return nil, err
 	}
 
-	var b bytes.Buffer
-	f.decode(&b, p)
+	var b2 bytes.Buffer
+	f.decode(&b2, b1.Bytes())
 
-	return &b, nil
+	return &b2, nil
 }

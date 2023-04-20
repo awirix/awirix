@@ -3,16 +3,18 @@
 github.com/AlecAivazis/survey/v2
 github.com/AlecAivazis/survey/v2/core
 github.com/AlecAivazis/survey/v2/terminal
-# github.com/JohannesKaufmann/html-to-markdown v1.3.6
+# github.com/JohannesKaufmann/html-to-markdown v1.3.7
 ## explicit; go 1.13
 github.com/JohannesKaufmann/html-to-markdown
 github.com/JohannesKaufmann/html-to-markdown/escape
-# github.com/Microsoft/go-winio v0.6.0
+# github.com/Microsoft/go-winio v0.6.1
 ## explicit; go 1.17
 github.com/Microsoft/go-winio
+github.com/Microsoft/go-winio/internal/fs
 github.com/Microsoft/go-winio/internal/socket
+github.com/Microsoft/go-winio/internal/stringbuffer
 github.com/Microsoft/go-winio/pkg/guid
-# github.com/ProtonMail/go-crypto v0.0.0-20230217124315-7d5c6f04bbb8
+# github.com/ProtonMail/go-crypto v0.0.0-20230417170513-8ee5748c52b5
 ## explicit; go 1.13
 github.com/ProtonMail/go-crypto/bitcurves
 github.com/ProtonMail/go-crypto/brainpool
@@ -74,7 +76,7 @@ github.com/alecthomas/chroma/lexers/y
 github.com/alecthomas/chroma/lexers/z
 github.com/alecthomas/chroma/quick
 github.com/alecthomas/chroma/styles
-# github.com/andybalholm/cascadia v1.3.1
+# github.com/andybalholm/cascadia v1.3.2
 ## explicit; go 1.16
 github.com/andybalholm/cascadia
 # github.com/atotto/clipboard v0.1.4
@@ -97,12 +99,14 @@ github.com/awirix/lua/pm
 github.com/awirix/templates
 # github.com/aymanbagabas/go-osc52 v1.2.2
 ## explicit; go 1.16
-github.com/aymanbagabas/go-osc52
+# github.com/aymanbagabas/go-osc52/v2 v2.0.1
+## explicit; go 1.16
+github.com/aymanbagabas/go-osc52/v2
 # github.com/aymerick/douceur v0.2.0
 ## explicit
 github.com/aymerick/douceur/css
 github.com/aymerick/douceur/parser
-# github.com/briandowns/spinner v1.22.0
+# github.com/briandowns/spinner v1.23.0
 ## explicit; go 1.17
 github.com/briandowns/spinner
 # github.com/charmbracelet/bubbles v0.15.0
@@ -123,8 +127,8 @@ github.com/charmbracelet/bubbletea
 ## explicit; go 1.13
 github.com/charmbracelet/glamour
 github.com/charmbracelet/glamour/ansi
-# github.com/charmbracelet/lipgloss v0.6.0
-## explicit; go 1.15
+# github.com/charmbracelet/lipgloss v0.7.1
+## explicit; go 1.17
 github.com/charmbracelet/lipgloss
 # github.com/cixtor/readability v1.0.0
 ## explicit
@@ -146,7 +150,7 @@ github.com/cloudflare/circl/sign/ed448
 # github.com/containerd/console v1.0.3
 ## explicit; go 1.13
 github.com/containerd/console
-# github.com/dlclark/regexp2 v1.8.1
+# github.com/dlclark/regexp2 v1.9.0
 ## explicit; go 1.13
 github.com/dlclark/regexp2
 github.com/dlclark/regexp2/syntax
@@ -161,7 +165,7 @@ github.com/emirpasic/gods/utils
 # github.com/enescakir/emoji v1.0.0
 ## explicit; go 1.13
 github.com/enescakir/emoji
-# github.com/fatih/color v1.14.1
+# github.com/fatih/color v1.15.0
 ## explicit; go 1.17
 github.com/fatih/color
 # github.com/fsnotify/fsnotify v1.6.0
@@ -181,7 +185,7 @@ github.com/go-git/go-billy/v5/helper/polyfill
 github.com/go-git/go-billy/v5/memfs
 github.com/go-git/go-billy/v5/osfs
 github.com/go-git/go-billy/v5/util
-# github.com/go-git/go-git/v5 v5.5.2
+# github.com/go-git/go-git/v5 v5.6.1
 ## explicit; go 1.13
 github.com/go-git/go-git/v5
 github.com/go-git/go-git/v5/config
@@ -248,13 +252,13 @@ github.com/hashicorp/hcl/hcl/token
 github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
-# github.com/hhrutter/lzw v0.0.0-20190829144645-6f07a24e8650
-## explicit; go 1.12
+# github.com/hhrutter/lzw v1.0.0
+## explicit; go 1.19
 github.com/hhrutter/lzw
-# github.com/hhrutter/tiff v0.0.0-20190829141212-736cae8d0bc7
-## explicit; go 1.12
+# github.com/hhrutter/tiff v1.0.0
+## explicit; go 1.19
 github.com/hhrutter/tiff
-# github.com/imdario/mergo v0.3.13
+# github.com/imdario/mergo v0.3.15
 ## explicit; go 1.13
 github.com/imdario/mergo
 # github.com/inconshreveable/mousetrap v1.1.0
@@ -278,7 +282,7 @@ github.com/kevinburke/ssh_config
 # github.com/lithammer/fuzzysearch v1.1.5
 ## explicit; go 1.15
 github.com/lithammer/fuzzysearch/fuzzy
-# github.com/lrstanley/bubblezone v0.0.0-20221222153816-e95291e2243e
+# github.com/lrstanley/bubblezone v0.0.0-20230303230241-08f906ff62a9
 ## explicit; go 1.19
 github.com/lrstanley/bubblezone
 # github.com/lucasb-eyer/go-colorful v1.2.0
@@ -290,7 +294,7 @@ github.com/magiconair/properties
 # github.com/mattn/go-colorable v0.1.13
 ## explicit; go 1.15
 github.com/mattn/go-colorable
-# github.com/mattn/go-isatty v0.0.17
+# github.com/mattn/go-isatty v0.0.18
 ## explicit; go 1.15
 github.com/mattn/go-isatty
 # github.com/mattn/go-localereader v0.0.1
@@ -305,14 +309,14 @@ github.com/metafates/gache
 # github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d
 ## explicit
 github.com/mgutz/ansi
-# github.com/microcosm-cc/bluemonday v1.0.22
+# github.com/microcosm-cc/bluemonday v1.0.23
 ## explicit; go 1.19
 github.com/microcosm-cc/bluemonday
 github.com/microcosm-cc/bluemonday/css
 # github.com/mitchellh/mapstructure v1.5.0
 ## explicit; go 1.14
 github.com/mitchellh/mapstructure
-# github.com/muesli/ansi v0.0.0-20221106050444-61f0cd9a192a
+# github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6
 ## explicit; go 1.17
 github.com/muesli/ansi
 github.com/muesli/ansi/compressor
@@ -327,8 +331,8 @@ github.com/muesli/reflow/padding
 github.com/muesli/reflow/truncate
 github.com/muesli/reflow/wordwrap
 github.com/muesli/reflow/wrap
-# github.com/muesli/termenv v0.14.0
-## explicit; go 1.13
+# github.com/muesli/termenv v0.15.1
+## explicit; go 1.17
 github.com/muesli/termenv
 # github.com/mvdan/xurls v1.1.0
 ## explicit
@@ -336,22 +340,29 @@ github.com/mvdan/xurls
 # github.com/olekukonko/tablewriter v0.0.5
 ## explicit; go 1.12
 github.com/olekukonko/tablewriter
-# github.com/pdfcpu/pdfcpu v0.3.13
-## explicit; go 1.17
+# github.com/pdfcpu/pdfcpu v0.4.0
+## explicit; go 1.20
 github.com/pdfcpu/pdfcpu/internal/corefont/metrics
 github.com/pdfcpu/pdfcpu/pkg/api
 github.com/pdfcpu/pdfcpu/pkg/filter
 github.com/pdfcpu/pdfcpu/pkg/font
 github.com/pdfcpu/pdfcpu/pkg/log
 github.com/pdfcpu/pdfcpu/pkg/pdfcpu
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/color
 github.com/pdfcpu/pdfcpu/pkg/pdfcpu/create
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/draw
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/font
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/form
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/format
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/matrix
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model
 github.com/pdfcpu/pdfcpu/pkg/pdfcpu/primitives
+github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types
 github.com/pdfcpu/pdfcpu/pkg/pdfcpu/validate
-github.com/pdfcpu/pdfcpu/pkg/types
 # github.com/pelletier/go-toml v1.9.5
 ## explicit; go 1.12
 github.com/pelletier/go-toml
-# github.com/pelletier/go-toml/v2 v2.0.6
+# github.com/pelletier/go-toml/v2 v2.0.7
 ## explicit; go 1.16
 github.com/pelletier/go-toml/v2
 github.com/pelletier/go-toml/v2/internal/characters
@@ -361,7 +372,6 @@ github.com/pelletier/go-toml/v2/unstable
 # github.com/pjbgf/sha1cd v0.3.0
 ## explicit; go 1.19
 github.com/pjbgf/sha1cd
-github.com/pjbgf/sha1cd/cgo
 github.com/pjbgf/sha1cd/internal
 github.com/pjbgf/sha1cd/ubc
 # github.com/pkg/errors v0.9.1
@@ -382,7 +392,7 @@ github.com/robertkrimen/otto/token
 # github.com/sahilm/fuzzy v0.1.0
 ## explicit
 github.com/sahilm/fuzzy
-# github.com/samber/lo v1.37.0
+# github.com/samber/lo v1.38.1
 ## explicit; go 1.18
 github.com/samber/lo
 # github.com/samber/mo v1.8.0
@@ -397,7 +407,7 @@ github.com/sirupsen/logrus
 # github.com/skeema/knownhosts v1.1.0
 ## explicit; go 1.17
 github.com/skeema/knownhosts
-# github.com/spf13/afero v1.9.4
+# github.com/spf13/afero v1.9.5
 ## explicit; go 1.16
 github.com/spf13/afero
 github.com/spf13/afero/internal/common
@@ -405,7 +415,7 @@ github.com/spf13/afero/mem
 # github.com/spf13/cast v1.5.0
 ## explicit; go 1.18
 github.com/spf13/cast
-# github.com/spf13/cobra v1.6.1
+# github.com/spf13/cobra v1.7.0
 ## explicit; go 1.15
 github.com/spf13/cobra
 # github.com/spf13/jwalterweatherman v1.1.0
@@ -447,8 +457,10 @@ github.com/yuin/goldmark/util
 github.com/yuin/goldmark-emoji
 github.com/yuin/goldmark-emoji/ast
 github.com/yuin/goldmark-emoji/definition
-# golang.org/x/crypto v0.6.0
+# golang.org/x/crypto v0.8.0
 ## explicit; go 1.17
+golang.org/x/crypto/argon2
+golang.org/x/crypto/blake2b
 golang.org/x/crypto/blowfish
 golang.org/x/crypto/cast5
 golang.org/x/crypto/chacha20
@@ -469,21 +481,21 @@ golang.org/x/crypto/ssh
 golang.org/x/crypto/ssh/agent
 golang.org/x/crypto/ssh/internal/bcrypt_pbkdf
 golang.org/x/crypto/ssh/knownhosts
-# golang.org/x/exp v0.0.0-20230224173230-c95f2b4c22f2
-## explicit; go 1.18
+# golang.org/x/exp v0.0.0-20230420155640-133eef4313cb
+## explicit; go 1.20
 golang.org/x/exp/constraints
 golang.org/x/exp/slices
-# golang.org/x/image v0.5.0
+# golang.org/x/image v0.7.0
 ## explicit; go 1.12
 golang.org/x/image/ccitt
 golang.org/x/image/riff
 golang.org/x/image/vp8
 golang.org/x/image/vp8l
 golang.org/x/image/webp
-# golang.org/x/mod v0.8.0
+# golang.org/x/mod v0.10.0
 ## explicit; go 1.17
 golang.org/x/mod/semver
-# golang.org/x/net v0.7.0
+# golang.org/x/net v0.9.0
 ## explicit; go 1.17
 golang.org/x/net/context
 golang.org/x/net/html
@@ -493,7 +505,7 @@ golang.org/x/net/proxy
 # golang.org/x/sync v0.1.0
 ## explicit
 golang.org/x/sync/errgroup
-# golang.org/x/sys v0.5.0
+# golang.org/x/sys v0.7.0
 ## explicit; go 1.17
 golang.org/x/sys/cpu
 golang.org/x/sys/execabs
@@ -501,10 +513,10 @@ golang.org/x/sys/internal/unsafeheader
 golang.org/x/sys/plan9
 golang.org/x/sys/unix
 golang.org/x/sys/windows
-# golang.org/x/term v0.5.0
+# golang.org/x/term v0.7.0
 ## explicit; go 1.17
 golang.org/x/term
-# golang.org/x/text v0.7.0
+# golang.org/x/text v0.9.0
 ## explicit; go 1.17
 golang.org/x/text/feature/plural
 golang.org/x/text/internal
@@ -523,12 +535,13 @@ golang.org/x/text/runes
 golang.org/x/text/transform
 golang.org/x/text/unicode/norm
 golang.org/x/text/width
-# golang.org/x/tools v0.6.0
+# golang.org/x/tools v0.8.0
 ## explicit; go 1.18
 golang.org/x/tools/cmd/stringer
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/packagesdriver
 golang.org/x/tools/go/packages
+golang.org/x/tools/go/types/objectpath
 golang.org/x/tools/internal/event
 golang.org/x/tools/internal/event/core
 golang.org/x/tools/internal/event/keys

@@ -18,31 +18,43 @@ package primitives
 
 import (
 	"fmt"
+	"io"
 	"math"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
-	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu"
+	"github.com/pdfcpu/pdfcpu/pkg/log"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/color"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/draw"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/matrix"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 	"github.com/pkg/errors"
 )
 
+// ImageData represents a more direct way for providing image data for form filling scenarios.
 type ImageData struct {
 	Payload       string // base64 encoded image data
 	Format        string // jpeg, png, webp, tiff, ccitt
 	Width, Height int
 }
+
+// ImageBox is a rectangular region within content containing an image.
 type ImageBox struct {
 	pdf             *PDF
 	content         *Content
 	Name            string
-	FileName        string     `json:"file"` // path of image file name
-	Data            *ImageData // TODO
+	Src             string     `json:"src"` // path of image file name
+	Data            *ImageData // TODO Implement
 	Position        [2]float64 `json:"pos"` // x,y
 	x, y            float64
 	Dx, Dy          float64
-	dest            *pdfcpu.Rectangle
+	dest            *types.Rectangle
 	Anchor          string
-	anchor          pdfcpu.Anchor
+	anchor          types.Anchor
 	anchored        bool
 	Width           float64
 	Height          float64
@@ -50,10 +62,11 @@ type ImageBox struct {
 	Border          *Border
 	Padding         *Padding
 	BackgroundColor string `json:"bgCol"`
-	bgCol           *pdfcpu.SimpleColor
+	bgCol           *color.SimpleColor
 	Rotation        float64 `json:"rot"`
 	Url             string
 	Hide            bool
+	PageNr          string `json:"-"`
 }
 
 func (ib *ImageBox) resolveFileName(s string) (string, error) {
@@ -69,6 +82,14 @@ func (ib *ImageBox) resolveFileName(s string) (string, error) {
 	return ib.pdf.resolveFileName(varName)
 }
 
+func (ib *ImageBox) parseAnchor() (types.Anchor, error) {
+	if ib.Position[0] != 0 || ib.Position[1] != 0 {
+		var a types.Anchor
+		return a, errors.New("pdfcpu: Please supply \"pos\" or \"anchor\"")
+	}
+	return types.ParseAnchor(ib.Anchor)
+}
+
 func (ib *ImageBox) validate() error {
 
 	ib.x = ib.Position[0]
@@ -80,19 +101,16 @@ func (ib *ImageBox) validate() error {
 
 	// TODO Validate width, height inside content box
 
-	if ib.FileName != "" {
-		s, err := ib.resolveFileName(ib.FileName)
+	if ib.Src != "" {
+		s, err := ib.resolveFileName(ib.Src)
 		if err != nil {
 			return err
 		}
-		ib.FileName = s
+		ib.Src = s
 	}
 
 	if ib.Anchor != "" {
-		if ib.Position[0] != 0 || ib.Position[1] != 0 {
-			return errors.New("pdfcpu: Please supply \"pos\" or \"anchor\"")
-		}
-		a, err := pdfcpu.ParseAnchor(ib.Anchor)
+		a, err := ib.parseAnchor()
 		if err != nil {
 			return err
 		}
@@ -162,6 +180,10 @@ func (ib *ImageBox) mergeIn(ib0 *ImageBox) {
 		ib.Width = ib0.Width
 	}
 
+	if ib.Height == 0 {
+		ib.Height = ib0.Height
+	}
+
 	if ib.Margin == nil {
 		ib.Margin = ib0.Margin
 	}
@@ -174,8 +196,8 @@ func (ib *ImageBox) mergeIn(ib0 *ImageBox) {
 		ib.Padding = ib0.Padding
 	}
 
-	if ib.FileName == "" && ib.Data == nil {
-		ib.FileName = ib0.FileName
+	if ib.Src == "" && ib.Data == nil {
+		ib.Src = ib0.Src
 		ib.Data = ib0.Data
 	}
 
@@ -193,72 +215,98 @@ func (ib *ImageBox) mergeIn(ib0 *ImageBox) {
 
 }
 
-func (ib *ImageBox) image(pageImages, images pdfcpu.ImageMap, pageNr int) (int, int, string, error) {
+func (ib *ImageBox) cachedImg(img model.ImageResource, pageImages model.ImageMap, pageNr int) (int, int, string, error) {
+	imgResIDs := ib.pdf.XObjectResIDs[pageNr]
+	img.Res.ID = "Im" + strconv.Itoa(len(pageImages))
+	if ib.pdf.Update() {
+		var id string
+		for k, v := range imgResIDs {
+			if v == img.Res.IndRef {
+				id = k
+				break
+			}
+		}
+		if id == "" {
+			id = imgResIDs.NewIDForPrefix("Im", len(pageImages))
+		}
+		img.Res.ID = id
+	}
+	pageImages[ib.Src] = img
+
+	return img.Width, img.Height, img.Res.ID, nil
+}
+
+func (ib *ImageBox) checkForExistingImage(sd *types.StreamDict, w, h int) (*types.IndirectRef, error) {
+	// For each existing image in xRefTable with matching w,h check for byte level identity.
+	for objNr, io := range ib.pdf.Optimize.ImageObjects {
+		d := io.ImageDict.Dict
+		if w != *d.IntEntry("Width") || h != *d.IntEntry("Height") {
+			continue
+		}
+		// compare decoded content from sd and io.ImageDict
+		ok, err := model.EqualObjects(*sd, *io.ImageDict, ib.pdf.XRefTable)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			// If identical create indRef for objNr
+			return types.NewIndirectRef(objNr, 0), nil
+		}
+	}
+	return nil, nil
+}
+
+func (ib *ImageBox) imageResource(pageImages, images model.ImageMap, pageNr int) (*model.ImageResource, error) {
+
+	var err error
+	pdf := ib.pdf
+	imgResIDs := pdf.XObjectResIDs[pageNr]
+
+	var f io.ReadCloser
+	if strings.HasPrefix(ib.Src, "http") {
+		client := pdf.httpClient
+		if client == nil {
+			pdf.httpClient = &http.Client{
+				Timeout: 10 * time.Second,
+			}
+			client = pdf.httpClient
+		}
+		resp, err := client.Get(ib.Src)
+		if err != nil {
+			log.CLI.Printf("%v: %s\n", err, ib.Src)
+			return nil, err
+		}
+		if resp.StatusCode != 200 {
+			log.CLI.Printf("http status %d: %s\n", resp.StatusCode, ib.Src)
+			return nil, nil
+		}
+		defer resp.Body.Close()
+		f = resp.Body
+	} else {
+		f, err = os.Open(ib.Src)
+		if err != nil {
+			return nil, err
+		}
+		defer f.Close()
+	}
+
 	var (
 		w, h   int
 		id     string
-		indRef *pdfcpu.IndirectRef
+		indRef *types.IndirectRef
+		sd     *types.StreamDict
 	)
 
-	img, ok := pageImages[ib.FileName]
-	if ok {
-		return img.Width, img.Height, img.Res.ID, nil
-	}
+	if ib.pdf.Update() {
 
-	imgResIDs := ib.pdf.XObjectResIDs[pageNr]
-
-	img, ok = images[ib.FileName]
-	if ok {
-		img.Res.ID = "Im" + strconv.Itoa(len(pageImages))
-		if ib.pdf.Optimize != nil {
-			var id string
-			for k, v := range imgResIDs {
-				if v == img.Res.IndRef {
-					id = k
-					break
-				}
-			}
-			if id == "" {
-				id = imgResIDs.NewIDForPrefix("Im", len(pageImages))
-			}
-			img.Res.ID = id
-		}
-		pageImages[ib.FileName] = img
-		return img.Width, img.Height, img.Res.ID, nil
-	}
-
-	f, err := os.Open(ib.FileName)
-	if err != nil {
-		return w, h, id, err
-	}
-	defer f.Close()
-
-	var sd *pdfcpu.StreamDict
-
-	if ib.pdf.Optimize != nil {
-
-		// PDF file update
-		sd, w, h, err = pdfcpu.CreateImageStreamDict(ib.pdf.XRefTable, f, false, false)
+		sd, w, h, err = model.CreateImageStreamDict(ib.pdf.XRefTable, f, false, false)
 		if err != nil {
-			return w, h, id, err
+			return nil, err
 		}
 
-		// For each existing image in xRefTable with matching w,h check for byte level identity.
-		for objNr, io := range ib.pdf.Optimize.ImageObjects {
-			d := io.ImageDict.Dict
-			if w != *d.IntEntry("Width") || h != *d.IntEntry("Height") {
-				continue
-			}
-			// compare decoded content from sd and io.ImageDict
-			ok, err := pdfcpu.EqualObjects(*sd, *io.ImageDict, ib.pdf.XRefTable)
-			if err != nil {
-				return w, h, id, err
-			}
-			if ok {
-				// If identical create indRef for objNr
-				indRef = pdfcpu.NewIndirectRef(objNr, 0)
-				break
-			}
+		indRef, err := ib.checkForExistingImage(sd, w, h)
+		if err != nil {
+			return nil, err
 		}
 
 		if indRef != nil {
@@ -276,46 +324,68 @@ func (ib *ImageBox) image(pageImages, images pdfcpu.ImageMap, pageNr int) (int, 
 	}
 
 	if indRef == nil {
-		if ib.pdf.Optimize != nil {
+		if ib.pdf.Update() {
 			indRef, err = ib.pdf.XRefTable.IndRefForNewObject(*sd)
 			if err != nil {
-				return w, h, id, err
+				return nil, err
 			}
 			id = imgResIDs.NewIDForPrefix("Im", len(pageImages))
 		} else {
-			indRef, w, h, err = pdfcpu.CreateImageResource(ib.pdf.XRefTable, f, false, false)
+			indRef, w, h, err = model.CreateImageResource(ib.pdf.XRefTable, f, false, false)
 			if err != nil {
-				return w, h, id, err
+				return nil, err
 			}
 			id = "Im" + strconv.Itoa(len(pageImages))
 		}
 	}
 
-	res := pdfcpu.Resource{ID: id, IndRef: indRef}
-	img = pdfcpu.ImageResource{Res: res, Width: w, Height: h}
-	images[ib.FileName] = img
-	pageImages[ib.FileName] = img
-
-	return w, h, id, nil
+	res := model.Resource{ID: id, IndRef: indRef}
+	imgRes := model.ImageResource{Res: res, Width: w, Height: h}
+	return &imgRes, nil
 }
 
-func (ib *ImageBox) createLink(p *pdfcpu.Page, pageNr int, r *pdfcpu.Rectangle, m pdfcpu.Matrix) {
+func (ib *ImageBox) image(pageImages, images model.ImageMap, pageNr int) (int, int, string, error) {
 
-	p1 := m.Transform(pdfcpu.Point{X: r.LL.X, Y: r.LL.Y})
-	p2 := m.Transform(pdfcpu.Point{X: r.UR.X, Y: r.LL.X})
-	p3 := m.Transform(pdfcpu.Point{X: r.UR.X, Y: r.UR.Y})
-	p4 := m.Transform(pdfcpu.Point{X: r.LL.X, Y: r.UR.Y})
+	img, ok := pageImages[ib.Src]
+	if ok {
+		return img.Width, img.Height, img.Res.ID, nil
+	}
 
-	ql := pdfcpu.QuadLiteral{P1: p1, P2: p2, P3: p3, P4: p4}
+	img, ok = images[ib.Src]
+	if ok {
+		return ib.cachedImg(img, pageImages, pageNr)
+	}
+
+	imgRes, err := ib.imageResource(pageImages, images, pageNr)
+	if err != nil || imgRes == nil {
+		return 0, 0, "", nil
+	}
+
+	images[ib.Src] = *imgRes
+	pageImages[ib.Src] = *imgRes
+
+	return imgRes.Width, imgRes.Height, imgRes.Res.ID, nil
+}
+
+func (ib *ImageBox) createLink(p *model.Page, pageNr int, r *types.Rectangle, m matrix.Matrix) {
+
+	p1 := m.Transform(types.Point{X: r.LL.X, Y: r.LL.Y})
+	p2 := m.Transform(types.Point{X: r.UR.X, Y: r.LL.X})
+	p3 := m.Transform(types.Point{X: r.UR.X, Y: r.UR.Y})
+	p4 := m.Transform(types.Point{X: r.LL.X, Y: r.UR.Y})
+
+	ql := types.QuadLiteral{P1: p1, P2: p2, P3: p3, P4: p4}
 
 	id := fmt.Sprintf("l%d%d", pageNr, len(p.LinkAnnots))
-	ann := pdfcpu.NewLinkAnnotation(
+	ann := model.NewLinkAnnotation(
 		*ql.EnclosingRectangle(5.0),
-		pdfcpu.QuadPoints{ql},
+		types.QuadPoints{ql},
+		nil,
 		ib.Url,
 		id,
-		pdfcpu.AnnNoZoom+pdfcpu.AnnNoRotate,
-		nil)
+		0,
+		nil,
+		false)
 
 	p.LinkAnnots = append(p.LinkAnnots, ann)
 }
@@ -353,11 +423,11 @@ func (ib *ImageBox) prepareMargin() (float64, float64, float64, float64, error) 
 	return mTop, mRight, mBot, mLeft, nil
 }
 
-func (ib *ImageBox) prepareBorder() (float64, *pdfcpu.SimpleColor, pdfcpu.LineJoinStyle, error) {
+func (ib *ImageBox) prepareBorder() (float64, *color.SimpleColor, types.LineJoinStyle, error) {
 
 	bWidth := 0.
-	var bCol *pdfcpu.SimpleColor
-	bStyle := pdfcpu.LJMiter
+	var bCol *color.SimpleColor
+	bStyle := types.LJMiter
 
 	if ib.Border != nil {
 
@@ -415,40 +485,7 @@ func (ib *ImageBox) preparePadding() (float64, float64, float64, float64, error)
 	return pTop, pRight, pBot, pLeft, nil
 }
 
-func (ib *ImageBox) render(p *pdfcpu.Page, pageNr int, images pdfcpu.ImageMap) error {
-
-	mTop, mRight, mBot, mLeft, err := ib.prepareMargin()
-	if err != nil {
-		return err
-	}
-
-	bWidth, bCol, bStyle, err := ib.prepareBorder()
-	if err != nil {
-		return err
-	}
-
-	pTop, pRight, pBot, pLeft, err := ib.preparePadding()
-	if err != nil {
-		return err
-	}
-
-	w, h, id, err := ib.image(p.Im, images, pageNr)
-	if err != nil {
-		return err
-	}
-
-	rSrc := pdfcpu.RectForDim(float64(w), float64(h))
-
-	cBox := ib.dest
-	if ib.content != nil {
-		cBox = ib.content.Box()
-	}
-	r := cBox.CroppedCopy(0)
-	r.LL.X += mLeft
-	r.LL.Y += mBot
-	r.UR.X -= mRight
-	r.UR.Y -= mTop
-
+func (ib *ImageBox) calcDim(rSrc, r *types.Rectangle, bWidth, pTop, pBot, pLeft, pRight float64) {
 	if ib.Width == 0 && ib.Height == 0 {
 		if rSrc.Width() <= r.Width() && rSrc.Height() <= r.Height() {
 			ib.Width = rSrc.Width()
@@ -462,12 +499,30 @@ func (ib *ImageBox) render(p *pdfcpu.Page, pageNr int, images pdfcpu.ImageMap) e
 	} else if ib.Height == 0 {
 		ib.Height = rSrc.ScaledHeight(ib.Width-2*bWidth-pLeft-pRight) + 2*bWidth + pTop + pBot
 	}
+}
+
+func (ib *ImageBox) calcTransform(
+	mLeft, mBot, mRight, mTop,
+	pLeft, pBot, pRight, pTop,
+	bWidth float64, rSrc *types.Rectangle) (matrix.Matrix, float64, float64, float64, float64, *types.Rectangle) {
+
+	cBox := ib.dest
+	if ib.content != nil {
+		cBox = ib.content.Box()
+	}
+	r := cBox.CroppedCopy(0)
+	r.LL.X += mLeft
+	r.LL.Y += mBot
+	r.UR.X -= mRight
+	r.UR.Y -= mTop
+
+	ib.calcDim(rSrc, r, bWidth, pTop, pBot, pLeft, pRight)
 
 	var x, y float64
 	if ib.anchored {
-		x, y = pdfcpu.AnchorPosition(ib.anchor, r, ib.Width, ib.Height)
+		x, y = types.AnchorPosition(ib.anchor, r, ib.Width, ib.Height)
 	} else {
-		x, y = pdfcpu.NormalizeCoord(ib.x, ib.y, cBox, ib.pdf.origin, false)
+		x, y = types.NormalizeCoord(ib.x, ib.y, cBox, ib.pdf.origin, false)
 		if y < 0 {
 			y = cBox.Center().Y - ib.Height/2 - r.LL.Y
 		} else if y > 0 {
@@ -480,7 +535,7 @@ func (ib *ImageBox) render(p *pdfcpu.Page, pageNr int, images pdfcpu.ImageMap) e
 		}
 	}
 
-	dx, dy := pdfcpu.NormalizeOffset(ib.Dx, ib.Dy, ib.pdf.origin)
+	dx, dy := types.NormalizeOffset(ib.Dx, ib.Dy, ib.pdf.origin)
 	x += r.LL.X + dx
 	y += r.LL.Y + dy
 
@@ -496,27 +551,61 @@ func (ib *ImageBox) render(p *pdfcpu.Page, pageNr int, images pdfcpu.ImageMap) e
 		y = r.UR.Y - ib.Height
 	}
 
-	r = pdfcpu.RectForWidthAndHeight(x, y, ib.Width, ib.Height)
+	r = types.RectForWidthAndHeight(x, y, ib.Width, ib.Height)
 	r.LL.X += bWidth / 2
 	r.LL.Y += bWidth / 2
 	r.UR.X -= bWidth / 2
 	r.UR.Y -= bWidth / 2
 
-	if bCol == nil {
-		bCol = &pdfcpu.Black
-	}
-
-	sin := math.Sin(float64(ib.Rotation) * float64(pdfcpu.DegToRad))
-	cos := math.Cos(float64(ib.Rotation) * float64(pdfcpu.DegToRad))
+	sin := math.Sin(float64(ib.Rotation) * float64(matrix.DegToRad))
+	cos := math.Cos(float64(ib.Rotation) * float64(matrix.DegToRad))
 
 	dx = r.LL.X
 	dy = r.LL.Y
 	r.Translate(-r.LL.X, -r.LL.Y)
 
-	dx += ib.Dx + r.Width()/2 + sin*(r.Height()/2) - cos*r.Width()/2
-	dy += ib.Dy + r.Height()/2 - cos*(r.Height()/2) - sin*r.Width()/2
+	dx += r.Width()/2 + sin*(r.Height()/2) - cos*r.Width()/2
+	dy += r.Height()/2 - cos*(r.Height()/2) - sin*r.Width()/2
 
-	m := pdfcpu.CalcTransformMatrix(1, 1, sin, cos, dx, dy)
+	m := matrix.CalcTransformMatrix(1, 1, sin, cos, dx, dy)
+
+	return m, x, y, sin, cos, r
+}
+
+func (ib *ImageBox) render(p *model.Page, pageNr int, images model.ImageMap) error {
+
+	mTop, mRight, mBot, mLeft, err := ib.prepareMargin()
+	if err != nil {
+		return err
+	}
+
+	bWidth, bCol, bStyle, err := ib.prepareBorder()
+	if err != nil {
+		return err
+	}
+	if bCol == nil {
+		bCol = &color.Black
+	}
+
+	pTop, pRight, pBot, pLeft, err := ib.preparePadding()
+	if err != nil {
+		return err
+	}
+
+	w, h, id, err := ib.image(p.Im, images, pageNr)
+	if err != nil {
+		return err
+	}
+
+	missingImg := w == 0 && h == 0
+	if missingImg {
+		w = 200
+	}
+
+	rSrc := types.RectForDim(float64(w), float64(h))
+
+	m, x, y, sin, cos, r := ib.calcTransform(mLeft, mBot, mRight, mTop, pLeft, pBot, pRight, pTop, bWidth, rSrc)
+
 	fmt.Fprintf(p.Buf, "q %.2f %.2f %.2f %.2f %.2f %.2f cm ", m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1])
 
 	if ib.Url != "" {
@@ -528,23 +617,42 @@ func (ib *ImageBox) render(p *pdfcpu.Page, pageNr int, images pdfcpu.ImageMap) e
 		if bWidth == 0 {
 			bCol = ib.bgCol
 		}
-		pdfcpu.FillRect(p.Buf, r, bWidth, bCol, *ib.bgCol, &bStyle)
+		draw.FillRect(p.Buf, r, bWidth, bCol, *ib.bgCol, &bStyle)
 	} else if ib.Border != nil {
-		pdfcpu.DrawRect(p.Buf, r, bWidth, bCol, &bStyle)
+		draw.DrawRect(p.Buf, r, bWidth, bCol, &bStyle)
+	}
+	if ib.pdf.Debug {
+		draw.DrawCircle(p.Buf, r.LL.X, r.LL.Y, 5, color.Black, &color.Red)
 	}
 	fmt.Fprint(p.Buf, "Q ")
 
-	// Render image
-	rDest := pdfcpu.RectForWidthAndHeight(x+bWidth+pLeft, y+bWidth+pBot, ib.Width-2*bWidth-pLeft-pRight, ib.Height-2*bWidth-pTop-pBot)
-	sx, sy, dx, dy, _ := pdfcpu.BestFitRectIntoRect(rSrc, rDest, false)
-	dx += rDest.LL.X
-	dy += rDest.LL.Y
+	if !missingImg {
+		// Render image
+		rDest := types.RectForWidthAndHeight(x+bWidth+pLeft, y+bWidth+pBot, ib.Width-2*bWidth-pLeft-pRight, ib.Height-2*bWidth-pTop-pBot)
+		sx, sy, dx, dy, _ := types.BestFitRectIntoRect(rSrc, rDest, false, false)
+		dx += rDest.LL.X
+		dy += rDest.LL.Y
 
-	dx += ib.Dx + sx/2 + sin*(sy/2) - cos*sx/2
-	dy += ib.Dy + sy/2 - cos*(sy/2) - sin*sx/2
+		dx += sx/2 + sin*(sy/2) - cos*sx/2
+		dy += sy/2 - cos*(sy/2) - sin*sx/2
 
-	m = pdfcpu.CalcTransformMatrix(sx, sy, sin, cos, dx, dy)
-	fmt.Fprintf(p.Buf, "q %.2f %.2f %.2f %.2f %.2f %.2f cm /%s Do Q ", m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1], id)
+		m = matrix.CalcTransformMatrix(sx, sy, sin, cos, dx, dy)
+		fmt.Fprintf(p.Buf, "q %.2f %.2f %.2f %.2f %.2f %.2f cm /%s Do Q ", m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1], id)
+	}
 
 	return nil
+}
+
+// RenderForFill renders ib during form filling.
+func (ib *ImageBox) RenderForFill(pdf *PDF, p *model.Page, pageNr int, imageMap model.ImageMap) error {
+
+	ib.pdf = pdf
+
+	if err := ib.validate(); err != nil {
+		return err
+	}
+
+	ib.dest = p.CropBox
+
+	return ib.render(p, pageNr, imageMap)
 }
