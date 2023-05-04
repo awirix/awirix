@@ -451,15 +451,11 @@ func Lib() *luadoc.Lib {
 				},
 			},
 			{
-				Name:        "markdown_smart",
-				Description: `Gets the readable part of the selection and converts it to Markdown. Similar to reader mode in browsers.`,
-				Value:       selectionMarkdownSmart,
+				Name:        "simplified",
+				Description: `Gets the readable part of the selection (simplified view). Similar to reader mode in browsers.`,
+				Value:       selectionSimplified,
 				Returns: []*luadoc.Param{
-					{
-						Name:        "markdown",
-						Description: `The Markdown representation of the selection.`,
-						Type:        luadoc.String,
-					},
+					selection,
 					{
 						Name:        "error",
 						Description: `An error message if the readable part could not be found.`,
@@ -515,6 +511,24 @@ func Lib() *luadoc.Lib {
 						Name:        "markdown",
 						Description: `The Markdown representation of the document.`,
 						Type:        luadoc.String,
+					},
+				},
+			},
+			{
+				Name:        "simplified",
+				Description: `Gets the readable part of the document (simplified view). Similar to reader mode in browsers.`,
+				Value:       documentSimplified,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "html",
+						Description: `The simplified document`,
+						Type:        documentTypeName,
+					},
+					{
+						Name:        "error",
+						Description: `An error message if the readable part could not be found.`,
+						Type:        luadoc.String,
+						Optional:    true,
 					},
 				},
 			},

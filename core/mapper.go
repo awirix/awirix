@@ -1,4 +1,4 @@
-package scraper
+package core
 
 import "github.com/awirix/gluamapper"
 

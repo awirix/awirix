@@ -3,9 +3,9 @@ package tui
 import (
 	"fmt"
 	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
@@ -52,7 +52,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.pushState(stateError)
 	case msgExtensionLoaded:
 		m.current.extension = msg
-		if m.current.extension.Scraper().HasSearch() {
+		if m.current.extension.Core().HasSearch() {
 			return m, m.pushState(stateSearch)
 		} else {
 			return m, m.handleLayer(nil, m.nextLayer())
@@ -71,7 +71,7 @@ func (m *model) updateLoading(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case msgLayerDone:
 		// tea.Sequence is broken, so use deprecated tea.Sequentially
 		return m, tea.Sequentially(
-			listSetItems[*scraper.Media](
+			listSetItems[*core.Media](
 				msg,
 				m.component.layers[m.nextLayer().String()],
 			),
@@ -242,7 +242,7 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.Reset):
 			m.resetSelected()
 		case key.Matches(msg, m.keyMap.Info):
-			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			media, ok := listGetSelectedItem[*core.Media](thisList).Get()
 			if !ok {
 				goto end
 			}
@@ -256,7 +256,7 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.handleMediaInfo(media),
 			)
 		case key.Matches(msg, m.keyMap.SelectAll):
-			if m.current.extension.Scraper().HasLayers() {
+			if m.current.extension.Core().HasLayers() {
 				goto end
 			}
 
@@ -265,7 +265,7 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.toggleSelect(item.(*lItem))
 			}
 		case key.Matches(msg, m.keyMap.Select):
-			if m.current.extension.Scraper().HasLayers() {
+			if m.current.extension.Core().HasLayers() {
 				goto end
 			}
 
@@ -276,19 +276,19 @@ func (m *model) updateSearchResults(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			m.toggleSelect(item)
 		case key.Matches(msg, m.keyMap.Confirm):
-			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			media, ok := listGetSelectedItem[*core.Media](thisList).Get()
 			if !ok {
 				goto end
 			}
 
-			if m.current.extension.Scraper().HasLayers() {
+			if m.current.extension.Core().HasLayers() {
 				return m, tea.Batch(
 					m.handleLayer(media, m.nextLayer()),
 					m.pushState(stateLoading),
 				)
 			}
 
-			if m.current.extension.Scraper().HasActions() {
+			if m.current.extension.Core().HasActions() {
 				if len(m.selectedMedia) == 0 {
 					item, ok := thisList.SelectedItem().(*lItem)
 					if !ok {
@@ -337,7 +337,7 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.toggleSelect(item.(*lItem))
 			}
 		case key.Matches(msg, m.keyMap.Info):
-			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			media, ok := listGetSelectedItem[*core.Media](thisList).Get()
 			if !ok {
 				goto end
 			}
@@ -363,7 +363,7 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.toggleSelect(item)
 		case key.Matches(msg, m.keyMap.Confirm):
 			if m.nextLayer() == nil {
-				if !m.current.extension.Scraper().HasActions() {
+				if !m.current.extension.Core().HasActions() {
 					goto end
 				}
 
@@ -379,7 +379,7 @@ func (m *model) updateLayer(msg tea.Msg) (tea.Model, tea.Cmd) {
 				return m, m.pushState(stateActionSelect)
 			}
 
-			media, ok := listGetSelectedItem[*scraper.Media](thisList).Get()
+			media, ok := listGetSelectedItem[*core.Media](thisList).Get()
 			if !ok {
 				goto end
 			}
@@ -412,7 +412,7 @@ func (m *model) updateActionSelect(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keyMap.Reverse):
 			return m, listReverseItems(thisList)
 		case key.Matches(msg, m.keyMap.Confirm):
-			action, ok := listGetSelectedItem[*scraper.Action](thisList).Get()
+			action, ok := listGetSelectedItem[*core.Action](thisList).Get()
 			if !ok {
 				goto end
 			}

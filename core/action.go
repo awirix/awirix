@@ -1,4 +1,4 @@
-package scraper
+package core
 
 import (
 	"github.com/awirix/lua"
@@ -6,7 +6,7 @@ import (
 )
 
 type Action struct {
-	scraper *Scraper
+	core *Core
 	*action
 }
 
@@ -25,11 +25,11 @@ func (a *Action) String() string {
 }
 
 func (a *Action) Call(media *Media) error {
-	err := a.scraper.state.CallByParam(lua.P{
+	err := a.core.state.CallByParam(lua.P{
 		Fn:      a.Handler,
 		NRet:    0,
 		Protect: true,
-	}, media.Value(), a.scraper.context)
+	}, media.Value(), a.core.context)
 
 	if err != nil {
 		return errAction(err)
@@ -38,7 +38,7 @@ func (a *Action) Call(media *Media) error {
 	return nil
 }
 
-func (s *Scraper) newAction(table *lua.LTable) (*Action, error) {
+func (c *Core) newAction(table *lua.LTable) (*Action, error) {
 	aux := &action{}
 	err := tableMapper.Map(table, aux)
 
@@ -46,5 +46,5 @@ func (s *Scraper) newAction(table *lua.LTable) (*Action, error) {
 		return nil, errAction(err)
 	}
 
-	return &Action{scraper: s, action: aux}, nil
+	return &Action{core: c, action: aux}, nil
 }

@@ -3,8 +3,8 @@ package tui
 import (
 	"context"
 	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/extension"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/stack"
 	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/help"
@@ -38,7 +38,7 @@ type model struct {
 		state             state
 		extension         *extension.Extension
 		extensionToRemove *extension.Extension
-		layer             *scraper.Layer
+		layer             *core.Layer
 		error             error
 		context           context.Context
 		cancelContext     context.CancelFunc
@@ -135,19 +135,19 @@ func (m *model) resize(width, height int) {
 	m.component.mediaInfo.SetContent(strings.TrimSpace(md))
 }
 
-func (m *model) nextLayer() *scraper.Layer {
-	layers := m.current.extension.Scraper().Layers()
+func (m *model) nextLayer() *core.Layer {
+	layers := m.current.extension.Core().Layers()
 
 	if m.current.layer == nil {
 		return layers[0]
 	}
 
-	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
+	index := slices.IndexFunc(layers, func(l *core.Layer) bool {
 		return l.String() == m.current.layer.String()
 	})
 
 	if index == -1 {
-		panic("current layer is not listed in the scraper")
+		panic("current layer is not listed in the core")
 	}
 
 	if index == len(layers)-1 {
@@ -157,19 +157,19 @@ func (m *model) nextLayer() *scraper.Layer {
 	return layers[index+1]
 }
 
-func (m *model) previousLayer() *scraper.Layer {
-	layers := m.current.extension.Scraper().Layers()
+func (m *model) previousLayer() *core.Layer {
+	layers := m.current.extension.Core().Layers()
 
 	if m.current.layer == nil {
 		return layers[0]
 	}
 
-	index := slices.IndexFunc(layers, func(l *scraper.Layer) bool {
+	index := slices.IndexFunc(layers, func(l *core.Layer) bool {
 		return l.String() == m.current.layer.String()
 	})
 
 	if index == -1 {
-		panic("current layer is not listed in the scraper")
+		panic("current layer is not listed in the core")
 	}
 
 	if index == 0 {
@@ -199,7 +199,7 @@ func (m *model) toggleSelect(item *lItem) {
 
 func (m *model) injectContext(ext *extension.Extension) {
 	ext.SetContext(m.current.context)
-	ext.Scraper().SetExtensionContext(&scraper.Context{
+	ext.Core().SetExtensionContext(&core.Context{
 		Progress: func(message string) {
 			m.text.status = message
 		},

@@ -3,10 +3,10 @@ package mini
 import (
 	"fmt"
 	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/icon"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
 )
 
@@ -25,7 +25,7 @@ type state struct {
 	Extension *extension.Extension
 	Query     string
 	LastSelectedMedia,
-	LastSelectedSearchMedia *scraper.Media
+	LastSelectedSearchMedia *core.Media
 	Action string
 }
 
@@ -40,13 +40,13 @@ func stateSelectExtension(s *state) (err error) {
 		return err
 	}
 
-	progress("Loading scraper")
-	err = s.Extension.LoadScraper(s.Options.Debug)
+	progress("Loading core")
+	err = s.Extension.LoadCore(s.Options.Debug)
 	if err != nil {
 		return err
 	}
 
-	s.Extension.Scraper().SetExtensionContext(&scraper.Context{
+	s.Extension.Core().SetExtensionContext(&core.Context{
 		Progress: progress,
 		Error: func(err error) {
 			// TODO: handle it better
@@ -54,7 +54,7 @@ func stateSelectExtension(s *state) (err error) {
 		},
 	})
 
-	if s.Extension.Scraper().HasSearch() {
+	if s.Extension.Core().HasSearch() {
 		return stateInputQuery(s)
 	}
 
@@ -71,7 +71,7 @@ func stateInputQuery(s *state) (err error) {
 }
 
 func stateSearchMedia(s *state) error {
-	search := s.Extension.Scraper().Search()
+	search := s.Extension.Core().Search()
 	medias, err := search.Call(s.Query)
 	if err != nil {
 		return err
@@ -82,13 +82,13 @@ func stateSearchMedia(s *state) error {
 		return stateInputQuery(s)
 	}
 
-	s.LastSelectedMedia, err = selectOne[*scraper.Media](search.String(), medias, renderMedia)
+	s.LastSelectedMedia, err = selectOne[*core.Media](search.String(), medias, renderMedia)
 	if err != nil {
 		return err
 	}
 	s.LastSelectedSearchMedia = s.LastSelectedMedia
 
-	if s.Extension.Scraper().HasLayers() {
+	if s.Extension.Core().HasLayers() {
 		return stateLayers(s)
 	}
 
@@ -96,7 +96,7 @@ func stateSearchMedia(s *state) error {
 }
 
 func stateLayers(s *state) error {
-	layers := s.Extension.Scraper().Layers()
+	layers := s.Extension.Core().Layers()
 
 	for _, layer := range layers {
 		medias, err := layer.Call(s.LastSelectedMedia)
@@ -106,14 +106,14 @@ func stateLayers(s *state) error {
 
 		if len(medias) == 0 {
 			notFound()
-			if s.Extension.Scraper().HasSearch() {
+			if s.Extension.Core().HasSearch() {
 				return stateSearchMedia(s)
 			}
 
 			return fmt.Errorf("nothing was found")
 		}
 
-		s.LastSelectedMedia, err = selectOne[*scraper.Media](layer.String(), medias, renderMedia)
+		s.LastSelectedMedia, err = selectOne[*core.Media](layer.String(), medias, renderMedia)
 		if err != nil {
 			return err
 		}
@@ -125,11 +125,11 @@ func stateLayers(s *state) error {
 func stateDoAction(s *state) error {
 	var actions = make([]string, 0)
 
-	for _, action := range s.Extension.Scraper().Actions() {
+	for _, action := range s.Extension.Core().Actions() {
 		actions = append(actions, action.String())
 	}
 
-	action, err := selectOne("What do you want to do?", s.Extension.Scraper().Actions(), func(s *scraper.Action) string { return s.String() })
+	action, err := selectOne("What do you want to do?", s.Extension.Core().Actions(), func(s *core.Action) string { return s.String() })
 	if err != nil {
 		return err
 	}
@@ -150,14 +150,14 @@ func stateDoNext(s *state) error {
 	)
 
 	options := []string{optionSelectExtension}
-	if s.Extension.Scraper().HasSearch() {
+	if s.Extension.Core().HasSearch() {
 		options = append(options, optionSearch)
 	}
 
 	var optionLayer string
 
-	if s.Extension.Scraper().HasLayers() {
-		layers := s.Extension.Scraper().Layers()
+	if s.Extension.Core().HasLayers() {
+		layers := s.Extension.Core().Layers()
 		optionLayer = fmt.Sprintf(`Back to the "%s"`, layers[0].String())
 		options = append(options, optionLayer)
 	}

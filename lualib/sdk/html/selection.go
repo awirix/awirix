@@ -325,7 +325,7 @@ func selectionMarkdown(L *lua.LState) int {
 	return 1
 }
 
-func selectionMarkdownSmart(L *lua.LState) int {
+func selectionSimplified(L *lua.LState) int {
 	selection := checkSelection(L, 1)
 
 	html, err := selection.Html()
@@ -344,9 +344,6 @@ func selectionMarkdownSmart(L *lua.LState) int {
 
 	document := goquery.NewDocumentFromNode(article.Node)
 
-	converter := md.NewConverter("", true, nil)
-	markdown := converter.Convert(document.Selection)
-
-	L.Push(lua.LString(markdown))
+	pushSelection(L, document.Selection)
 	return 1
 }

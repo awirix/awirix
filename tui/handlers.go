@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/color"
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
 	"github.com/awirix/awirix/key"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
@@ -44,23 +44,23 @@ $ %[3]s config info -k %[4]s
 			return nil
 		}
 
-		if !ext.IsScraperLoaded() {
-			err := ext.LoadScraper(false)
+		if !ext.IsCoreLoaded() {
+			err := ext.LoadCore(false)
 			if err != nil {
 				return msgError(err)
 			}
 		}
 
-		if ext.Scraper().HasSearch() {
-			search := ext.Scraper().Search()
+		if ext.Core().HasSearch() {
+			search := ext.Core().Search()
 			m.component.searchResults.Title = search.Subtitle()
 			m.component.searchInput.Placeholder = search.Placeholder()
 			m.component.searchResults.SetStatusBarItemName(search.Noun.Singular(), search.Noun.Plural())
 			m.text.searchTitle = search.String()
 		}
 
-		if ext.Scraper().HasLayers() {
-			layers := ext.Scraper().Layers()
+		if ext.Core().HasLayers() {
+			layers := ext.Core().Layers()
 			m.component.layers = make(map[string]*list.Model, len(layers))
 			for i, layer := range layers {
 				lst := m.newList(
@@ -78,7 +78,7 @@ $ %[3]s config info -k %[4]s
 
 		// it returns tea cmd it's just nil if we don't have any filter applied,
 		// so we can safely ignore it here
-		listSetItems(ext.Scraper().Actions(), &m.component.actionSelect)
+		listSetItems(ext.Core().Actions(), &m.component.actionSelect)
 
 		return msgExtensionLoaded(ext)
 	})
@@ -88,7 +88,7 @@ func (m *model) handleSearch(query string) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Searching for " + style.Fg(color.Yellow)(query)
 
-		search := m.current.extension.Scraper().Search()
+		search := m.current.extension.Core().Search()
 		media, err := search.Call(query)
 
 		if err != nil {
@@ -99,7 +99,7 @@ func (m *model) handleSearch(query string) tea.Cmd {
 	})
 }
 
-func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd {
+func (m *model) handleLayer(media *core.Media, layer *core.Layer) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		if media != nil {
 			m.text.status = "Loading " + style.Fg(color.Yellow)(media.String())
@@ -117,13 +117,13 @@ func (m *model) handleLayer(media *scraper.Media, layer *scraper.Layer) tea.Cmd 
 	})
 }
 
-func (m *model) handleAction(action *scraper.Action) tea.Cmd {
+func (m *model) handleAction(action *core.Action) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Performing " + style.Fg(color.Yellow)(action.String())
 
-		var medias = make([]*scraper.Media, 0)
+		var medias = make([]*core.Media, 0)
 		for item := range m.selectedMedia {
-			medias = append(medias, item.Internal().(*scraper.Media))
+			medias = append(medias, item.Internal().(*core.Media))
 		}
 
 		for _, media := range medias {
@@ -137,7 +137,7 @@ func (m *model) handleAction(action *scraper.Action) tea.Cmd {
 	})
 }
 
-func (m *model) handleMediaInfo(media *scraper.Media) tea.Cmd {
+func (m *model) handleMediaInfo(media *core.Media) tea.Cmd {
 	return m.handleWrapper(func() tea.Msg {
 		m.text.status = "Loading info for " + style.Fg(color.Yellow)(media.String())
 		info, err := media.Info()

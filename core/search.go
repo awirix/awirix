@@ -1,4 +1,4 @@
-package scraper
+package core
 
 import (
 	"github.com/awirix/lua"
@@ -7,8 +7,8 @@ import (
 )
 
 type Search struct {
-	scraper *Scraper
-	cache   map[string][]*Media
+	core  *Core
+	cache map[string][]*Media
 	*search
 }
 
@@ -55,17 +55,17 @@ func (s *Search) Call(query string) (subMedia []*Media, err error) {
 		return cached, nil
 	}
 
-	err = s.scraper.state.CallByParam(lua.P{
+	err = s.core.state.CallByParam(lua.P{
 		Fn:      s.Handler,
 		NRet:    1,
 		Protect: true,
-	}, lua.LString(query), s.scraper.context)
+	}, lua.LString(query), s.core.context)
 
 	if err != nil {
 		return nil, errSearch(err)
 	}
 
-	media, err := s.scraper.checkMediaSlice()
+	media, err := s.core.checkMediaSlice()
 	if err != nil {
 		return nil, errSearch(err)
 	}
@@ -74,7 +74,7 @@ func (s *Search) Call(query string) (subMedia []*Media, err error) {
 	return media, nil
 }
 
-func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
+func (c *Core) newSearch(table *lua.LTable) (*Search, error) {
 	aux := &search{}
 	err := tableMapper.Map(table, aux)
 
@@ -86,5 +86,5 @@ func (s *Scraper) newSearch(table *lua.LTable) (*Search, error) {
 		return nil, errSearch(ErrMissingHandler)
 	}
 
-	return &Search{scraper: s, search: aux, cache: make(map[string][]*Media)}, nil
+	return &Search{core: c, search: aux, cache: make(map[string][]*Media)}, nil
 }

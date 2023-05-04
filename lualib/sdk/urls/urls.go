@@ -6,7 +6,10 @@ import (
 	"net/url"
 )
 
-const valuesTypeName = "url_values"
+const (
+	valuesTypeName = "url_values"
+	urlTypeName    = "url_url"
+)
 
 func Lib() *luadoc.Lib {
 	classValues := &luadoc.Class{
@@ -131,10 +134,119 @@ func Lib() *luadoc.Lib {
 		},
 	}
 
+	classURL := &luadoc.Class{
+		Name:        urlTypeName,
+		Description: "Structured URL",
+		Methods: []*luadoc.Method{
+			{
+				Name:        "hostname",
+				Description: "",
+				Value:       urlURLHostname,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "hostname",
+						Description: "URLs hostname",
+						Type:        luadoc.String,
+					},
+				},
+			},
+			{
+				Name:        "parse",
+				Description: "",
+				Value:       urlURLParse,
+				Params: []*luadoc.Param{
+					{
+						Name:        "ref",
+						Description: "",
+						Type:        luadoc.String,
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "",
+						Type:        urlTypeName,
+					},
+				},
+			},
+			{
+				Name:        "string",
+				Description: "",
+				Value:       urlURLString,
+				Returns: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "",
+						Type:        luadoc.String,
+					},
+				},
+			},
+			{
+				Name:        "join_path",
+				Description: "",
+				Value:       urlURLJoinPath,
+				Params: []*luadoc.Param{
+					{
+						Name:        "...",
+						Description: "",
+						Type:        luadoc.String,
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "",
+						Type:        urlTypeName,
+					},
+				},
+			},
+			{
+				Name:        "query",
+				Description: "",
+				Value:       urlURLQuery,
+				Params: []*luadoc.Param{
+					{
+						Name:        "query",
+						Description: "",
+						Type:        valuesTypeName,
+						Optional:    true,
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "query",
+						Description: "",
+						Type:        valuesTypeName,
+						Optional:    true,
+					},
+				},
+			},
+		},
+	}
+
 	return &luadoc.Lib{
 		Name:        "urls",
 		Description: "URLs is a library for working with URLs.",
 		Funcs: []*luadoc.Func{
+			{
+				Name:        "parse",
+				Description: "Parses URL",
+				Value:       urlParse,
+				Params: []*luadoc.Param{
+					{
+						Name:        "raw_url",
+						Description: "URL string to parse",
+						Type:        luadoc.String,
+					},
+				},
+				Returns: []*luadoc.Param{
+					{
+						Name:        "url",
+						Description: "Parsed URL",
+						Type:        urlTypeName,
+					},
+				},
+			},
 			{
 				Name:        "values",
 				Description: "Creates a new values.",
@@ -186,30 +298,6 @@ func Lib() *luadoc.Lib {
 				},
 			},
 			{
-				Name:        "join_path",
-				Description: `Joins any number of path elements into a single path, separating them with slashes. Empty strings are ignored.`,
-				Value:       urlJoinPath,
-				Params: []*luadoc.Param{
-					{
-						Name:        "url",
-						Description: "The URL to join the path to.",
-						Type:        luadoc.String,
-					},
-					{
-						Name:        "paths",
-						Description: "The paths to join.",
-						Type:        luadoc.List(luadoc.String),
-					},
-				},
-				Returns: []*luadoc.Param{
-					{
-						Name:        "url",
-						Description: "The URL with the joined path.",
-						Type:        luadoc.String,
-					},
-				},
-			},
-			{
 				Name:        "query_escape",
 				Description: `Escapes the string so it can be safely placed inside a URL query parameter, replacing special characters (including /) with %XX sequences as needed.`,
 				Value:       urlQueryEscape,
@@ -256,6 +344,7 @@ func Lib() *luadoc.Lib {
 		},
 		Classes: []*luadoc.Class{
 			classValues,
+			classURL,
 		},
 	}
 }
@@ -275,6 +364,21 @@ func pushValues(L *lua.LState, v *url.Values) {
 	L.Push(ud)
 }
 
+func checkURL(L *lua.LState, idx int) *url.URL {
+	u, ok := L.CheckUserData(idx).Value.(*url.URL)
+	if !ok {
+		L.ArgError(idx, "expected `url`")
+	}
+	return u
+}
+
+func pushURL(L *lua.LState, u *url.URL) {
+	ud := L.NewUserData()
+	ud.Value = u
+	L.SetMetatable(ud, L.GetTypeMetatable(urlTypeName))
+	L.Push(ud)
+}
+
 func urlPathEscape(L *lua.LState) int {
 	s := L.CheckString(1)
 	L.Push(lua.LString(url.PathEscape(s)))
@@ -290,30 +394,6 @@ func urlPathUnescape(L *lua.LState) int {
 		return 2
 	}
 	L.Push(lua.LString(s))
-	return 1
-}
-
-func urlJoinPath(L *lua.LState) int {
-	base := L.CheckString(1)
-	rels := L.CheckTable(2)
-
-	var paths []string
-	rels.ForEach(func(k lua.LValue, v lua.LValue) {
-		if s, ok := v.(lua.LString); ok {
-			paths = append(paths, string(s))
-		} else {
-			L.ArgError(2, "expected a list of strings")
-		}
-	})
-
-	joined, err := url.JoinPath(base, paths...)
-	if err != nil {
-		L.Push(lua.LNil)
-		L.Push(lua.LString(err.Error()))
-		return 2
-	}
-
-	L.Push(lua.LString(joined))
 	return 1
 }
 
@@ -392,5 +472,76 @@ func urlValuesHas(L *lua.LState) int {
 	v := checkValues(L, 1)
 	key := L.CheckString(2)
 	L.Push(lua.LBool(v.Has(key)))
+	return 1
+}
+
+func urlParse(L *lua.LState) int {
+	rawURL := L.CheckString(1)
+
+	u, err := url.Parse(rawURL)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	pushURL(L, u)
+	return 1
+}
+
+func urlURLHostname(L *lua.LState) int {
+	u := checkURL(L, 1)
+
+	L.Push(lua.LString(u.Hostname()))
+	return 1
+}
+
+func urlURLQuery(L *lua.LState) int {
+	u := checkURL(L, 1)
+
+	if L.GetTop() == 1 {
+		values := u.Query()
+		pushValues(L, &values)
+		return 1
+	} else { // >= 2
+		values := checkValues(L, 2)
+		u.RawQuery = values.Encode()
+		return 0
+	}
+}
+
+func urlURLJoinPath(L *lua.LState) int {
+	u := checkURL(L, 1)
+
+	top := L.GetTop()
+	elems := make([]string, top-1)
+
+	for i := 2; i <= top; i++ {
+		elems[i-2] = L.CheckString(i)
+	}
+
+	pushURL(L, u.JoinPath(elems...))
+	return 1
+}
+
+func urlURLParse(L *lua.LState) int {
+	u := checkURL(L, 1)
+	ref := L.CheckString(2)
+
+	parsed, err := u.Parse(ref)
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	pushURL(L, parsed)
+	return 1
+}
+
+func urlURLString(L *lua.LState) int {
+	u := checkURL(L, 1)
+
+	L.Push(lua.LString(u.String()))
 	return 1
 }

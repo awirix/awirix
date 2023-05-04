@@ -34,7 +34,8 @@ func Update(ext *extension.Extension) (*extension.Extension, error) {
 }
 
 func updateClone(progress func(string), ext *extension.Extension) error {
-	if ext.Passport().Repository == nil {
+	repo, ok := ext.Passport().Repository.Get()
+	if !ok {
 		return fmt.Errorf("no repository specified in the passport")
 	}
 
@@ -50,7 +51,7 @@ func updateClone(progress func(string), ext *extension.Extension) error {
 
 	progress("Cloning repository")
 	_, err = git.PlainClone(tmpPath, false, &git.CloneOptions{
-		URL:   ext.Passport().Repository.URL(),
+		URL:   repo.URL(),
 		Depth: 1,
 	})
 

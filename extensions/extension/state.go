@@ -2,11 +2,11 @@ package extension
 
 import (
 	"context"
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/log"
 	"github.com/awirix/awirix/lualib"
 	"github.com/awirix/awirix/luautil"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/where"
 	"github.com/awirix/lua"
 	"github.com/spf13/viper"
@@ -75,6 +75,6 @@ func inject(ext *Extension, L *lua.LState) {
 		}, nil),
 	}, nil)
 
-	L.SetGlobal(scraper.GlobalExtension, table)
+	L.SetGlobal(core.GlobalExtension, table)
 	L.SetContext(context.WithValue(context.Background(), "extension", ext))
 }

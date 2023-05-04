@@ -1,4 +1,4 @@
-package scraper
+package core
 
 import (
 	"github.com/awirix/lua"
@@ -7,7 +7,7 @@ import (
 )
 
 type Media struct {
-	scraper  *Scraper
+	core     *Core
 	internal lua.LValue
 	*media
 }
@@ -39,26 +39,26 @@ func (m *Media) HasInfo() bool {
 }
 
 func (m *Media) Info() (string, error) {
-	err := m.scraper.state.CallByParam(lua.P{
+	err := m.core.state.CallByParam(lua.P{
 		Fn:      m.media.Info,
 		NRet:    1,
 		Protect: true,
-	}, m.internal, m.scraper.context)
+	}, m.internal, m.core.context)
 
 	if err != nil {
 		return "", errMedia(err)
 	}
 
-	info := m.scraper.state.CheckAny(-1)
+	info := m.core.state.CheckAny(-1)
 	if info.Type() != lua.LTString {
 		return "", errMedia(errors.New("info must be a string"))
 	}
 
-	m.scraper.state.Pop(1)
+	m.core.state.Pop(1)
 	return info.String(), nil
 }
 
-func (s *Scraper) newMedia(table *lua.LTable) (*Media, error) {
+func (c *Core) newMedia(table *lua.LTable) (*Media, error) {
 	aux := &media{}
 	err := tableMapper.Map(table, aux)
 
@@ -73,5 +73,5 @@ func (s *Scraper) newMedia(table *lua.LTable) (*Media, error) {
 	aux.Title = strings.TrimSpace(aux.Title)
 	aux.Description = strings.TrimSpace(aux.Description)
 
-	return &Media{scraper: s, media: aux, internal: table}, nil
+	return &Media{core: c, media: aux, internal: table}, nil
 }

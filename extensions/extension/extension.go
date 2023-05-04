@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/passport"
 	"github.com/awirix/awirix/filename"
 	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/key"
 	"github.com/awirix/awirix/log"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/tester"
 	"github.com/awirix/awirix/where"
 	"github.com/awirix/lua"
@@ -32,7 +32,7 @@ func errMissing(name string) error {
 type Extension struct {
 	path     string
 	passport *passport.Passport
-	scraper  *scraper.Scraper
+	core     *core.Core
 	tester   *tester.Tester
 	state    *lua.LState
 }
@@ -64,7 +64,7 @@ func (e *Extension) loadPassport() error {
 	return nil
 }
 
-func (e *Extension) LoadScraper(debug bool) error {
+func (e *Extension) LoadCore(debug bool) error {
 	e.initState(debug)
 
 	path := filepath.Join(e.Path(), filename.MainLua)
@@ -83,12 +83,12 @@ func (e *Extension) LoadScraper(debug bool) error {
 	}
 	defer file.Close()
 
-	theScraper, err := scraper.New(e.state, file)
+	theCore, err := core.New(e.state, file)
 	if err != nil {
 		return errExtension(err)
 	}
 
-	theScraper.SetExtensionContext(&scraper.Context{
+	theCore.SetExtensionContext(&core.Context{
 		Progress: func(message string) {
 			log.Tracef("%s: progress: %s", e, message)
 		},
@@ -96,7 +96,7 @@ func (e *Extension) LoadScraper(debug bool) error {
 			log.Tracef("%s: error: %s", e, err)
 		},
 	})
-	e.scraper = theScraper
+	e.core = theCore
 	return nil
 }
 
@@ -128,19 +128,14 @@ func (e *Extension) LoadTester(debug bool) error {
 	return nil
 }
 
-func (e *Extension) IsScraperLoaded() bool {
-	return e.scraper != nil
+func (e *Extension) IsCoreLoaded() bool {
+	return e.core != nil
 }
 
 func (e *Extension) String() string {
 	var b strings.Builder
 
 	b.WriteString(e.Passport().Name)
-
-	if viper.GetBool(key.IconShowExtensionIcon) && e.Passport().Icon != "" {
-		b.WriteRune(' ')
-		b.WriteString(e.Passport().Icon.String())
-	}
 
 	if viper.GetBool(key.IconShowExtensionFlag) {
 		flag, err := emoji.CountryFlag(e.Passport().Language.Code)
@@ -160,8 +155,8 @@ func (e *Extension) Passport() *passport.Passport {
 	return e.passport
 }
 
-func (e *Extension) Scraper() *scraper.Scraper {
-	return e.scraper
+func (e *Extension) Core() *core.Core {
+	return e.core
 }
 
 func (e *Extension) Tester() *tester.Tester {

@@ -3,14 +3,20 @@ package cmd
 import (
 	"fmt"
 	"github.com/AlecAivazis/survey/v2"
+	"github.com/awirix/awirix/app"
 	"github.com/awirix/awirix/color"
 	"github.com/awirix/awirix/extensions/extension"
 	"github.com/awirix/awirix/extensions/manager"
+	"github.com/awirix/awirix/filesystem"
 	"github.com/awirix/awirix/icon"
+	"github.com/awirix/awirix/log"
+	"github.com/awirix/awirix/lualib"
 	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/text"
+	"github.com/awirix/lua"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"
+	"os"
 	"regexp"
 )
 
@@ -177,7 +183,7 @@ var xSelCmd = &cobra.Command{
 
 		switch {
 		case lo.Must(cmd.Flags().GetBool("run")):
-			handleErr(ext.LoadScraper(true))
+			handleErr(ext.LoadCore(true))
 
 		case lo.Must(cmd.Flags().GetBool("test")):
 			handleErr(ext.LoadTester(true))
@@ -230,7 +236,7 @@ var xUpCmd = &cobra.Command{
 		handleErr(err)
 
 		for _, ext := range extensions {
-			if ext.Passport().Repository == nil {
+			if ext.Passport().Repository.IsAbsent() {
 				if lo.Must(cmd.Flags().GetBool("verbose")) {
 					printWarning(fmt.Sprintf("skipping %s, no repository specified", style.Fg(color.Purple)(ext.String())))
 				}
@@ -245,8 +251,8 @@ var xUpCmd = &cobra.Command{
 			}
 
 			var outcome string
-			if updated.Passport().Version.Compare(ext.Passport().Version) > 0 {
-				outcome = fmt.Sprintf("updated %s => %s", ext.Passport().Version, updated.Passport().Version)
+			if updated.Passport().Version.Compare(&ext.Passport().Version) > 0 {
+				outcome = fmt.Sprintf("updated %s => %s", ext.Passport().Version.String(), updated.Passport().Version.String())
 			} else {
 				outcome = "already up to date"
 			}
@@ -266,5 +272,32 @@ var xHealthCmd = &cobra.Command{
 	Args:  cobra.NoArgs,
 	Run: func(cmd *cobra.Command, args []string) {
 		manager.Health(cmd.OutOrStdout())
+	},
+}
+
+func init() {
+	xLibCmd.Flags().BoolP("stdout", "s", false, "write output to stdout")
+	xCmd.AddCommand(xLibCmd)
+}
+
+var xLibCmd = &cobra.Command{
+	Use:   "lib",
+	Short: "Generate library hints",
+	Args:  cobra.NoArgs,
+	Run: func(cmd *cobra.Command, args []string) {
+		state := lua.NewState(nil)
+		lib := lualib.Lib(state)
+		doc := lib.LuaDoc()
+
+		if lo.Must(cmd.Flags().GetBool("stdout")) {
+			fmt.Println(doc)
+		} else {
+			filename := app.Name + ".lua"
+			err := filesystem.Api().WriteFile(filename, []byte(doc), os.ModePerm)
+			handleErr(err)
+
+			_, err = log.WriteSuccessf(os.Stderr, "%s generated\n", filename)
+			handleErr(err)
+		}
 	},
 }

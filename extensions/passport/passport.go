@@ -9,10 +9,10 @@ import (
 	"github.com/awirix/awirix/language"
 	"github.com/awirix/awirix/style"
 	"github.com/awirix/awirix/version"
-	"github.com/enescakir/emoji"
 	"github.com/mvdan/xurls"
 	"github.com/pkg/errors"
 	"github.com/samber/lo"
+	"github.com/samber/mo"
 	"io"
 	"net/url"
 	"strings"
@@ -20,17 +20,17 @@ import (
 )
 
 type Passport struct {
-	Icon       emoji.Emoji        `json:"-"`
-	Name       string             `json:"name"`
-	ID         string             `json:"id"`
-	About      string             `json:"about"`
-	Version    *version.Version   `json:"version"`
-	Language   *language.Language `json:"language"`
-	Authors    []string           `json:"authors"`
-	NSFW       bool               `json:"nsfw"`
-	Tags       []string           `json:"tags,omitempty"`
-	Repository *github.Repository `json:"repository,omitempty"`
-	Programs   []string           `json:"programs,omitempty"`
+	Name       string                       `json:"name"`
+	ID         string                       `json:"id"`
+	About      string                       `json:"about"`
+	Version    version.Version              `json:"version"`
+	Awirix     version.Version              `json:"awirix"`
+	Language   language.Language            `json:"language"`
+	Authors    []string                     `json:"authors"`
+	NSFW       bool                         `json:"nsfw"`
+	Tags       []string                     `json:"tags"`
+	Repository mo.Option[github.Repository] `json:"repository"`
+	Programs   []string                     `json:"programs"`
 }
 
 func errPassport(err error) error {
@@ -129,10 +129,10 @@ func (p *Passport) Validate() error {
 		return errPassport(fmt.Errorf("name is empty"))
 	}
 
-	if p.Repository != nil {
+	if repo, ok := p.Repository.Get(); ok {
 		for _, t := range []*lo.Tuple2[string, string]{
-			{"name", p.Repository.Name},
-			{"owner", p.Repository.Owner},
+			{"name", repo.Name},
+			{"owner", repo.Owner},
 		} {
 			if t.B == "" {
 				return errPassport(fmt.Errorf("missing required field in repo: %s", t.A))

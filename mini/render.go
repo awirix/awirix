@@ -1,12 +1,12 @@
 package mini
 
 import (
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/extension"
-	"github.com/awirix/awirix/scraper"
 	"github.com/awirix/awirix/style"
 )
 
-func renderMedia(media *scraper.Media) (rendered string) {
+func renderMedia(media *core.Media) (rendered string) {
 	rendered += media.String()
 
 	if description := media.Description(); description != "" {

@@ -22,7 +22,6 @@ const (
 )
 
 const (
-	IconShowExtensionIcon = "icon.show_extension_icon"
 	IconShowExtensionFlag = "icon.show_extension_flag"
 )
 

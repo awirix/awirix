@@ -1,4 +1,4 @@
-package scraper
+package core
 
 type Noun struct {
 	noun `lua:",squash"`

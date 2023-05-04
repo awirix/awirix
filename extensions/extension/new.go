@@ -106,17 +106,12 @@ func GenerateInteractive() (*Extension, error) {
 				return nil
 			},
 			Transform: func(ans any) (newAns any) {
-				var tags []string
+				var tags = strings.Split(strings.Trim(ans.(string), ", "), ",")
 
-				for _, tag := range strings.Split(strings.Trim(ans.(string), ", "), ",") {
-					if tag == "" {
-						continue
-					}
-
-					tags = append(tags, strings.TrimSpace(tag))
-				}
-
-				return tags
+				return lo.FilterMap(tags, func(tag string, _ int) (string, bool) {
+					tag = strings.TrimSpace(tag)
+					return tag, tag != ""
+				})
 			},
 		},
 		{
@@ -163,9 +158,10 @@ func GenerateInteractive() (*Extension, error) {
 		Name:     answers.Name,
 		ID:       passport.ToID(answers.Name),
 		About:    answers.About,
-		Version:  version.MustParse("0.1.0"),
+		Version:  *version.MustParse("0.1.0"),
+		Awirix:   *app.Version,
 		Tags:     answers.Tags,
-		Language: lang,
+		Language: *lang,
 		NSFW:     answers.Nsfw,
 	}
 
@@ -234,13 +230,19 @@ func GenerateInteractive() (*Extension, error) {
 	}
 
 	if viper.GetBool(key.ExtensionsNewInitGitRepo) {
-		git.PlainInit(path, false)
+		_, err = git.PlainInit(path, false)
+		if err != nil {
+			return nil, errExtension(err)
+		}
 	}
 
 	if viper.GetBool(key.ExtensionsNewAddLibraryDoc) {
 		state := lua.NewState(nil)
 		lib := lualib.Lib(state)
-		filesystem.Api().WriteFile(filepath.Join(path, fmt.Sprintf("%s.lua", app.Name)), []byte(lib.LuaDoc()), os.ModePerm)
+		err = filesystem.Api().WriteFile(filepath.Join(path, fmt.Sprintf("%s.lua", app.Name)), []byte(lib.LuaDoc()), os.ModePerm)
+		if err != nil {
+			return nil, errExtension(err)
+		}
 	}
 
 	return New(path)

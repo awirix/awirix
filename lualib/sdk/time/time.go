@@ -85,8 +85,13 @@ func checkTime(L *lua.LState, n int) time.Time {
 }
 
 func timeSleep(L *lua.LState) int {
-	d := time.Duration(L.CheckInt64(1))
-	time.Sleep(d)
+	delay := time.Duration(L.CheckInt64(1))
+
+	select {
+	case <-L.Context().Done():
+	case <-time.After(delay):
+	}
+
 	return 0
 }
 

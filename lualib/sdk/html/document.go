@@ -4,6 +4,7 @@ import (
 	md "github.com/JohannesKaufmann/html-to-markdown"
 	"github.com/PuerkitoBio/goquery"
 	lua "github.com/awirix/lua"
+	"github.com/cixtor/readability"
 	"strings"
 )
 
@@ -73,5 +74,27 @@ func documentMarkdown(L *lua.LState) int {
 	converter := md.NewConverter("", true, nil)
 
 	L.Push(lua.LString(converter.Convert(document.Selection)))
+	return 1
+}
+
+func documentSimplified(L *lua.LState) int {
+	document := checkDocument(L, 1)
+	html, err := document.Html()
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	article, err := readability.New().Parse(strings.NewReader(html), "https://example.com")
+	if err != nil {
+		L.Push(lua.LNil)
+		L.Push(lua.LString(err.Error()))
+		return 2
+	}
+
+	document = goquery.NewDocumentFromNode(article.Node)
+
+	pushDocument(L, document)
 	return 1
 }

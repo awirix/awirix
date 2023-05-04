@@ -48,6 +48,9 @@ func (m *model) newList(title, singular, plural string, statusMessageLifetime *t
 		SelectedDesc.
 		Border(border, false, false, false, true)
 
+	// remove filter matching style
+	delegate.Styles.FilterMatch = lipgloss.NewStyle()
+
 	l := list.New(nil, delegate, 0, 0)
 	l.Title = title
 

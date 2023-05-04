@@ -122,11 +122,6 @@ and the extension will be unable to access the filesystem outside of API methods
 
 	// ICON
 	{
-		key.IconShowExtensionIcon,
-		true,
-		"Show extension's icon",
-	},
-	{
 		key.IconShowExtensionFlag,
 		false,
 		"Show extension's flag based on its language",

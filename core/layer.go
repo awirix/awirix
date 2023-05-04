@@ -1,4 +1,4 @@
-package scraper
+package core
 
 import (
 	"github.com/awirix/lua"
@@ -6,8 +6,8 @@ import (
 )
 
 type Layer struct {
-	scraper *Scraper
-	cache   map[*Media][]*Media
+	core  *Core
+	cache map[*Media][]*Media
 	*layer
 }
 
@@ -41,17 +41,17 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 		value = lua.LNil
 	}
 
-	err = l.scraper.state.CallByParam(lua.P{
+	err = l.core.state.CallByParam(lua.P{
 		Fn:      l.Handler,
 		NRet:    1,
 		Protect: true,
-	}, value, l.scraper.context)
+	}, value, l.core.context)
 
 	if err != nil {
 		return nil, errLayer(err)
 	}
 
-	medias, err := l.scraper.checkMediaSlice()
+	medias, err := l.core.checkMediaSlice()
 	if err != nil {
 		return nil, errLayer(err)
 	}
@@ -60,7 +60,7 @@ func (l *Layer) Call(media *Media) (subMedia []*Media, err error) {
 	return medias, nil
 }
 
-func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
+func (c *Core) newLayer(table *lua.LTable) (*Layer, error) {
 	aux := &layer{}
 	err := tableMapper.Map(table, aux)
 
@@ -76,5 +76,5 @@ func (s *Scraper) newLayer(table *lua.LTable) (*Layer, error) {
 		return nil, errLayer(ErrMissingHandler)
 	}
 
-	return &Layer{scraper: s, layer: aux, cache: make(map[*Media][]*Media)}, nil
+	return &Layer{core: c, layer: aux, cache: make(map[*Media][]*Media)}, nil
 }

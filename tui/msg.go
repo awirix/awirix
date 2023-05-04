@@ -1,16 +1,16 @@
 package tui
 
 import (
+	"github.com/awirix/awirix/core"
 	"github.com/awirix/awirix/extensions/extension"
-	"github.com/awirix/awirix/scraper"
 )
 
 type (
 	msgExtensionLoaded  *extension.Extension
-	msgSearchDone       []*scraper.Media
-	msgLayerDone        []*scraper.Media
+	msgSearchDone       []*core.Media
+	msgLayerDone        []*core.Media
 	msgLayerItemsSet    struct{}
-	msgActionDone       *scraper.Action
+	msgActionDone       *core.Action
 	msgMediaInfoDone    struct{}
 	msgError            error
 	msgExtensionRemoved *extension.Extension

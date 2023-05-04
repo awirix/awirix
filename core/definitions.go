@@ -1,6 +1,6 @@
-package scraper
+package core
 
-const Module = "scraper"
+const Module = "main"
 
 const (
 	GlobalExtension = "Extension"
